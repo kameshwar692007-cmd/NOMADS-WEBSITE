@@ -8,11 +8,9 @@ function drawArtwork(ctx, image) {
   // Cover the non-interactive logo/menu/map graphics baked into the original art.
   // React's real Header renders functional controls above this world.
   ctx.fillStyle = '#0a1426';
-  ctx.fillRect(0, 0, 436, 82);
-  ctx.fillRect(1380, 0, 292, 82);
+  ctx.fillRect(0, 0, WORLD_WIDTH, 82);
   ctx.fillStyle = '#c83246';
-  ctx.fillRect(0, 80, 436, 2);
-  ctx.fillRect(1380, 80, 292, 2);
+  ctx.fillRect(0, 80, WORLD_WIDTH, 2);
 
   // The source illustration contains a smudged, ghost-like artifact below
   // the fountain. Rebuild that segment from intact mirrored pixel pavement.
