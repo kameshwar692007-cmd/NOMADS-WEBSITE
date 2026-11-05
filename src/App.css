@@ -1339,3 +1339,35 @@ html, body {
   .game-action-message,.game-travel-status{bottom:84px;}
   .game-action-message{bottom:120px;}
 }
+
+
+/* Compact campus directory: show locations without hiding the entire game. */
+.directory-backdrop{
+  background:transparent;
+  backdrop-filter:none;
+  align-items:flex-start;
+  justify-content:flex-end;
+  padding:64px 18px 18px;
+  pointer-events:none;
+}
+.directory-panel{
+  pointer-events:auto;
+  max-width:345px;
+  max-height:calc(100dvh - 84px);
+  overflow-y:auto;
+  border:1px solid rgba(192,203,220,.65);
+  background:rgba(13,23,40,.97);
+  box-shadow:0 14px 34px rgba(0,0,0,.48);
+}
+.directory-header{padding:13px 17px;}
+.directory-list{gap:1px;padding:7px;}
+.directory-item{padding:8px 10px;gap:9px;}
+.directory-item-badge{width:32px;height:32px;}
+.directory-badge-img{width:22px;height:22px;}
+.directory-item-name{font-size:12px;}
+.directory-item-tagline{font-size:10px;}
+@media(max-width:768px){
+ .directory-backdrop{padding:56px 9px 0;}
+ .directory-panel{max-width:min(340px,calc(100vw - 18px));max-height:calc(100dvh - 116px);}
+ .directory-item{padding:10px 8px;}
+}
