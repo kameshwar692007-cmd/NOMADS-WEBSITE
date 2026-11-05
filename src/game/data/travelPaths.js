@@ -107,3 +107,21 @@ export function buildTravelPath(fromX,fromY,destinationId){
  return destinationId==='event-grounds'?eventPath(start,end):shortestPath(start,end);
 }
 export function getSpawnPoint(){return {...PLAZA_CENTER};}
+
+/**
+ * Click/tap-to-move on arbitrary walkable ground.
+ * Clamp the requested point and snap inaccessible taps to the nearest
+ * navigable grid center instead of allowing the player inside obstacles.
+ */
+export function buildPathToPoint(fromX,fromY,targetX,targetY){
+ const start={x:fromX,y:fromY};
+ const desired={
+  x:Math.max(48,Math.min(WORLD_WIDTH-48,targetX)),
+  y:Math.max(100,Math.min(WORLD_HEIGHT-64,targetY))
+ };
+ const goalId=nearestFree(desired);
+ if(goalId===null)return [];
+ let end=desired;
+ if(checkFootCollision(end.x,end.y))end=pointOf(goalId);
+ return shortestPath(start,end);
+}

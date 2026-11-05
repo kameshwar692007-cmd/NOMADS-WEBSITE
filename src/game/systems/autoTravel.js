@@ -29,6 +29,17 @@ export class AutoTravelSystem {
     return true;
   }
 
+  startPath(path, onArrive = null) {
+    this.cancel();
+    if (!path || path.length === 0) return false;
+    this.active = true;
+    this.destinationId = null;
+    this.waypoints = path;
+    this.index = 0;
+    this.onArrive = onArrive;
+    return true;
+  }
+
   cancel() {
     this.active = false;
     this.destinationId = null;

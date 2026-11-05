@@ -1,6 +1,7 @@
 // Approved campus art with repaired UI and plaza overlays.
 // All coordinates are in world pixels; gameplay remains on a separate moving layer.
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../data/mapData.js';
+import { getNomadHeroFrame } from './nomadHero.js';
 
 function drawArtwork(ctx, image) {
   ctx.drawImage(image, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -25,17 +26,16 @@ function drawArtwork(ctx, image) {
   ctx.restore();
 }
 
-function drawPlayer(ctx, assets, player, elapsed) {
+function drawPlayer(ctx, player, elapsed) {
   const {x, y, direction, moving} = player;
-  const walkingPose = moving && Math.floor(elapsed / 170) % 2 === 0;
-  const state = walkingPose ? 'walk' : 'idle';
-  const sprite = assets[`player/player-${state}-${direction}`];
-  const px = Math.round(x + 3), py = Math.round(y + 2);
+  // Fixed 32x48 world footprint for all directions and animation phases.
+  const sprite = getNomadHeroFrame(direction, elapsed, moving);
+  const px = Math.round(x), py = Math.round(y);
   ctx.fillStyle = 'rgba(4,8,14,.22)';
   ctx.beginPath();
-  ctx.ellipse(px + 13, py + 37, 7, 2.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(px + 16, py + 41, 9, 3, 0, 0, Math.PI*2);
   ctx.fill();
-  if (sprite && sprite.width > 1) ctx.drawImage(sprite, px, py, 26, 39);
+  ctx.drawImage(sprite, px, py, 32, 48);
 }
 
 export function renderWorld(ctx, assets, camera, player, zoom, width, height, elapsed) {
@@ -48,7 +48,7 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   ctx.translate(-Math.round(camera.x), -Math.round(camera.y));
   const campus = assets['world/campus'];
   if (campus?.width) drawArtwork(ctx, campus);
-  drawPlayer(ctx, assets, player, elapsed);
+  drawPlayer(ctx, player, elapsed);
   ctx.restore();
 }
 
