@@ -8,5 +8,9 @@ function loadImage(url){
  });
 }
 export async function loadAllAssets(){
- return {'world/campus':await loadImage('/assets/game/campus-world.png')};
+ const [campus,hero]=await Promise.all([
+  loadImage('/assets/game/campus-world.png'),
+  loadImage('/assets/game/characters/player/nomad-hero.svg')
+ ]);
+ return {'world/campus':campus,'player/nomad-hero':hero};
 }
