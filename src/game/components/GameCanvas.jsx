@@ -16,6 +16,9 @@ function getZoom(rect,isMobile){
 }
 export default function GameCanvas({
   onLocationInteract,
+  onDirectoryOpen,
+  onMapOpen,
+  onMenuOpen,
   isMobile,
   directoryTravelTarget,
   onDirectoryTravelConsumed
@@ -72,6 +75,13 @@ export default function GameCanvas({
       (e.clientY-rect.top)*dpr,
       cameraRef.current,zoom*dpr,canvas.width,canvas.height
     );
+    // The original approved artwork has designed Menu / Map signs.
+    // Use real hitboxes instead of drawing opaque masking rectangles over them.
+    if(point.y >= 0 && point.y <= 82){
+      if(point.x >= 1203 && point.x <= 1375){onDirectoryOpen?.();return;}
+      if(point.x >= 1380 && point.x <= 1536){onMenuOpen?.();return;}
+      if(point.x >= 1537 && point.x <= 1672){onMapOpen?.();return;}
+    }
     const building=findClickedBuilding(point.x,point.y);
     if(building){goToLocation(building.id);return;}
     const player=playerRef.current;
@@ -79,7 +89,7 @@ export default function GameCanvas({
     const started=travelRef.current.startPath(path,()=>setTraveling(false));
     setTraveling(started);
     setMessage(started?'':'That area is not walkable. Tap a pathway or select a building.');
-  },[isMobile,goToLocation]);
+  },[isMobile,goToLocation,onDirectoryOpen,onMapOpen,onMenuOpen]);
 
   useEffect(()=>{
     if(!loaded)return;
