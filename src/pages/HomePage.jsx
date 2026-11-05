@@ -63,17 +63,20 @@ export default function HomePage() {
 
   return (
     <div className="homepage-frame">
-      {/* 1. Minimal Header (Brand on left; DIRECTORY, MAP, MENU on right) */}
-      <Header 
+      {/* On narrow screens the world-image corner buttons are offscreen.
+          Keep accessible fixed controls on mobile only. */}
+      {isMobile && <Header
         onDirectoryOpen={() => setDirectoryOpen(true)}
         onMapOpen={() => setMapOpen(true)}
         onMenuOpen={() => setMenuOpen(true)}
-      />
-
+      />}
       {/* 2. Interactive Explorable Canvas World */}
       <main className="game-viewport">
         <GameCanvas 
           onLocationInteract={handleLocationInteract}
+          onDirectoryOpen={() => setDirectoryOpen(true)}
+          onMapOpen={() => setMapOpen(true)}
+          onMenuOpen={() => setMenuOpen(true)}
           isMobile={isMobile}
           directoryTravelTarget={travelTarget}
           onDirectoryTravelConsumed={handleTravelConsumed}

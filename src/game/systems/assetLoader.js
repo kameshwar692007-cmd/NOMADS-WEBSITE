@@ -10,7 +10,7 @@ function loadImage(url){
 export async function loadAllAssets(){
  const [campus,hero]=await Promise.all([
   loadImage('/assets/game/campus-world.png'),
-  loadImage('/assets/game/characters/player/nomad-hero.svg')
+  loadImage('/assets/game/characters/player/uploaded-hero.png')
  ]);
- return {'world/campus':campus,'player/nomad-hero':hero};
+ return {'world/campus':campus,'player/uploaded-hero':hero};
 }
