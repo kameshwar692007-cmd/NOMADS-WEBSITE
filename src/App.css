@@ -1279,3 +1279,63 @@ html, body {
   transform-origin: left bottom;
   opacity: .92;
 }
+
+
+/* Click/tap-only headquarters: universal guidance and touch-accessible overlays */
+.click-only-hints{
+  position:fixed;
+  left:50%;
+  bottom:12px;
+  transform:translateX(-50%);
+  width:max-content;
+  max-width:calc(100vw - 28px);
+  padding:10px 16px;
+  background:rgba(10,18,34,.94);
+  border:1px solid rgba(192,203,220,.55);
+  border-radius:12px;
+  box-shadow:0 5px 20px rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  z-index:35;
+  pointer-events:none;
+}
+.click-only-hints .hint-label{font-size:12px;font-weight:650;color:#f8fafc;white-space:normal;}
+.click-only-hints .hint-separator{color:#e84537;}
+.touch-hints{
+  bottom:max(8px,env(safe-area-inset-bottom));
+  width:calc(100vw - 22px);
+  gap:4px 7px;
+  padding:9px 12px;
+  border-radius:10px;
+}
+.touch-hints .hint-label{font-size:11px;}
+.game-action-message,.game-travel-status{
+  position:absolute;
+  left:50%;
+  bottom:70px;
+  transform:translateX(-50%);
+  z-index:36;
+  background:rgba(10,18,34,.94);
+  border:1px solid #8b9bb4;
+  color:#f8fafc;
+  border-radius:9px;
+  font-size:12px;
+  padding:8px 13px;
+  max-width:min(450px,90vw);
+  text-align:center;
+  pointer-events:none;
+}
+.game-action-message{border-color:#c83246;bottom:105px;}
+.world-canvas{touch-action:manipulation;cursor:crosshair;}
+@media(max-width:768px){
+  .game-header{padding:0 10px;height:52px;}
+  .header-brand-name{font-size:11px;}
+  .header-brand-sub{font-size:7px;letter-spacing:1px;}
+  .header-nav{gap:3px;}
+  .header-nav-btn{padding:7px 6px;font-size:9px;letter-spacing:0;}
+  .game-action-message,.game-travel-status{bottom:84px;}
+  .game-action-message{bottom:120px;}
+}
