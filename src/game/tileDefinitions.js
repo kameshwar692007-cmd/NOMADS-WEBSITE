@@ -1,0 +1,170 @@
+// Tile definitions for Kenney Tiny Town (132 tiles, 12 columns x 11 rows)
+export const TILE_SIZE = 16;
+export const SHEET_COLUMNS = 12;
+export const SHEET_ROWS = 11;
+
+export const CATEGORIES = [
+  'All',
+  'Grass and Terrain',
+  'Roads and Pathways',
+  'Buildings',
+  'Trees and Vegetation',
+  'Props and Decorations',
+  'Water and Channels'
+];
+
+export const TILE_DEFINITIONS = [
+  // Row 0 (0-11)
+  { id: 0, file: 'tile_0000.png', category: 'Grass and Terrain', name: 'Grass (Plain Turf)', role: 'Base ground terrain', tags: ['warm', 'green', 'ground'] },
+  { id: 1, file: 'tile_0001.png', category: 'Grass and Terrain', name: 'Grass (Tufted Variant)', role: 'Subtle ground variation', tags: ['warm', 'green', 'texture'] },
+  { id: 2, file: 'tile_0002.png', category: 'Grass and Terrain', name: 'Grass (Wildflower Meadow)', role: 'Floral meadow accent', tags: ['warm', 'flowers', 'meadow'] },
+  { id: 3, file: 'tile_0003.png', category: 'Trees and Vegetation', name: 'Autumn Tree Crown Top', role: 'Autumn foliage canopy', tags: ['autumn', 'tree', 'canopy'] },
+  { id: 4, file: 'tile_0004.png', category: 'Trees and Vegetation', name: 'Green Tree Crown Top', role: 'Deciduous green tree apex', tags: ['green', 'tree', 'canopy'] },
+  { id: 5, file: 'tile_0005.png', category: 'Trees and Vegetation', name: 'Mature Tree Crown Peak', role: 'Large canopy apex', tags: ['green', 'tree', 'large'] },
+  { id: 6, file: 'tile_0006.png', category: 'Trees and Vegetation', name: 'Green Conifer Tip', role: 'Pine evergreen tip', tags: ['conifer', 'pine', 'green'] },
+  { id: 7, file: 'tile_0007.png', category: 'Trees and Vegetation', name: 'Compact Pine Tree', role: 'Single-tile evergreen tree', tags: ['conifer', 'pine', 'compact'] },
+  { id: 8, file: 'tile_0008.png', category: 'Trees and Vegetation', name: 'Conifer Mid-Section', role: 'Tall pine body', tags: ['conifer', 'pine', 'trunk'] },
+  { id: 9, file: 'tile_0009.png', category: 'Trees and Vegetation', name: 'Golden Conifer Tip', role: 'Autumn pine tip', tags: ['autumn', 'pine', 'gold'] },
+  { id: 10, file: 'tile_0010.png', category: 'Trees and Vegetation', name: 'Compact Golden Pine', role: 'Single-tile golden conifer', tags: ['autumn', 'pine', 'gold'] },
+  { id: 11, file: 'tile_0011.png', category: 'Trees and Vegetation', name: 'Golden Conifer Mid', role: 'Golden pine mid-section', tags: ['autumn', 'pine', 'gold'] },
+
+  // Row 1 (12-23)
+  { id: 12, file: 'tile_0012.png', category: 'Roads and Pathways', name: 'Dirt Path NW Outer Edge', role: 'Top-left grass to dirt transition', tags: ['path', 'dirt', 'corner'] },
+  { id: 13, file: 'tile_0013.png', category: 'Roads and Pathways', name: 'Dirt Path North Edge', role: 'Northern border straight', tags: ['path', 'dirt', 'edge'] },
+  { id: 14, file: 'tile_0014.png', category: 'Roads and Pathways', name: 'Dirt Path NE Outer Edge', role: 'Top-right grass to dirt transition', tags: ['path', 'dirt', 'corner'] },
+  { id: 15, file: 'tile_0015.png', category: 'Trees and Vegetation', name: 'Autumn Foliage Left', role: 'Autumn canopy left flank', tags: ['autumn', 'tree'] },
+  { id: 16, file: 'tile_0016.png', category: 'Trees and Vegetation', name: 'Green Foliage Left', role: 'Green canopy left flank', tags: ['green', 'tree'] },
+  { id: 17, file: 'tile_0017.png', category: 'Trees and Vegetation', name: 'Green Foliage Right', role: 'Green canopy right flank', tags: ['green', 'tree'] },
+  { id: 18, file: 'tile_0018.png', category: 'Trees and Vegetation', name: 'Tree Trunk & Roots', role: 'Grounded wooden tree trunk', tags: ['trunk', 'wood', 'base'] },
+  { id: 19, file: 'tile_0019.png', category: 'Trees and Vegetation', name: 'Tall Evergreen Conifer', role: 'Dense conifer evergreen body', tags: ['pine', 'conifer', 'tall'] },
+  { id: 20, file: 'tile_0020.png', category: 'Trees and Vegetation', name: 'Conifer Ground Base', role: 'Conifer trunk base', tags: ['pine', 'base'] },
+  { id: 21, file: 'tile_0021.png', category: 'Trees and Vegetation', name: 'Autumn Foliage Right', role: 'Autumn canopy right flank', tags: ['autumn', 'tree'] },
+  { id: 22, file: 'tile_0022.png', category: 'Trees and Vegetation', name: 'Tall Autumn Conifer', role: 'Dense golden conifer body', tags: ['autumn', 'pine'] },
+  { id: 23, file: 'tile_0023.png', category: 'Trees and Vegetation', name: 'Autumn Trunk Base', role: 'Autumn trunk base', tags: ['autumn', 'base'] },
+
+  // Row 2 (24-35)
+  { id: 24, file: 'tile_0024.png', category: 'Roads and Pathways', name: 'Dirt Path West Edge', role: 'Western border straight', tags: ['path', 'dirt', 'edge'] },
+  { id: 25, file: 'tile_0025.png', category: 'Roads and Pathways', name: 'Dirt Path Solid Loam', role: 'Solid earthen path center', tags: ['path', 'dirt', 'center'] },
+  { id: 26, file: 'tile_0026.png', category: 'Roads and Pathways', name: 'Dirt Path East Edge', role: 'Eastern border straight', tags: ['path', 'dirt', 'edge'] },
+  { id: 27, file: 'tile_0027.png', category: 'Trees and Vegetation', name: 'Autumn Bush', role: 'Golden low scrub', tags: ['autumn', 'shrub'] },
+  { id: 28, file: 'tile_0028.png', category: 'Trees and Vegetation', name: 'Green Shrub', role: 'Lush round garden shrub', tags: ['green', 'shrub'] },
+  { id: 29, file: 'tile_0029.png', category: 'Props and Decorations', name: 'Crimson Market Awning', role: 'Bazaar canopy & crimson highlight', tags: ['crimson', 'signage', 'market'] },
+  { id: 30, file: 'tile_0030.png', category: 'Trees and Vegetation', name: 'Medium Garden Shrub', role: 'Manicured green bush', tags: ['green', 'hedge'] },
+  { id: 31, file: 'tile_0031.png', category: 'Trees and Vegetation', name: 'Small Green Bush', role: 'Border greenery hedge', tags: ['green', 'small'] },
+  { id: 32, file: 'tile_0032.png', category: 'Trees and Vegetation', name: 'Tall Green Shrub', role: 'Vertical hedge hedge', tags: ['green', 'tall'] },
+  { id: 33, file: 'tile_0033.png', category: 'Trees and Vegetation', name: 'Medium Autumn Shrub', role: 'Golden landscape bush', tags: ['autumn', 'hedge'] },
+  { id: 34, file: 'tile_0034.png', category: 'Trees and Vegetation', name: 'Small Autumn Bush', role: 'Low amber hedge', tags: ['autumn', 'small'] },
+  { id: 35, file: 'tile_0035.png', category: 'Trees and Vegetation', name: 'Tall Autumn Shrub', role: 'Vertical golden hedge', tags: ['autumn', 'tall'] },
+
+  // Row 3 (36-47)
+  { id: 36, file: 'tile_0036.png', category: 'Roads and Pathways', name: 'Dirt Path SW Outer Edge', role: 'Bottom-left grass to dirt transition', tags: ['path', 'dirt', 'corner'] },
+  { id: 37, file: 'tile_0037.png', category: 'Roads and Pathways', name: 'Dirt Path South Edge', role: 'Southern border straight', tags: ['path', 'dirt', 'edge'] },
+  { id: 38, file: 'tile_0038.png', category: 'Roads and Pathways', name: 'Dirt Path SE Outer Edge', role: 'Bottom-right grass to dirt transition', tags: ['path', 'dirt', 'corner'] },
+  { id: 39, file: 'tile_0039.png', category: 'Roads and Pathways', name: 'Dirt Path NW Inner Turn', role: 'Inner corner grass intersection', tags: ['path', 'turn'] },
+  { id: 40, file: 'tile_0040.png', category: 'Roads and Pathways', name: 'Dirt Path NE Inner Turn', role: 'Inner corner grass intersection', tags: ['path', 'turn'] },
+  { id: 41, file: 'tile_0041.png', category: 'Roads and Pathways', name: 'Dirt Path SW Inner Turn', role: 'Inner corner grass intersection', tags: ['path', 'turn'] },
+  { id: 42, file: 'tile_0042.png', category: 'Roads and Pathways', name: 'Dirt Path SE Inner Turn', role: 'Inner corner grass intersection', tags: ['path', 'turn'] },
+  { id: 43, file: 'tile_0043.png', category: 'Grass and Terrain', name: 'Shoreline Embankment', role: 'Grass to water boundary edge', tags: ['shore', 'water', 'border'] },
+  { id: 44, file: 'tile_0044.png', category: 'Props and Decorations', name: 'Fence Horizontal Left Post', role: 'Paddock perimeter fence start', tags: ['fence', 'wood', 'perimeter'] },
+  { id: 45, file: 'tile_0045.png', category: 'Props and Decorations', name: 'Fence Horizontal Rail', role: 'Paddock fence connecting rail', tags: ['fence', 'wood'] },
+  { id: 46, file: 'tile_0046.png', category: 'Props and Decorations', name: 'Fence Horizontal Right Post', role: 'Paddock perimeter fence end', tags: ['fence', 'wood'] },
+  { id: 47, file: 'tile_0047.png', category: 'Props and Decorations', name: 'Fence Vertical Top Post', role: 'Vertical fence upper terminal', tags: ['fence', 'wood'] },
+
+  // Row 4 (48-59)
+  { id: 48, file: 'tile_0048.png', category: 'Buildings', name: 'Slate Roof Apex NW', role: 'Navy slate roof top-left gable', tags: ['navy', 'roof', 'slate'] },
+  { id: 49, file: 'tile_0049.png', category: 'Buildings', name: 'Slate Roof Ridge Center', role: 'Navy slate roof ridge crest', tags: ['navy', 'roof', 'slate'] },
+  { id: 50, file: 'tile_0050.png', category: 'Buildings', name: 'Slate Roof Apex NE', role: 'Navy slate roof top-right gable', tags: ['navy', 'roof', 'slate'] },
+  { id: 51, file: 'tile_0051.png', category: 'Buildings', name: 'Slate Roof Stone Chimney', role: 'Slate roof chimney apex', tags: ['navy', 'roof', 'chimney'] },
+  { id: 52, file: 'tile_0052.png', category: 'Buildings', name: 'Crimson Roof Apex NW', role: 'Crimson terracotta roof top-left gable', tags: ['crimson', 'roof', 'highlight'] },
+  { id: 53, file: 'tile_0053.png', category: 'Buildings', name: 'Crimson Roof Ridge Center', role: 'Crimson terracotta roof ridge crest', tags: ['crimson', 'roof', 'highlight'] },
+  { id: 54, file: 'tile_0054.png', category: 'Buildings', name: 'Crimson Roof Apex NE', role: 'Crimson terracotta roof top-right gable', tags: ['crimson', 'roof', 'highlight'] },
+  { id: 55, file: 'tile_0055.png', category: 'Buildings', name: 'Crimson Roof Brick Chimney', role: 'Crimson roof brick chimney apex', tags: ['crimson', 'roof', 'chimney'] },
+  { id: 56, file: 'tile_0056.png', category: 'Props and Decorations', name: 'Fence Vertical Mid Span', role: 'Vertical fence middle section', tags: ['fence', 'wood'] },
+  { id: 57, file: 'tile_0057.png', category: 'Props and Decorations', name: 'Fence Gate / Crossing', role: 'Gated fence latch portal', tags: ['fence', 'gate', 'wood'] },
+  { id: 58, file: 'tile_0058.png', category: 'Props and Decorations', name: 'Fence Standalone Post', role: 'Upright picket post', tags: ['fence', 'post'] },
+  { id: 59, file: 'tile_0059.png', category: 'Props and Decorations', name: 'Fence Vertical Base', role: 'Vertical fence ground terminal', tags: ['fence', 'post'] },
+
+  // Row 5 (60-71)
+  { id: 60, file: 'tile_0060.png', category: 'Buildings', name: 'Slate Roof Eave Left', role: 'Navy roof left lower pitch', tags: ['navy', 'roof', 'eave'] },
+  { id: 61, file: 'tile_0061.png', category: 'Buildings', name: 'Slate Roof Slope Mid', role: 'Navy roof downward center pitch', tags: ['navy', 'roof', 'slope'] },
+  { id: 62, file: 'tile_0062.png', category: 'Buildings', name: 'Slate Roof Eave Right', role: 'Navy roof right lower pitch', tags: ['navy', 'roof', 'eave'] },
+  { id: 63, file: 'tile_0063.png', category: 'Buildings', name: 'Slate Roof Dormer Window', role: 'Navy attic dormer detail', tags: ['navy', 'roof', 'dormer'] },
+  { id: 64, file: 'tile_0064.png', category: 'Buildings', name: 'Crimson Roof Eave Left', role: 'Crimson roof left lower pitch', tags: ['crimson', 'roof', 'eave'] },
+  { id: 65, file: 'tile_0065.png', category: 'Buildings', name: 'Crimson Roof Slope Mid', role: 'Crimson roof downward center pitch', tags: ['crimson', 'roof', 'slope'] },
+  { id: 66, file: 'tile_0066.png', category: 'Buildings', name: 'Crimson Roof Eave Right', role: 'Crimson roof right lower pitch', tags: ['crimson', 'roof', 'eave'] },
+  { id: 67, file: 'tile_0067.png', category: 'Buildings', name: 'Crimson Roof Dormer Window', role: 'Crimson attic dormer detail', tags: ['crimson', 'roof', 'dormer'] },
+  { id: 68, file: 'tile_0068.png', category: 'Props and Decorations', name: 'Platinum Low Wall Left', role: 'Chiseled stone parapet left', tags: ['platinum', 'stone', 'wall'] },
+  { id: 69, file: 'tile_0069.png', category: 'Props and Decorations', name: 'Platinum Low Wall Mid', role: 'Chiseled stone parapet span', tags: ['platinum', 'stone', 'wall'] },
+  { id: 70, file: 'tile_0070.png', category: 'Props and Decorations', name: 'Platinum Low Wall Right', role: 'Chiseled stone parapet right', tags: ['platinum', 'stone', 'wall'] },
+  { id: 71, file: 'tile_0071.png', category: 'Props and Decorations', name: 'Platinum Low Wall Post', role: 'Chiseled stone pillar terminal', tags: ['platinum', 'stone', 'wall'] },
+
+  // Row 6 (72-83)
+  { id: 72, file: 'tile_0072.png', category: 'Buildings', name: 'Timber Wall Plain', role: 'Natural timber plank wall facade', tags: ['warm', 'wood', 'wall'] },
+  { id: 73, file: 'tile_0073.png', category: 'Buildings', name: 'Timber Wall with Window', role: 'Wood wall with framed window', tags: ['warm', 'wood', 'window'] },
+  { id: 74, file: 'tile_0074.png', category: 'Buildings', name: 'Timber Wall with Entry Door', role: 'Wood wall with reinforced door', tags: ['warm', 'wood', 'door'] },
+  { id: 75, file: 'tile_0075.png', category: 'Buildings', name: 'Timber Wall Corner Post', role: 'Vertical wood corner column', tags: ['warm', 'wood', 'corner'] },
+  { id: 76, file: 'tile_0076.png', category: 'Buildings', name: 'Platinum Stone Wall Plain', role: 'Ashlar platinum masonry facade', tags: ['platinum', 'stone', 'wall'] },
+  { id: 77, file: 'tile_0077.png', category: 'Buildings', name: 'Platinum Stone Wall with Window', role: 'Ashlar wall with arched window', tags: ['platinum', 'stone', 'window'] },
+  { id: 78, file: 'tile_0078.png', category: 'Buildings', name: 'Platinum Stone Grand Portal', role: 'Ashlar facade with arched portal', tags: ['platinum', 'stone', 'door'] },
+  { id: 79, file: 'tile_0079.png', category: 'Buildings', name: 'Platinum Stone Quoin Pillar', role: 'Polished ashlar corner pillar', tags: ['platinum', 'stone', 'corner'] },
+  { id: 80, file: 'tile_0080.png', category: 'Props and Decorations', name: 'Cargo Crate (Small)', role: 'Merchant freight container', tags: ['prop', 'crate', 'logistics'] },
+  { id: 81, file: 'tile_0081.png', category: 'Props and Decorations', name: 'Stacked Cargo Crates', role: 'Warehouse double stacked boxes', tags: ['prop', 'crate', 'logistics'] },
+  { id: 82, file: 'tile_0082.png', category: 'Props and Decorations', name: 'Oak Provisions Barrel', role: 'Provisions and water barrel', tags: ['prop', 'barrel', 'logistics'] },
+  { id: 83, file: 'tile_0083.png', category: 'Props and Decorations', name: 'Double Barrels Group', role: 'Depot stored barrels group', tags: ['prop', 'barrel', 'logistics'] },
+
+  // Row 7 (84-95)
+  { id: 84, file: 'tile_0084.png', category: 'Buildings', name: 'Timber Foundation Left', role: 'Timber building base left beam', tags: ['wood', 'foundation'] },
+  { id: 85, file: 'tile_0085.png', category: 'Buildings', name: 'Timber Foundation Threshold', role: 'Timber doorway entrance step', tags: ['wood', 'threshold'] },
+  { id: 86, file: 'tile_0086.png', category: 'Buildings', name: 'Timber Foundation Right', role: 'Timber building base right beam', tags: ['wood', 'foundation'] },
+  { id: 87, file: 'tile_0087.png', category: 'Buildings', name: 'Timber Foundation Base Skirt', role: 'Wood foundation underpinning', tags: ['wood', 'skirt'] },
+  { id: 88, file: 'tile_0088.png', category: 'Buildings', name: 'Stone Bastion Plinth Left', role: 'Platinum fortress base left', tags: ['platinum', 'bastion', 'foundation'] },
+  { id: 89, file: 'tile_0089.png', category: 'Buildings', name: 'Stone Bastion Threshold', role: 'Platinum fortress stone entrance step', tags: ['platinum', 'threshold'] },
+  { id: 90, file: 'tile_0090.png', category: 'Buildings', name: 'Stone Bastion Plinth Right', role: 'Platinum fortress base right', tags: ['platinum', 'bastion', 'foundation'] },
+  { id: 91, file: 'tile_0091.png', category: 'Buildings', name: 'Stone Foundation Course', role: 'Platinum ashlar base course', tags: ['platinum', 'foundation'] },
+  { id: 92, file: 'tile_0092.png', category: 'Props and Decorations', name: 'Two-Wheeled Transport Cart', role: 'Merchant freight handcart', tags: ['prop', 'cart', 'logistics'] },
+  { id: 93, file: 'tile_0093.png', category: 'Props and Decorations', name: 'Bazaar Display Bench', role: 'Market trade wares table', tags: ['prop', 'market', 'table'] },
+  { id: 94, file: 'tile_0094.png', category: 'Props and Decorations', name: 'Merchant Bazaar Stall', role: 'Bazaar sales kiosk counter', tags: ['prop', 'market', 'counter'] },
+  { id: 95, file: 'tile_0095.png', category: 'Props and Decorations', name: 'Crimson Guild Banner', role: 'Wayfinding post with crimson flag', tags: ['crimson', 'signage', 'banner'] },
+
+  // Row 8 (96-107)
+  { id: 96, file: 'tile_0096.png', category: 'Roads and Pathways', name: 'Cobblestone Paving NW', role: 'Paved plaza stone border top-left', tags: ['platinum', 'paving', 'curb'] },
+  { id: 97, file: 'tile_0097.png', category: 'Roads and Pathways', name: 'Cobblestone Paving North', role: 'Paved plaza stone border north straight', tags: ['platinum', 'paving', 'edge'] },
+  { id: 98, file: 'tile_0098.png', category: 'Roads and Pathways', name: 'Cobblestone Paving NE', role: 'Paved plaza stone border top-right', tags: ['platinum', 'paving', 'curb'] },
+  { id: 99, file: 'tile_0099.png', category: 'Roads and Pathways', name: 'Cobblestone Paving West', role: 'Paved plaza stone border west straight', tags: ['platinum', 'paving', 'edge'] },
+  { id: 100, file: 'tile_0100.png', category: 'Roads and Pathways', name: 'Cobblestone Plaza Solid Center', role: 'Platinum ashlar paved square center', tags: ['platinum', 'paving', 'center'] },
+  { id: 101, file: 'tile_0101.png', category: 'Roads and Pathways', name: 'Cobblestone Paving East', role: 'Paved plaza stone border east straight', tags: ['platinum', 'paving', 'edge'] },
+  { id: 102, file: 'tile_0102.png', category: 'Roads and Pathways', name: 'Cobblestone Paving SW', role: 'Paved plaza stone border bottom-left', tags: ['platinum', 'paving', 'curb'] },
+  { id: 103, file: 'tile_0103.png', category: 'Props and Decorations', name: 'Stone Water Well Rim', role: 'Cistern upper stone coping', tags: ['platinum', 'well', 'water'] },
+  { id: 104, file: 'tile_0104.png', category: 'Props and Decorations', name: 'Stone Water Well Basin', role: 'Cistern winch pulley and bucket', tags: ['platinum', 'well', 'water'] },
+  { id: 105, file: 'tile_0105.png', category: 'Props and Decorations', name: 'Platinum Civic Streetlamp', role: 'Ornate lantern post for nocturnal lighting', tags: ['platinum', 'lamp', 'light'] },
+  { id: 106, file: 'tile_0106.png', category: 'Props and Decorations', name: 'Civic Plaza Bench', role: 'Polished stone resting bench', tags: ['platinum', 'bench', 'civic'] },
+  { id: 107, file: 'tile_0107.png', category: 'Props and Decorations', name: 'Monumental Plaza Fountain', role: 'Carved platinum fountain basin', tags: ['platinum', 'fountain', 'civic'] },
+
+  // Row 9 (108-119)
+  { id: 108, file: 'tile_0108.png', category: 'Roads and Pathways', name: 'Cobblestone Paving South', role: 'Paved plaza stone border south straight', tags: ['platinum', 'paving', 'edge'] },
+  { id: 109, file: 'tile_0109.png', category: 'Roads and Pathways', name: 'Cobblestone Paving Smooth Variant', role: 'Smooth paved square alternate center', tags: ['platinum', 'paving', 'center'] },
+  { id: 110, file: 'tile_0110.png', category: 'Roads and Pathways', name: 'Cobblestone Paving SE', role: 'Paved plaza stone border bottom-right', tags: ['platinum', 'paving', 'curb'] },
+  { id: 111, file: 'tile_0111.png', category: 'Water and Channels', name: 'Canal Embankment NW', role: 'Water basin inner corner top-left', tags: ['water', 'canal', 'bank'] },
+  { id: 112, file: 'tile_0112.png', category: 'Water and Channels', name: 'Canal Embankment North', role: 'Water northern bank straight', tags: ['water', 'canal', 'bank'] },
+  { id: 113, file: 'tile_0113.png', category: 'Water and Channels', name: 'Canal Embankment NE', role: 'Water basin inner corner top-right', tags: ['water', 'canal', 'bank'] },
+  { id: 114, file: 'tile_0114.png', category: 'Water and Channels', name: 'Canal Flowing Deep Water', role: 'Navigable open waterway stream', tags: ['water', 'deep', 'navy'] },
+  { id: 115, file: 'tile_0115.png', category: 'Props and Decorations', name: 'Cartographic Milestone Pillar', role: 'Carved wayfinding rune marker', tags: ['platinum', 'marker', 'signage'] },
+  { id: 116, file: 'tile_0116.png', category: 'Props and Decorations', name: 'Hanging Wall Lantern', role: 'Cantilevered wrought lantern sconce', tags: ['platinum', 'lamp', 'light'] },
+  { id: 117, file: 'tile_0117.png', category: 'Props and Decorations', name: 'Commemorative Stone Plinth', role: 'Honorary monument pedestal', tags: ['platinum', 'monument'] },
+  { id: 118, file: 'tile_0118.png', category: 'Props and Decorations', name: 'Platinum Decorative Urn', role: 'Sculpted ornamental stone planter', tags: ['platinum', 'urn', 'decor'] },
+  { id: 119, file: 'tile_0119.png', category: 'Props and Decorations', name: 'Harbor Mooring Bollard', role: 'Quayside stone tie post', tags: ['platinum', 'harbor', 'bollard'] },
+
+  // Row 10 (120-131)
+  { id: 120, file: 'tile_0120.png', category: 'Roads and Pathways', name: 'Cobblestone Inner Turn NW', role: 'Paved avenue inner turning junction', tags: ['platinum', 'paving', 'turn'] },
+  { id: 121, file: 'tile_0121.png', category: 'Roads and Pathways', name: 'Cobblestone Inner Turn NE', role: 'Paved avenue inner turning junction', tags: ['platinum', 'paving', 'turn'] },
+  { id: 122, file: 'tile_0122.png', category: 'Roads and Pathways', name: 'Cobblestone Inner Turn SW', role: 'Paved avenue inner turning junction', tags: ['platinum', 'paving', 'turn'] },
+  { id: 123, file: 'tile_0123.png', category: 'Water and Channels', name: 'Canal Embankment West', role: 'Deep water western bank quay', tags: ['water', 'quay', 'bank'] },
+  { id: 124, file: 'tile_0124.png', category: 'Water and Channels', name: 'Canal Embankment East', role: 'Deep water eastern bank quay', tags: ['water', 'quay', 'bank'] },
+  { id: 125, file: 'tile_0125.png', category: 'Water and Channels', name: 'Canal Deep Basin Center', role: 'Deep reflective water basin', tags: ['water', 'deep', 'navy'] },
+  { id: 126, file: 'tile_0126.png', category: 'Water and Channels', name: 'Canal Rippled Water', role: 'Flowing water with surface current ripples', tags: ['water', 'ripple'] },
+  { id: 127, file: 'tile_0127.png', category: 'Props and Decorations', name: 'Mill Waterwheel Blade Left', role: 'Rotary mill power timber wing', tags: ['wood', 'mill', 'machinery'] },
+  { id: 128, file: 'tile_0128.png', category: 'Props and Decorations', name: 'Mill Waterwheel Axle Hub', role: 'Hydraulic gear transmission box', tags: ['wood', 'mill', 'machinery'] },
+  { id: 129, file: 'tile_0129.png', category: 'Props and Decorations', name: 'Mill Waterwheel Blade Right', role: 'Rotary mill power opposing wing', tags: ['wood', 'mill', 'machinery'] },
+  { id: 130, file: 'tile_0130.png', category: 'Water and Channels', name: 'Bridge Timber Abutment Pier', role: 'Heavy wooden bridge shoreline support', tags: ['bridge', 'wood', 'crossing'] },
+  { id: 131, file: 'tile_0131.png', category: 'Water and Channels', name: 'Bridge Timber Deck over Water', role: 'Planked bridge deck crossing water channel', tags: ['bridge', 'wood', 'crossing'] }
+];
