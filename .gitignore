@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 public/debug-crops/
+public/debug-anime-boy/
 
 # Editor directories and files
 .vscode/*
