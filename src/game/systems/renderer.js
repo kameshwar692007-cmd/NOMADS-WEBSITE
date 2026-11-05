@@ -6,24 +6,13 @@ import { getNomadHeroFrame } from './nomadHero.js';
 function drawArtwork(ctx, image) {
   ctx.drawImage(image, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-  // Cover the non-interactive logo/menu/map graphics baked into the original art.
-  // React's real Header renders functional controls above this world.
-  ctx.fillStyle = '#0a1426';
-  ctx.fillRect(0, 0, WORLD_WIDTH, 82);
-  ctx.fillStyle = '#c83246';
-  ctx.fillRect(0, 80, WORLD_WIDTH, 2);
+  // The approved illustration already contains clean paving below the fountain.
+  // Never mirror/copy canvas pixels into the plaza (that created the triangular seam).
+  // Hide only the baked static corner buttons, not the landscape between them.
+  ctx.fillStyle = '#0b1629';
+  ctx.fillRect(0, 0, 437, 82);
+  ctx.fillRect(1380, 0, WORLD_WIDTH - 1380, 82);
 
-  // The source illustration contains a smudged, ghost-like artifact below
-  // the fountain. Rebuild that segment from intact mirrored pixel pavement.
-  // Avoid blur/inpainting: it softens the existing retro pixel-art.
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(802, 536, 63, 64);
-  ctx.clip();
-  ctx.translate(865, 0);
-  ctx.scale(-1, 1);
-  ctx.drawImage(image, 739, 536, 63, 64, 0, 536, 63, 64);
-  ctx.restore();
 }
 
 function drawPlayer(ctx, player, elapsed) {
