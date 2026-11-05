@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import GameCanvas from '../game/components/GameCanvas.jsx';
+import Header from '../game/components/Header.jsx';
 import LocationPanel from '../game/components/LocationPanel.jsx';
 import Directory from '../game/components/Directory.jsx';
 import MapModal from '../game/components/MapModal.jsx';
@@ -62,6 +63,13 @@ export default function HomePage() {
 
   return (
     <div className="homepage-frame">
+      {/* On narrow screens the world-image corner buttons are offscreen.
+          Keep accessible fixed controls on mobile only. */}
+      {isMobile && <Header
+        onDirectoryOpen={() => setDirectoryOpen(true)}
+        onMapOpen={() => setMapOpen(true)}
+        onMenuOpen={() => setMenuOpen(true)}
+      />}
       {/* 2. Interactive Explorable Canvas World */}
       <main className="game-viewport">
         <GameCanvas 
