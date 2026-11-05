@@ -65,7 +65,7 @@ export default function GameCanvas({
   useEffect(() => {
     if (directoryTravelTarget && loaded) {
       const player = playerRef.current;
-      autoTravelRef.current.startTravel(
+      const started = autoTravelRef.current.startTravel(
         player.x + 16, player.y + 40,
         directoryTravelTarget,
         (destId) => {
@@ -75,6 +75,10 @@ export default function GameCanvas({
           }
         }
       );
+      if (!started) {
+        const location = LOCATIONS.find(item => item.id === directoryTravelTarget);
+        if (location && Math.hypot(player.x + 16 - location.entranceX, player.y + 40 - location.entranceY) < location.interactionRadius) onLocationInteract(location);
+      }
       if (onDirectoryTravelConsumed) onDirectoryTravelConsumed();
     }
   }, [directoryTravelTarget, loaded, onLocationInteract, onDirectoryTravelConsumed]);
@@ -145,7 +149,7 @@ export default function GameCanvas({
     
     if (clicked) {
       const player = playerRef.current;
-      autoTravelRef.current.startTravel(
+      const started = autoTravelRef.current.startTravel(
         player.x + 16, player.y + 40,
         clicked.id,
         (destId) => {
@@ -153,6 +157,9 @@ export default function GameCanvas({
           if (loc) onLocationInteract(loc);
         }
       );
+      if (!started && Math.hypot(player.x + 16 - clicked.entranceX, player.y + 40 - clicked.entranceY) <= clicked.interactionRadius) {
+        onLocationInteract(clicked);
+      }
     }
   }, [isMobile, onLocationInteract]);
 
