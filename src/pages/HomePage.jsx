@@ -3,7 +3,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import GameCanvas from '../game/components/GameCanvas.jsx';
-import Header from '../game/components/Header.jsx';
 import LocationPanel from '../game/components/LocationPanel.jsx';
 import Directory from '../game/components/Directory.jsx';
 import MapModal from '../game/components/MapModal.jsx';
@@ -63,17 +62,13 @@ export default function HomePage() {
 
   return (
     <div className="homepage-frame">
-      {/* 1. Minimal Header (Brand on left; DIRECTORY, MAP, MENU on right) */}
-      <Header 
-        onDirectoryOpen={() => setDirectoryOpen(true)}
-        onMapOpen={() => setMapOpen(true)}
-        onMenuOpen={() => setMenuOpen(true)}
-      />
-
       {/* 2. Interactive Explorable Canvas World */}
       <main className="game-viewport">
         <GameCanvas 
           onLocationInteract={handleLocationInteract}
+          onDirectoryOpen={() => setDirectoryOpen(true)}
+          onMapOpen={() => setMapOpen(true)}
+          onMenuOpen={() => setMenuOpen(true)}
           isMobile={isMobile}
           directoryTravelTarget={travelTarget}
           onDirectoryTravelConsumed={handleTravelConsumed}
