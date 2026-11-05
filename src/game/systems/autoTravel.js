@@ -1,6 +1,4 @@
-// Nomad's Province — Auto Travel System
-// Waypoint-based movement (no teleporting)
-
+// Time-based, destination-aware movement with no teleport or early arrival.
 import { buildTravelPath } from '../data/travelPaths.js';
 
 export class AutoTravelSystem {
@@ -8,89 +6,64 @@ export class AutoTravelSystem {
     this.active = false;
     this.destinationId = null;
     this.waypoints = [];
-    this.currentWaypointIndex = 0;
-    this.speed = 2.5; // pixels per frame
-    this.onArrive = null; // callback when arriving at destination
+    this.index = 0;
+    this.speed = 150; // world pixels per second
+    this.onArrive = null;
+    this.lastFailedDestination = null;
   }
 
-  /**
-   * Start auto travel from current position to a destination location
-   */
-  startTravel(fromX, fromY, destinationId, onArrive) {
-    const path = buildTravelPath(fromX, fromY, destinationId);
-    if (path.length === 0) {
-      // Already at destination
-      if (onArrive) onArrive(destinationId);
+  startTravel(x, y, id, onArrive) {
+    this.cancel();
+    const path = buildTravelPath(x, y, id);
+    if (!path.length) {
+      // Empty path means already nearby or unreachable. Never teleport.
+      this.lastFailedDestination = id;
       return false;
     }
-
-    this.active = true;
-    this.destinationId = destinationId;
+    this.lastFailedDestination = null;
+    this.destinationId = id;
     this.waypoints = path;
-    this.currentWaypointIndex = 0;
+    this.index = 0;
     this.onArrive = onArrive;
+    this.active = true;
     return true;
   }
 
-  /**
-   * Cancel auto travel (e.g. when player provides manual input)
-   */
   cancel() {
     this.active = false;
     this.destinationId = null;
     this.waypoints = [];
-    this.currentWaypointIndex = 0;
+    this.index = 0;
     this.onArrive = null;
   }
 
-  /**
-   * Update each frame. Returns { dx, dy, arrived, direction } or null if inactive
-   */
-  update(playerX, playerY) {
-    if (!this.active || this.waypoints.length === 0) return null;
+  isActive() { return this.active; }
+  getDestinationId() { return this.destinationId; }
 
-    const target = this.waypoints[this.currentWaypointIndex];
-    const dx = target.x - playerX;
-    const dy = target.y - playerY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    // Reached current waypoint?
-    if (dist < this.speed * 2) {
-      this.currentWaypointIndex++;
-      
-      // Reached final waypoint?
-      if (this.currentWaypointIndex >= this.waypoints.length) {
-        const destId = this.destinationId;
-        const callback = this.onArrive;
-        this.cancel();
-        if (callback) callback(destId);
-        return { dx: 0, dy: 0, arrived: true, direction: 'down' };
+  update(x, y, dt = 1 / 60) {
+    if (!this.active) return null;
+    const step = this.speed * Math.max(0, Math.min(dt, 0.05));
+    while (this.index < this.waypoints.length) {
+      const target = this.waypoints[this.index];
+      const dx = target.x - x;
+      const dy = target.y - y;
+      const dist = Math.hypot(dx, dy);
+      if (dist <= 0.7) {
+        this.index++;
+        continue;
       }
-      
-      // Continue to next waypoint
-      return this.update(playerX, playerY);
+      const length = Math.min(step, dist);
+      return {
+        dx: dx / dist * length,
+        dy: dy / dist * length,
+        arrived: false,
+        direction: Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up')
+      };
     }
-
-    // Move toward current waypoint
-    const moveX = (dx / dist) * this.speed;
-    const moveY = (dy / dist) * this.speed;
-
-    // Determine facing direction
-    let direction;
-    if (Math.abs(dx) > Math.abs(dy)) {
-      direction = dx > 0 ? 'right' : 'left';
-    } else {
-      direction = dy > 0 ? 'down' : 'up';
-    }
-
-    return { dx: moveX, dy: moveY, arrived: false, direction };
-  }
-
-  isActive() {
-    return this.active;
-  }
-
-  getDestinationId() {
-    return this.destinationId;
+    const callback = this.onArrive;
+    const id = this.destinationId;
+    this.cancel();
+    if (callback) callback(id);
+    return { dx:0, dy:0, arrived:true, direction:'down' };
   }
 }
