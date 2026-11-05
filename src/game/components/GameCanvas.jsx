@@ -1,9 +1,7 @@
-// Nomad's Province — Main Game Canvas Component
-// Orchestrates: rendering, player input, camera, auto-travel, interactions
-
+// Click/tap-only interactive headquarters: no keyboard/joystick movement.
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { LOCATIONS, findNearbyLocation, findClickedBuilding } from '../data/locationData.js';
-import { getSpawnPoint } from '../data/travelPaths.js';
+import { LOCATIONS, findClickedBuilding } from '../data/locationData.js';
+import { getSpawnPoint, buildPathToPoint } from '../data/travelPaths.js';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../data/mapData.js';
 import { AutoTravelSystem } from '../systems/autoTravel.js';
 import { CameraSystem } from '../systems/camera.js';
@@ -11,328 +9,136 @@ import { resolveMovement } from '../systems/collision.js';
 import { loadAllAssets } from '../systems/assetLoader.js';
 import { renderWorld, screenToWorld } from '../systems/renderer.js';
 
-const PLAYER_SPEED = 168; // pixels per second, independent of FPS
-const DESKTOP_FIT_PADDING = 0.96;
-const MOBILE_ZOOM = 1.35;
-
-function getRenderZoom(rect, isMobile) {
-  if (isMobile) return MOBILE_ZOOM;
-  const fitX = rect.width / WORLD_WIDTH;
-  const fitY = rect.height / WORLD_HEIGHT;
-  return Math.max(0.72, Math.min(1.0, Math.min(fitX, fitY) * DESKTOP_FIT_PADDING));
+const MOBILE_ZOOM=1.15;
+function getZoom(rect,isMobile){
+  if(isMobile)return MOBILE_ZOOM;
+  return Math.max(0.52,Math.min(1,Math.min(rect.width/WORLD_WIDTH,rect.height/WORLD_HEIGHT)*0.985));
 }
-
-export default function GameCanvas({ 
-  onLocationInteract, 
+export default function GameCanvas({
+  onLocationInteract,
   isMobile,
-  joystickInput,
   directoryTravelTarget,
-  onDirectoryTravelConsumed,
-  interactRequest,
-  onInteractRequestConsumed
-}) {
-  const canvasRef = useRef(null);
-  const assetsRef = useRef(null);
-  const cameraRef = useRef(new CameraSystem());
-  const autoTravelRef = useRef(new AutoTravelSystem());
-  const keysRef = useRef(new Set());
-  const joystickRef = useRef(joystickInput);
-  useEffect(() => { joystickRef.current = joystickInput; }, [joystickInput]);
-  const frameRef = useRef(0);
-  const playerRef = useRef({
-    x: 0, y: 0,
-    direction: 'down',
-    moving: false
-  });
+  onDirectoryTravelConsumed
+}){
+  const canvasRef=useRef(null);
+  const assetsRef=useRef(null);
+  const cameraRef=useRef(new CameraSystem());
+  const travelRef=useRef(new AutoTravelSystem());
+  const playerRef=useRef({x:0,y:0,direction:'down',moving:false});
+  const interactRef=useRef(onLocationInteract);
+  const [loaded,setLoaded]=useState(false);
+  const [traveling,setTraveling]=useState(false);
+  const [message,setMessage]=useState('');
+  useEffect(()=>{interactRef.current=onLocationInteract;},[onLocationInteract]);
+  useEffect(()=>{
+    let mounted=true;
+    const spawn=getSpawnPoint();
+    playerRef.current={x:spawn.x-16,y:spawn.y-40,direction:'down',moving:false};
+    cameraRef.current.snapTo(spawn.x,spawn.y);
+    loadAllAssets().then(assets=>{if(mounted){assetsRef.current=assets;setLoaded(true);}});
+    return ()=>{mounted=false;travelRef.current.cancel();};
+  },[]);
 
-  const [loaded, setLoaded] = useState(false);
-  const [nearbyLocation, setNearbyLocation] = useState(null);
-
-  // Initialize spawn position & load assets
-  useEffect(() => {
-    const spawn = getSpawnPoint();
-    playerRef.current.x = spawn.x - 16;
-    playerRef.current.y = spawn.y - 40;
-    cameraRef.current.snapTo(spawn.x, spawn.y);
-
-    loadAllAssets().then(assets => {
-      assetsRef.current = assets;
-      setLoaded(true);
+  const goToLocation=useCallback((id)=>{
+    const loc=LOCATIONS.find(l=>l.id===id);
+    if(!loc)return;
+    const player=playerRef.current;
+    const x=player.x+16,y=player.y+40;
+    setMessage('');
+    if(Math.hypot(x-loc.entranceX,y-loc.entranceY)<=18){
+      travelRef.current.cancel();setTraveling(false);interactRef.current(loc);return;
+    }
+    const started=travelRef.current.startTravel(x,y,id,()=>{
+      setTraveling(false);interactRef.current(loc);
     });
-  }, []);
+    setTraveling(started);
+    if(!started)setMessage('This entrance is temporarily unreachable. Choose another location.');
+  },[]);
 
-  // Handle external directory/map travel requests
-  useEffect(() => {
-    if (directoryTravelTarget && loaded) {
-      const player = playerRef.current;
-      const started = autoTravelRef.current.startTravel(
-        player.x + 16, player.y + 40,
-        directoryTravelTarget,
-        (destId) => {
-          const loc = LOCATIONS.find(l => l.id === destId);
-          if (loc) {
-            onLocationInteract(loc);
-          }
-        }
-      );
-      if (!started) {
-        const location = LOCATIONS.find(item => item.id === directoryTravelTarget);
-        if (location && Math.hypot(player.x + 16 - location.entranceX, player.y + 40 - location.entranceY) < location.interactionRadius) onLocationInteract(location);
-      }
-      if (onDirectoryTravelConsumed) onDirectoryTravelConsumed();
-    }
-  }, [directoryTravelTarget, loaded, onLocationInteract, onDirectoryTravelConsumed]);
+  useEffect(()=>{
+    if(!loaded||!directoryTravelTarget)return;
+    goToLocation(directoryTravelTarget);
+    onDirectoryTravelConsumed?.();
+  },[directoryTravelTarget,loaded,goToLocation,onDirectoryTravelConsumed]);
 
-  // Handle external mobile interact button trigger
-  useEffect(() => {
-    if (interactRequest && loaded) {
-      const player = playerRef.current;
-      const nearby = findNearbyLocation(player.x + 16, player.y + 40);
-      if (nearby) {
-        onLocationInteract(nearby);
-      }
-      if (onInteractRequestConsumed) onInteractRequestConsumed();
-    }
-  }, [interactRequest, loaded, onLocationInteract, onInteractRequestConsumed]);
-
-  // Keyboard navigation & interaction
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      const key = e.key.toLowerCase();
-      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
-        e.preventDefault();
-        keysRef.current.add(key);
-        // Requirement 7: Cancel auto-travel on manual input immediately
-        if (autoTravelRef.current.isActive()) {
-          autoTravelRef.current.cancel();
-        }
-      }
-      // Requirement 5: Interaction with E, Enter, Space
-      if (key === 'e' || key === 'enter' || key === ' ') {
-        e.preventDefault();
-        const player = playerRef.current;
-        const nearby = findNearbyLocation(player.x + 16, player.y + 40);
-        if (nearby) {
-          onLocationInteract(nearby);
-        }
-      }
-    };
-
-    const handleKeyUp = (e) => {
-      keysRef.current.delete(e.key.toLowerCase());
-    };
-    const resetKeys = () => keysRef.current.clear();
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('blur', resetKeys);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('blur', resetKeys);
-    };
-  }, [onLocationInteract]);
-
-  // Requirement 7: Click/tap to travel (building or its label)
-  const handleCanvasClick = useCallback((e) => {
-    if (!assetsRef.current) return;
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    const zoom = getRenderZoom(rect, isMobile);
-
-    const screenX = (e.clientX - rect.left) * dpr;
-    const screenY = (e.clientY - rect.top) * dpr;
-    
-    const world = screenToWorld(screenX, screenY, cameraRef.current, zoom * dpr, canvas.width, canvas.height);
-    const clicked = findClickedBuilding(world.x, world.y);
-    
-    if (clicked) {
-      const player = playerRef.current;
-      const started = autoTravelRef.current.startTravel(
-        player.x + 16, player.y + 40,
-        clicked.id,
-        (destId) => {
-          const loc = LOCATIONS.find(l => l.id === destId);
-          if (loc) onLocationInteract(loc);
-        }
-      );
-      if (!started && Math.hypot(player.x + 16 - clicked.entranceX, player.y + 40 - clicked.entranceY) <= clicked.interactionRadius) {
-        onLocationInteract(clicked);
-      }
-    }
-  }, [isMobile, onLocationInteract]);
-
-  // Main game loop (60 FPS RequestAnimationFrame)
-  useEffect(() => {
-    if (!loaded) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    let animId;
-    let lastProximityCheck = 0;
-    let lastTime = 0;
-    let blockedFrames = 0;
-
-    const gameLoop = (now) => {
-      const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.035) : 1 / 60;
-      lastTime = now;
-      frameRef.current++;
-      const frame = frameRef.current;
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const rect = canvas.getBoundingClientRect();
-      const zoom = getRenderZoom(rect, isMobile);
-
-      // Handle window resize dynamically
-      const targetW = Math.floor(rect.width * dpr);
-      const targetH = Math.floor(rect.height * dpr);
-      if (canvas.width !== targetW || canvas.height !== targetH) {
-        canvas.width = targetW;
-        canvas.height = targetH;
-      }
-
-      const player = playerRef.current;
-      let moving = false;
-      let dx = 0, dy = 0;
-
-      // Manual joystick input should immediately cancel an active auto-trip.
-      if (autoTravelRef.current.isActive() && joystickRef.current &&
-          Math.hypot(joystickRef.current.dx, joystickRef.current.dy) > 0.15) {
-        autoTravelRef.current.cancel();
-      }
-
-      // Auto-travel system
-      if (autoTravelRef.current.isActive()) {
-        const result = autoTravelRef.current.update(player.x + 16, player.y + 40, dt);
-        if (result && !result.arrived) {
-          dx = result.dx;
-          dy = result.dy;
-          player.direction = result.direction;
-          moving = true;
-        }
-      } else {
-        // Manual keyboard input
-        const keys = keysRef.current;
-        if (keys.has('w') || keys.has('arrowup')) { dy -= PLAYER_SPEED * dt; }
-        if (keys.has('s') || keys.has('arrowdown')) { dy += PLAYER_SPEED * dt; }
-        if (keys.has('a') || keys.has('arrowleft')) { dx -= PLAYER_SPEED * dt; }
-        if (keys.has('d') || keys.has('arrowright')) { dx += PLAYER_SPEED * dt; }
-
-        // Mobile joystick input
-        const joystick = joystickRef.current;
-        if (joystick && (joystick.dx !== 0 || joystick.dy !== 0)) {
-          dx += joystick.dx * PLAYER_SPEED * dt;
-          dy += joystick.dy * PLAYER_SPEED * dt;
-          if (autoTravelRef.current.isActive()) {
-            autoTravelRef.current.cancel();
-          }
-        }
-
-        if (dx !== 0 || dy !== 0) {
-          moving = true;
-          // Normalize diagonal movement speed
-          if (dx !== 0 && dy !== 0) {
-            const len = Math.sqrt(dx * dx + dy * dy);
-            dx = (dx / len) * PLAYER_SPEED * dt;
-            dy = (dy / len) * PLAYER_SPEED * dt;
-          }
-          if (Math.abs(dx) > Math.abs(dy)) {
-            player.direction = dx > 0 ? 'right' : 'left';
-          } else {
-            player.direction = dy > 0 ? 'down' : 'up';
-          }
-        }
-      }
-
-      // Check collisions against buildings, water, cliffs & world boundaries
-      if (moving) {
-        const newPos = resolveMovement(player.x, player.y, dx, dy);
-        const travelled = Math.hypot(newPos.x - player.x, newPos.y - player.y);
-        // Blocked by a newly encountered object? Reroute from the ACTUAL position.
-        if (autoTravelRef.current.isActive() && travelled < 0.12 && Math.hypot(dx, dy) > 0.12) {
-          blockedFrames++;
-          if (blockedFrames === 15) {
-            const destinationId = autoTravelRef.current.getDestinationId();
-            autoTravelRef.current.startTravel(player.x + 16, player.y + 40, destinationId, (id) => {
-              const location = LOCATIONS.find(item => item.id === id);
-              if (location) onLocationInteract(location);
-            });
-          }
-          if (blockedFrames > 40) autoTravelRef.current.cancel();
-        } else {
-          blockedFrames = 0;
-        }
-        player.x = newPos.x;
-        player.y = newPos.y;
-        moving = travelled > 0.08;
-      }
-      player.moving = moving;
-
-      // Update camera follow
-      cameraRef.current.update(
-        player.x + 16, player.y + 40,
-        canvas.width, canvas.height,
-        zoom * dpr
-      );
-
-      // Periodically check nearby building proximity (every 6 frames for performance)
-      if (frame - lastProximityCheck > 6) {
-        lastProximityCheck = frame;
-        const nearby = findNearbyLocation(player.x + 16, player.y + 40);
-        setNearbyLocation(prev => {
-          if (prev?.id !== nearby?.id) return nearby;
-          return prev;
-        });
-      }
-
-      // Render world
-      ctx.imageSmoothingEnabled = false;
-      renderWorld(
-        ctx, assetsRef.current, cameraRef.current,
-        player, zoom * dpr, canvas.width, canvas.height, now
-      );
-
-      animId = requestAnimationFrame(gameLoop);
-    };
-
-    animId = requestAnimationFrame(gameLoop);
-    return () => cancelAnimationFrame(animId);
-  }, [loaded, isMobile, onLocationInteract]);
-
-  if (!loaded) {
-    return (
-      <div className="game-loading">
-        <div className="loading-content">
-          <div className="loading-brand">NOMAD'S PROVINCE</div>
-          <div className="loading-bar-track">
-            <div className="loading-bar-fill"></div>
-          </div>
-          <div className="loading-text">Loading campus world assets...</div>
-        </div>
-      </div>
+  const handleClick=useCallback(e=>{
+    const canvas=canvasRef.current;
+    if(!canvas||!assetsRef.current)return;
+    const rect=canvas.getBoundingClientRect();
+    const dpr=Math.min(window.devicePixelRatio||1,1.5);
+    const zoom=getZoom(rect,isMobile);
+    const point=screenToWorld(
+      (e.clientX-rect.left)*dpr,
+      (e.clientY-rect.top)*dpr,
+      cameraRef.current,zoom*dpr,canvas.width,canvas.height
     );
-  }
+    const building=findClickedBuilding(point.x,point.y);
+    if(building){goToLocation(building.id);return;}
+    const player=playerRef.current;
+    const path=buildPathToPoint(player.x+16,player.y+40,point.x,point.y);
+    const started=travelRef.current.startPath(path,()=>setTraveling(false));
+    setTraveling(started);
+    setMessage(started?'':'That area is not walkable. Tap a pathway or select a building.');
+  },[isMobile,goToLocation]);
 
-  return (
-    <div className="canvas-wrapper">
-      <canvas 
-        ref={canvasRef} 
-        className="world-canvas"
-        onClick={handleCanvasClick}
-      />
+  useEffect(()=>{
+    if(!loaded)return;
+    const canvas=canvasRef.current;
+    if(!canvas)return;
+    const ctx=canvas.getContext('2d',{alpha:false});
+    let animationId,lastTime=0,blockedFrames=0;
+    const loop=(now)=>{
+      const dt=lastTime?Math.max(0,Math.min((now-lastTime)/1000,.04)):1/60;
+      lastTime=now;
+      const dpr=Math.min(window.devicePixelRatio||1,1.5);
+      const rect=canvas.getBoundingClientRect();
+      const width=Math.max(1,Math.round(rect.width*dpr));
+      const height=Math.max(1,Math.round(rect.height*dpr));
+      if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
+      const zoom=getZoom(rect,isMobile);
+      const player=playerRef.current;
+      let moved=false;
+      if(travelRef.current.isActive()){
+        const p=travelRef.current.update(player.x+16,player.y+40,dt);
+        if(p&&!p.arrived){
+          player.direction=p.direction;
+          const next=resolveMovement(player.x,player.y,p.dx,p.dy);
+          const distance=Math.hypot(next.x-player.x,next.y-player.y);
+          player.x=next.x;player.y=next.y;
+          moved=distance>0.08;
+          if(!moved&&Math.hypot(p.dx,p.dy)>0.1){
+            blockedFrames++;
+            if(blockedFrames===15){
+              const destination=travelRef.current.getDestinationId();
+              if(destination){
+                // Replan from actual feet coordinates, never from spawn/plaza.
+                travelRef.current.startTravel(player.x+16,player.y+40,destination,()=>{
+                  const loc=LOCATIONS.find(l=>l.id===destination);
+                  setTraveling(false);if(loc)interactRef.current(loc);
+                });
+              } else {travelRef.current.cancel();setTraveling(false);}
+            }
+            if(blockedFrames>35){
+              travelRef.current.cancel();
+              setTraveling(false);
+              setMessage('Path blocked. Tap another reachable destination.');
+            }
+          }else blockedFrames=0;
+        }
+      }
+      player.moving=moved;
+      cameraRef.current.update(player.x+16,player.y+40,width,height,zoom*dpr);
+      renderWorld(ctx,assetsRef.current,cameraRef.current,player,zoom*dpr,width,height,now);
+      animationId=requestAnimationFrame(loop);
+    };
+    animationId=requestAnimationFrame(loop);
+    return ()=>cancelAnimationFrame(animationId);
+  },[loaded,isMobile]);
 
-      {/* Floating proximity indicator when near building entrance */}
-      {nearbyLocation && (
-        <div 
-          className="in-world-prompt"
-          onClick={() => onLocationInteract(nearbyLocation)}
-        >
-          <span className="prompt-badge" style={{ backgroundColor: nearbyLocation.accentColor }}>E</span>
-          <span className="prompt-label">Enter <strong>{nearbyLocation.displayName}</strong></span>
-          <span className="prompt-sub">&rarr;</span>
-        </div>
-      )}
-    </div>
-  );
+  if(!loaded)return <div className="game-loading"><div className="loading-content">Loading Nomad's Province...</div></div>;
+  return <div className="canvas-wrapper">
+    <canvas ref={canvasRef} className="world-canvas" onClick={handleClick} aria-label="Interactive headquarters. Click or tap a building to travel there."/>
+    {message&&<div className="game-action-message" role="status" onClick={()=>setMessage('')}>{message}</div>}
+    {traveling&&<div className="game-travel-status" role="status">Walking to destination...</div>}
+  </div>;
 }
