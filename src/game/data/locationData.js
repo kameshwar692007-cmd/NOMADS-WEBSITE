@@ -44,7 +44,7 @@ export const LOCATIONS = [
     id:'event-grounds', displayName:'Event Grounds', shortName:'Events',
     description:'Explore upcoming events, past events, results and highlights.', tagline:'Upcoming & Past Events', route:'/events', accentColor:'#fdbe53',
     badgeAsset:'/assets/game/ui/badge-events.png', worldX:575, worldY:650, buildingWidth:520, buildingHeight:225,
-    entranceX:835, entranceY:835, interactionRadius:64, collisionBox:{x:55,y:18,w:410,h:125},
+    entranceX:700, entranceY:807, interactionRadius:72, collisionBox:{x:55,y:18,w:410,h:125},
     enterLabel:'ENTER GROUNDS', secondaryLabel:'VIEW EVENTS',
     sectionDetails:{highlights:['Upcoming and past events','Schedules and announcements','Gallery, videos and highlights','Results, winners, organizers and partners'],quickStats:[{label:'Categories',value:'Esports • Game Dev • Sports'},{label:'Status',value:'Dynamic'},{label:'Registration',value:'External'}]}
   }
