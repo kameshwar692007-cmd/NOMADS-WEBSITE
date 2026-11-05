@@ -22,7 +22,7 @@ function drawPlayer(ctx, assets, player, elapsed) {
   ctx.fill();
   const hero=assets['player/uploaded-hero'] || assets['player/nomad-hero'];
   if(hero?.width){
-    ctx.drawImage(hero,column*32,row*48,32,48,px,py,32,48);
+    ctx.drawImage(hero,column*16,row*24,16,24,px,py+6,32,42);
   }
 }
 
