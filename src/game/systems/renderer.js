@@ -18,11 +18,11 @@ function drawPlayer(ctx, assets, player, elapsed) {
   const px=Math.round(x),py=Math.round(y);
   ctx.fillStyle='rgba(4,8,14,.22)';
   ctx.beginPath();
-  ctx.ellipse(px+16,py+43,10,3,0,0,Math.PI*2);
+  ctx.ellipse(px+16,py+40,9,2.5,0,0,Math.PI*2);
   ctx.fill();
   const hero=assets['player/uploaded-hero'] || assets['player/nomad-hero'];
   if(hero?.width){
-    ctx.drawImage(hero,column*16,row*24,16,24,px,py+6,32,42);
+    ctx.drawImage(hero,column*16,row*24,16,24,px+2,py-2,28,42);
   }
 }
 
