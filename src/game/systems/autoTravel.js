@@ -10,6 +10,7 @@ export class AutoTravelSystem {
     this.speed = 150; // world pixels per second
     this.onArrive = null;
     this.lastFailedDestination = null;
+    this.currentDirection = 'down';
   }
 
   startTravel(x, y, id, onArrive) {
@@ -64,17 +65,32 @@ export class AutoTravelSystem {
         continue;
       }
       const length = Math.min(step, dist);
+
+      // Direction hysteresis: prevent rapid 1-frame flickering on diagonal movement
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+      let dir = this.currentDirection || 'down';
+
+      if (absDx > absDy * 1.2) {
+        dir = dx > 0 ? 'right' : 'left';
+      } else if (absDy > absDx * 1.2) {
+        dir = dy > 0 ? 'down' : 'up';
+      } else if (!this.currentDirection) {
+        dir = absDx > absDy ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+      }
+      this.currentDirection = dir;
+
       return {
         dx: dx / dist * length,
         dy: dy / dist * length,
         arrived: false,
-        direction: Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up')
+        direction: dir
       };
     }
     const callback = this.onArrive;
     const id = this.destinationId;
     this.cancel();
     if (callback) callback(id);
-    return { dx:0, dy:0, arrived:true, direction:'down' };
+    return { dx: 0, dy: 0, arrived: true, direction: this.currentDirection || 'down' };
   }
 }

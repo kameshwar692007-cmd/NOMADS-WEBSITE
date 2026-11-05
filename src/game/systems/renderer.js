@@ -4,42 +4,42 @@ import { WORLD_WIDTH, WORLD_HEIGHT } from '../data/mapData.js';
 
 function drawArtwork(ctx, image) {
   ctx.drawImage(image, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-
-  // Keep the approved art intact. The previously painted solid blocks were
-  // hiding the authored corner scenery and created two large black voids.
-  // The original logo and Map/Menu signs remain visible on the artwork.
-
 }
 
+// 4-phase natural walk cycle: Left Stride (1) -> Passing/Neutral (2) -> Right Stride (3) -> Passing/Neutral (2)
+const WALK_CYCLE = [1, 2, 3, 2];
+
 function drawPlayer(ctx, assets, player, elapsed) {
-  const {x,y,direction,moving}=player;
-  const row={down:0,up:1,left:2,right:3}[direction] ?? 0;
-  const column=moving ? 1+Math.floor(elapsed/145)%3 : 0;
-  const px=Math.round(x),py=Math.round(y);
-  ctx.fillStyle='rgba(4,8,14,.22)';
+  const { x, y, direction, moving } = player;
+  const row = { down: 0, up: 1, left: 2, right: 3 }[direction] ?? 0;
+  const column = moving ? WALK_CYCLE[Math.floor(elapsed / 135) % 4] : 0;
+  const px = Math.round(x), py = Math.round(y);
+
+  ctx.fillStyle = 'rgba(4,8,14,.22)';
   ctx.beginPath();
-  ctx.ellipse(px+16,py+40,9,2.5,0,0,Math.PI*2);
+  ctx.ellipse(px + 16, py + 40, 9, 2.5, 0, 0, Math.PI * 2);
   ctx.fill();
-  const hero=assets['player/uploaded-hero'] || assets['player/nomad-hero'];
-  if(hero?.width){
-    ctx.drawImage(hero,column*16,row*24,16,24,px+2,py-2,28,42);
+
+  const hero = assets['player/uploaded-hero'] || assets['player/nomad-hero'];
+  if (hero?.width) {
+    ctx.drawImage(hero, column * 16, row * 24, 16, 24, px + 2, py - 2, 28, 42);
   }
 }
 
-function drawWorldDirectory(ctx){
+function drawWorldDirectory(ctx) {
   // Match the permanent, authored Menu and Map plaques on the top right.
-  const x=1203,y=10,w=167,h=65;
+  const x = 1203, y = 10, w = 167, h = 65;
   ctx.save();
-  ctx.fillStyle='#0d1b33';
-  ctx.strokeStyle='#e4e5ec';
-  ctx.lineWidth=4;
+  ctx.fillStyle = '#0d1b33';
+  ctx.strokeStyle = '#e4e5ec';
+  ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.roundRect(x,y,w,h,13);
-  ctx.fill();ctx.stroke();
-  ctx.fillStyle='#ffffff';
-  ctx.font='bold 18px Arial';
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText('DIRECTORY',x+w/2,y+h/2);
+  ctx.roundRect(x, y, w, h, 13);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 18px Arial';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('DIRECTORY', x + w / 2, y + h / 2);
   ctx.restore();
 }
 
@@ -58,6 +58,8 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   ctx.restore();
 }
 
-export function screenToWorld(x, y, camera, zoom, width, height) {
-  return {x: (x - width / 2) / zoom + camera.x, y: (y - height / 2) / zoom + camera.y};
+export function screenToWorld(screenX, screenY, camera, zoom, canvasW, canvasH) {
+  const worldX = (screenX - canvasW / 2) / zoom + camera.x;
+  const worldY = (screenY - canvasH / 2) / zoom + camera.y;
+  return { x: worldX, y: worldY };
 }
