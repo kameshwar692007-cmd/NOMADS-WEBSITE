@@ -11,7 +11,7 @@ import { resolveMovement } from '../systems/collision.js';
 import { loadAllAssets } from '../systems/assetLoader.js';
 import { renderWorld, screenToWorld } from '../systems/renderer.js';
 
-const PLAYER_SPEED = 2.6;
+const PLAYER_SPEED = 168; // pixels per second, independent of FPS
 const DESKTOP_FIT_PADDING = 0.96;
 const MOBILE_ZOOM = 1.35;
 
@@ -36,6 +36,8 @@ export default function GameCanvas({
   const cameraRef = useRef(new CameraSystem());
   const autoTravelRef = useRef(new AutoTravelSystem());
   const keysRef = useRef(new Set());
+  const joystickRef = useRef(joystickInput);
+  useEffect(() => { joystickRef.current = joystickInput; }, [joystickInput]);
   const frameRef = useRef(0);
   const playerRef = useRef({
     x: 0, y: 0,
@@ -50,7 +52,7 @@ export default function GameCanvas({
   useEffect(() => {
     const spawn = getSpawnPoint();
     playerRef.current.x = spawn.x - 16;
-    playerRef.current.y = spawn.y - 24;
+    playerRef.current.y = spawn.y - 40;
     cameraRef.current.snapTo(spawn.x, spawn.y);
 
     loadAllAssets().then(assets => {
@@ -64,7 +66,7 @@ export default function GameCanvas({
     if (directoryTravelTarget && loaded) {
       const player = playerRef.current;
       autoTravelRef.current.startTravel(
-        player.x + 16, player.y + 24,
+        player.x + 16, player.y + 40,
         directoryTravelTarget,
         (destId) => {
           const loc = LOCATIONS.find(l => l.id === destId);
@@ -81,7 +83,7 @@ export default function GameCanvas({
   useEffect(() => {
     if (interactRequest && loaded) {
       const player = playerRef.current;
-      const nearby = findNearbyLocation(player.x + 16, player.y + 24);
+      const nearby = findNearbyLocation(player.x + 16, player.y + 40);
       if (nearby) {
         onLocationInteract(nearby);
       }
@@ -105,7 +107,7 @@ export default function GameCanvas({
       if (key === 'e' || key === 'enter' || key === ' ') {
         e.preventDefault();
         const player = playerRef.current;
-        const nearby = findNearbyLocation(player.x + 16, player.y + 24);
+        const nearby = findNearbyLocation(player.x + 16, player.y + 40);
         if (nearby) {
           onLocationInteract(nearby);
         }
@@ -115,12 +117,15 @@ export default function GameCanvas({
     const handleKeyUp = (e) => {
       keysRef.current.delete(e.key.toLowerCase());
     };
+    const resetKeys = () => keysRef.current.clear();
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', resetKeys);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', resetKeys);
     };
   }, [onLocationInteract]);
 
@@ -129,7 +134,7 @@ export default function GameCanvas({
     if (!assetsRef.current) return;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const zoom = getRenderZoom(rect, isMobile);
 
     const screenX = (e.clientX - rect.left) * dpr;
@@ -141,7 +146,7 @@ export default function GameCanvas({
     if (clicked) {
       const player = playerRef.current;
       autoTravelRef.current.startTravel(
-        player.x + 16, player.y + 24,
+        player.x + 16, player.y + 40,
         clicked.id,
         (destId) => {
           const loc = LOCATIONS.find(l => l.id === destId);
@@ -160,11 +165,15 @@ export default function GameCanvas({
 
     let animId;
     let lastProximityCheck = 0;
+    let lastTime = 0;
+    let blockedFrames = 0;
 
-    const gameLoop = () => {
+    const gameLoop = (now) => {
+      const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.035) : 1 / 60;
+      lastTime = now;
       frameRef.current++;
       const frame = frameRef.current;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const rect = canvas.getBoundingClientRect();
       const zoom = getRenderZoom(rect, isMobile);
 
@@ -180,9 +189,15 @@ export default function GameCanvas({
       let moving = false;
       let dx = 0, dy = 0;
 
+      // Manual joystick input should immediately cancel an active auto-trip.
+      if (autoTravelRef.current.isActive() && joystickRef.current &&
+          Math.hypot(joystickRef.current.dx, joystickRef.current.dy) > 0.15) {
+        autoTravelRef.current.cancel();
+      }
+
       // Auto-travel system
       if (autoTravelRef.current.isActive()) {
-        const result = autoTravelRef.current.update(player.x + 16, player.y + 24);
+        const result = autoTravelRef.current.update(player.x + 16, player.y + 40, dt);
         if (result && !result.arrived) {
           dx = result.dx;
           dy = result.dy;
@@ -192,15 +207,16 @@ export default function GameCanvas({
       } else {
         // Manual keyboard input
         const keys = keysRef.current;
-        if (keys.has('w') || keys.has('arrowup')) { dy -= PLAYER_SPEED; }
-        if (keys.has('s') || keys.has('arrowdown')) { dy += PLAYER_SPEED; }
-        if (keys.has('a') || keys.has('arrowleft')) { dx -= PLAYER_SPEED; }
-        if (keys.has('d') || keys.has('arrowright')) { dx += PLAYER_SPEED; }
+        if (keys.has('w') || keys.has('arrowup')) { dy -= PLAYER_SPEED * dt; }
+        if (keys.has('s') || keys.has('arrowdown')) { dy += PLAYER_SPEED * dt; }
+        if (keys.has('a') || keys.has('arrowleft')) { dx -= PLAYER_SPEED * dt; }
+        if (keys.has('d') || keys.has('arrowright')) { dx += PLAYER_SPEED * dt; }
 
         // Mobile joystick input
-        if (joystickInput && (joystickInput.dx !== 0 || joystickInput.dy !== 0)) {
-          dx += joystickInput.dx * PLAYER_SPEED;
-          dy += joystickInput.dy * PLAYER_SPEED;
+        const joystick = joystickRef.current;
+        if (joystick && (joystick.dx !== 0 || joystick.dy !== 0)) {
+          dx += joystick.dx * PLAYER_SPEED * dt;
+          dy += joystick.dy * PLAYER_SPEED * dt;
           if (autoTravelRef.current.isActive()) {
             autoTravelRef.current.cancel();
           }
@@ -211,8 +227,8 @@ export default function GameCanvas({
           // Normalize diagonal movement speed
           if (dx !== 0 && dy !== 0) {
             const len = Math.sqrt(dx * dx + dy * dy);
-            dx = (dx / len) * PLAYER_SPEED;
-            dy = (dy / len) * PLAYER_SPEED;
+            dx = (dx / len) * PLAYER_SPEED * dt;
+            dy = (dy / len) * PLAYER_SPEED * dt;
           }
           if (Math.abs(dx) > Math.abs(dy)) {
             player.direction = dx > 0 ? 'right' : 'left';
@@ -225,14 +241,30 @@ export default function GameCanvas({
       // Check collisions against buildings, water, cliffs & world boundaries
       if (moving) {
         const newPos = resolveMovement(player.x, player.y, dx, dy);
+        const travelled = Math.hypot(newPos.x - player.x, newPos.y - player.y);
+        // Blocked by a newly encountered object? Reroute from the ACTUAL position.
+        if (autoTravelRef.current.isActive() && travelled < 0.12 && Math.hypot(dx, dy) > 0.12) {
+          blockedFrames++;
+          if (blockedFrames === 15) {
+            const destinationId = autoTravelRef.current.getDestinationId();
+            autoTravelRef.current.startTravel(player.x + 16, player.y + 40, destinationId, (id) => {
+              const location = LOCATIONS.find(item => item.id === id);
+              if (location) onLocationInteract(location);
+            });
+          }
+          if (blockedFrames > 40) autoTravelRef.current.cancel();
+        } else {
+          blockedFrames = 0;
+        }
         player.x = newPos.x;
         player.y = newPos.y;
+        moving = travelled > 0.08;
       }
       player.moving = moving;
 
       // Update camera follow
       cameraRef.current.update(
-        player.x + 16, player.y + 24,
+        player.x + 16, player.y + 40,
         canvas.width, canvas.height,
         zoom * dpr
       );
@@ -240,7 +272,7 @@ export default function GameCanvas({
       // Periodically check nearby building proximity (every 6 frames for performance)
       if (frame - lastProximityCheck > 6) {
         lastProximityCheck = frame;
-        const nearby = findNearbyLocation(player.x + 16, player.y + 24);
+        const nearby = findNearbyLocation(player.x + 16, player.y + 40);
         setNearbyLocation(prev => {
           if (prev?.id !== nearby?.id) return nearby;
           return prev;
@@ -251,7 +283,7 @@ export default function GameCanvas({
       ctx.imageSmoothingEnabled = false;
       renderWorld(
         ctx, assetsRef.current, cameraRef.current,
-        player, zoom * dpr, canvas.width, canvas.height, frame
+        player, zoom * dpr, canvas.width, canvas.height, now
       );
 
       animId = requestAnimationFrame(gameLoop);
@@ -259,7 +291,7 @@ export default function GameCanvas({
 
     animId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animId);
-  }, [loaded, isMobile, joystickInput]);
+  }, [loaded, isMobile, onLocationInteract]);
 
   if (!loaded) {
     return (
