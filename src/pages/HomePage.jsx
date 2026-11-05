@@ -9,7 +9,6 @@ import Directory from '../game/components/Directory.jsx';
 import MapModal from '../game/components/MapModal.jsx';
 import MenuDrawer from '../game/components/MenuDrawer.jsx';
 import ControlHints from '../game/components/ControlHints.jsx';
-import MobileControls from '../game/components/MobileControls.jsx';
 
 export default function HomePage() {
   const [activeLocation, setActiveLocation] = useState(null);
@@ -17,9 +16,7 @@ export default function HomePage() {
   const [mapOpen, setMapOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [joystickInput, setJoystickInput] = useState({ dx: 0, dy: 0 });
   const [travelTarget, setTravelTarget] = useState(null);
-  const [interactTrigger, setInteractTrigger] = useState(0);
 
   // Responsive device check
   useEffect(() => {
@@ -64,10 +61,6 @@ export default function HomePage() {
     setTravelTarget(null);
   }, []);
 
-  const handleMobileInteract = useCallback(() => {
-    setInteractTrigger(prev => prev + 1);
-  }, []);
-
   return (
     <div className="homepage-frame">
       {/* 1. Minimal Header (Brand on left; DIRECTORY, MAP, MENU on right) */}
@@ -82,11 +75,8 @@ export default function HomePage() {
         <GameCanvas 
           onLocationInteract={handleLocationInteract}
           isMobile={isMobile}
-          joystickInput={joystickInput}
           directoryTravelTarget={travelTarget}
           onDirectoryTravelConsumed={handleTravelConsumed}
-          interactRequest={interactTrigger}
-          onInteractRequestConsumed={() => {}}
         />
       </main>
 
@@ -119,13 +109,6 @@ export default function HomePage() {
       {/* 7. Desktop Unobtrusive Bottom Control Hints */}
       <ControlHints isMobile={isMobile} />
 
-      {/* 8. Mobile Virtual Joystick & Interact Button */}
-      {isMobile && (
-        <MobileControls 
-          onJoystickChange={setJoystickInput}
-          onInteract={handleMobileInteract}
-        />
-      )}
     </div>
   );
 }
