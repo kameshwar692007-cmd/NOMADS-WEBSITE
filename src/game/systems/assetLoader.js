@@ -8,9 +8,10 @@ function loadImage(url){
  });
 }
 export async function loadAllAssets(){
- const [campus,hero]=await Promise.all([
+ const [campus,hero,plazaPatch]=await Promise.all([
   loadImage('/assets/game/campus-world.png'),
-  loadImage('/assets/game/characters/player/uploaded-hero.png')
+  loadImage('/assets/game/characters/player/uploaded-hero.png'),
+  loadImage('/assets/game/plaza-clean-patch.png')
  ]);
- return {'world/campus':campus,'player/uploaded-hero':hero};
+ return {'world/campus':campus,'player/uploaded-hero':hero,'world/plaza-patch':plazaPatch};
 }
