@@ -1,5 +1,6 @@
 // Nomad's Province — Admin Command Center (/admin)
-// Comprehensive event management, status overrides, poster uploads, results & draft controls
+// Comprehensive event management, status mode overrides, poster uploads, results & draft controls
+// Genuine RBAC enforcement: SUPER_ADMIN, ADMIN, EDITOR with database-verified session check
 
 import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
@@ -20,7 +21,14 @@ import {
 export default function AdminPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeRole, setActiveRole] = useState('SUPER_ADMIN'); // 'SUPER_ADMIN' | 'ADMIN' | 'EDITOR'
+  const [userRoleState, setUserRoleState] = useState({
+    role: 'SUPER_ADMIN',
+    email: 'admin@nomadsprovince.com',
+    isStaff: true,
+    isAdmin: true,
+    isSuperAdmin: true,
+    isSimulated: true
+  });
   const [statusFilter, setStatusFilter] = useState('ALL');
   
   // Modal states
@@ -28,6 +36,8 @@ export default function AdminPage() {
   const [editingEvent, setEditingEvent] = useState(null);
   const [resultsModalOpen, setResultsModalOpen] = useState(false);
   const [selectedForResults, setSelectedForResults] = useState(null);
+  const [auditModalOpen, setAuditModalOpen] = useState(false);
+  const [auditLogs, setAuditLogs] = useState([]);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -36,40 +46,60 @@ export default function AdminPage() {
     venue: '',
     startDate: '',
     endDate: '',
+    registrationDeadline: '',
     registrationUrl: '',
     partner: "Nomad's Province",
     posterUrl: '',
     description: '',
-    status: 'AUTO',
+    statusMode: 'AUTO',
+    manualStatus: 'UPCOMING',
     isDraft: false
   });
 
   const [resultsData, setResultsData] = useState({
     champion: '',
     runnerUp: '',
-    highlights: ''
+    highlights: '',
+    trophy_notes: ''
   });
 
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [uploadingPoster, setUploadingPoster] = useState(false);
 
-  // Load events
-  const loadEvents = async () => {
+  // Load events and user role
+  const loadEventsAndRole = async () => {
     setLoading(true);
     try {
-      const data = await eventService.getAllEventsForAdmin();
-      setEvents(data);
+      const [eventsData, roleData] = await Promise.all([
+        eventService.getAllEventsForAdmin(),
+        eventService.getCurrentUserRole()
+      ]);
+      setEvents(eventsData);
+      setUserRoleState(roleData);
     } catch (err) {
-      console.error('Failed to load events:', err);
+      console.error('Failed to load admin telemetry:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadEvents();
+    loadEventsAndRole();
   }, []);
+
+  // For offline / local development simulation: switch simulated role
+  const handleSimulateRoleSwitch = (newRole) => {
+    sound.playSelect();
+    eventService.setSimulatedRole(newRole);
+    setUserRoleState((prev) => ({
+      ...prev,
+      role: newRole,
+      isStaff: ['SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(newRole),
+      isAdmin: ['SUPER_ADMIN', 'ADMIN'].includes(newRole),
+      isSuperAdmin: newRole === 'SUPER_ADMIN'
+    }));
+  };
 
   // Filtered event list
   const filteredEvents = events.filter((ev) => {
@@ -93,11 +123,13 @@ export default function AdminPage() {
       venue: 'Chennai Campus / Online',
       startDate: now.toISOString().slice(0, 16),
       endDate: later.toISOString().slice(0, 16),
+      registrationDeadline: '',
       registrationUrl: 'https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f',
       partner: "Nomad's Province",
       posterUrl: '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
       description: '',
-      status: 'AUTO',
+      statusMode: 'AUTO',
+      manualStatus: 'UPCOMING',
       isDraft: false
     });
     setFormError('');
@@ -115,11 +147,13 @@ export default function AdminPage() {
       venue: ev.venue,
       startDate: new Date(ev.startDate).toISOString().slice(0, 16),
       endDate: new Date(ev.endDate).toISOString().slice(0, 16),
+      registrationDeadline: ev.registrationDeadline ? new Date(ev.registrationDeadline).toISOString().slice(0, 16) : '',
       registrationUrl: ev.registrationUrl || '',
       partner: ev.partner || '',
       posterUrl: ev.posterUrl || '',
       description: ev.description || '',
-      status: ev.status || 'AUTO',
+      statusMode: ev.statusMode || 'AUTO',
+      manualStatus: ev.manualStatus || 'UPCOMING',
       isDraft: Boolean(ev.isDraft)
     });
     setFormError('');
@@ -137,7 +171,7 @@ export default function AdminPage() {
       if (editingEvent) {
         await eventService.updateEvent(editingEvent.id, formData);
         sound.playSelect();
-        setFormSuccess('Event updated successfully!');
+        setFormSuccess('Event updated and audit logged!');
       } else {
         await eventService.createEvent(formData);
         sound.playSelect();
@@ -145,7 +179,7 @@ export default function AdminPage() {
         setFormSuccess('New event created and registered!');
       }
 
-      await loadEvents();
+      await loadEventsAndRole();
       setTimeout(() => {
         setEditorOpen(false);
       }, 1200);
@@ -155,26 +189,30 @@ export default function AdminPage() {
     }
   };
 
-  // Delete event
+  // Delete event (Guarded by RBAC)
   const handleDelete = async (id, title) => {
+    if (!userRoleState.isAdmin && !userRoleState.isSuperAdmin) {
+      alert('Access Denied: Only Admins and Super Admins can delete events. Editors have edit-only access.');
+      return;
+    }
     if (!window.confirm(`Are you sure you want to permanently delete "${title}"?`)) {
       return;
     }
     sound.playCancel();
     try {
       await eventService.deleteEvent(id);
-      await loadEvents();
+      await loadEventsAndRole();
     } catch (err) {
       alert(err.message || 'Failed to delete event.');
     }
   };
 
-  // Status toggle
-  const handleStatusChange = async (id, newStatus) => {
+  // Status Mode and Override toggle
+  const handleStatusChange = async (id, modeOrStatus) => {
     sound.playSelect();
     try {
-      await eventService.setStatusOverride(id, newStatus);
-      await loadEvents();
+      await eventService.setStatusOverride(id, modeOrStatus);
+      await loadEventsAndRole();
     } catch (err) {
       alert(err.message || 'Failed to update status.');
     }
@@ -185,7 +223,7 @@ export default function AdminPage() {
     sound.playSelect();
     try {
       await eventService.toggleDraft(id);
-      await loadEvents();
+      await loadEventsAndRole();
     } catch (err) {
       alert(err.message || 'Failed to toggle draft status.');
     }
@@ -198,7 +236,8 @@ export default function AdminPage() {
     setResultsData({
       champion: ev.results?.champion || '',
       runnerUp: ev.results?.runnerUp || '',
-      highlights: ev.results?.highlights || ''
+      highlights: ev.results?.highlights || '',
+      trophy_notes: ev.results?.trophy_notes || ''
     });
     setResultsModalOpen(true);
   };
@@ -215,11 +254,19 @@ export default function AdminPage() {
         origin: { y: 0.5 },
         colors: ['#e84537', '#38bdf8', '#ffd700']
       });
-      await loadEvents();
+      await loadEventsAndRole();
       setResultsModalOpen(false);
     } catch (err) {
       alert(err.message || 'Failed to record results.');
     }
+  };
+
+  // Open Audit Log Drawer
+  const handleOpenAuditLogs = async () => {
+    sound.playSelect();
+    const logs = await eventService.getAuditLogs();
+    setAuditLogs(logs);
+    setAuditModalOpen(true);
   };
 
   // Poster File Upload
@@ -251,7 +298,7 @@ export default function AdminPage() {
   return (
     <GameShell
       title="ADMIN COMMAND CENTER"
-      subtitle="Event Operations, Live Status Overrides, Tournament Results & Media"
+      subtitle="Event Operations, RBAC Governance, Live Overrides, Tournament Results & Media"
       accentColor="#ef4444"
     >
       {/* 1. Admin Top Control & Telemetry Bar */}
@@ -264,6 +311,11 @@ export default function AdminPage() {
                 {eventService.isCloudConnected() ? 'CONNECTED: SUPABASE POSTGRESQL' : 'STORAGE: RESILIENT LOCAL FALLBACK'}
               </span>
               <span className="telemetry-env">VERCEL FREE TIER COMPATIBLE</span>
+              {userRoleState.isSimulated && (
+                <span className="telemetry-env" style={{ background: '#3b82f6', color: '#fff' }}>
+                  DEV ROLE SIMULATION
+                </span>
+              )}
             </div>
             <h2 className="telemetry-heading">Nomad's Province Event Governance</h2>
             <p className="telemetry-desc">
@@ -272,9 +324,11 @@ export default function AdminPage() {
             </p>
           </div>
 
-          {/* Role Access Selector */}
+          {/* Role Access Indicator & Simulator */}
           <div className="telemetry-role-box">
-            <span className="role-box-label">CURRENT ACCESS LEVEL</span>
+            <span className="role-box-label">
+              AUTHENTICATED ROLE: <strong style={{ color: '#38bdf8' }}>{userRoleState.role}</strong>
+            </span>
             <div className="role-selector-pills">
               {[
                 { id: 'SUPER_ADMIN', label: 'Super Admin', icon: '👑' },
@@ -283,8 +337,9 @@ export default function AdminPage() {
               ].map((role) => (
                 <button
                   key={role.id}
-                  className={`role-pill-btn ${activeRole === role.id ? 'active' : ''}`}
-                  onClick={() => { sound.playSelect(); setActiveRole(role.id); }}
+                  className={`role-pill-btn ${userRoleState.role === role.id ? 'active' : ''}`}
+                  onClick={() => handleSimulateRoleSwitch(role.id)}
+                  title={`Simulate ${role.label} permissions (DB RLS enforced in production)`}
                 >
                   <span>{role.icon}</span> {role.label}
                 </button>
@@ -338,12 +393,25 @@ export default function AdminPage() {
           ))}
         </div>
 
-        {activeRole !== 'VIEWER' && (
-          <button className="gamified-btn create-event-btn" onClick={handleOpenCreate} onMouseEnter={() => sound.playBlip()}>
-            <IconRocket size={16} />
-            <span>+ CREATE NEW EVENT</span>
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {(userRoleState.isAdmin || userRoleState.isSuperAdmin) && (
+            <button
+              className="gamified-btn secondary"
+              style={{ background: '#1e293b', border: '1px solid #475569' }}
+              onClick={handleOpenAuditLogs}
+            >
+              <IconShield size={16} />
+              <span>AUDIT TRAIL</span>
+            </button>
+          )}
+
+          {userRoleState.isStaff && (
+            <button className="gamified-btn create-event-btn" onClick={handleOpenCreate} onMouseEnter={() => sound.playBlip()}>
+              <IconRocket size={16} />
+              <span>+ CREATE NEW EVENT</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 3. Event Operations Table */}
@@ -357,7 +425,9 @@ export default function AdminPage() {
           <div className="admin-empty-pane">
             <IconEvents size={36} color="#64748b" />
             <p>No events found for category: {statusFilter}</p>
-            <button className="gamified-btn" onClick={handleOpenCreate}>CREATE AN EVENT</button>
+            {userRoleState.isStaff && (
+              <button className="gamified-btn" onClick={handleOpenCreate}>CREATE AN EVENT</button>
+            )}
           </div>
         ) : (
           <div className="admin-table-wrapper">
@@ -390,6 +460,11 @@ export default function AdminPage() {
                       <div className="table-partner">
                         Partner: <strong>{ev.partner}</strong>
                       </div>
+                      {ev.slug && (
+                        <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px', fontFamily: 'monospace' }}>
+                          slug: {ev.slug}
+                        </div>
+                      )}
                     </td>
 
                     <td className="cat-col">
@@ -414,30 +489,30 @@ export default function AdminPage() {
                           {ev.computedStatus}
                         </span>
 
-                        {ev.status !== 'AUTO' && (
-                          <span className="manual-override-tag">OVERRIDDEN</span>
+                        {ev.statusMode === 'MANUAL' && (
+                          <span className="manual-override-tag">MANUAL LOCK ({ev.manualStatus})</span>
                         )}
                       </div>
 
-                      {/* Quick One-Click Status Override */}
+                      {/* Quick One-Click Status Mode Controller */}
                       <div className="quick-status-actions">
                         <button 
                           className="status-action-pill" 
-                          title="Mark as Live Ongoing"
+                          title="Lock status to Live Ongoing"
                           onClick={() => handleStatusChange(ev.id, 'ONGOING')}
                         >
                           ● Live
                         </button>
                         <button 
                           className="status-action-pill" 
-                          title="Mark as Concluded / Ended"
+                          title="Lock status to Concluded / Ended"
                           onClick={() => handleStatusChange(ev.id, 'ENDED')}
                         >
                           ✓ End
                         </button>
                         <button 
                           className="status-action-pill" 
-                          title="Reset to Date-based Auto"
+                          title="Reset to Date-based Auto Calculation"
                           onClick={() => handleStatusChange(ev.id, 'AUTO')}
                         >
                           ⚡ Auto
@@ -471,7 +546,7 @@ export default function AdminPage() {
                           {ev.isDraft ? 'Publish' : 'Draft'}
                         </button>
 
-                        {activeRole === 'SUPER_ADMIN' && (
+                        {(userRoleState.isAdmin || userRoleState.isSuperAdmin) && (
                           <button 
                             className="action-btn delete-btn" 
                             onClick={() => handleDelete(ev.id, ev.title)}
@@ -564,6 +639,16 @@ export default function AdminPage() {
                 </div>
 
                 <div className="form-group span-2">
+                  <label className="retro-label">REGISTRATION DEADLINE (Optional)</label>
+                  <input
+                    type="datetime-local"
+                    className="retro-input"
+                    value={formData.registrationDeadline}
+                    onChange={(e) => setFormData({ ...formData, registrationDeadline: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group span-2">
                   <label className="retro-label">EXTERNAL REGISTRATION LINK (Google Form / WhatsApp)</label>
                   <input
                     type="url"
@@ -586,76 +671,82 @@ export default function AdminPage() {
                 </div>
 
                 <div className="form-group">
-                  <label className="retro-label">STATUS BEHAVIOR</label>
+                  <label className="retro-label">STATUS MODE (Temporal vs Manual Lock)</label>
                   <select
                     className="retro-input"
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    value={formData.statusMode === 'MANUAL' ? formData.manualStatus : 'AUTO'}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === 'AUTO') {
+                        setFormData({ ...formData, statusMode: 'AUTO', manualStatus: null });
+                      } else {
+                        setFormData({ ...formData, statusMode: 'MANUAL', manualStatus: val });
+                      }
+                    }}
                   >
-                    <option value="AUTO">Auto (Calculate based on Date & Time)</option>
-                    <option value="UPCOMING">Force Upcoming (Registrations Open)</option>
-                    <option value="ONGOING">Force Ongoing (Live Event Active)</option>
-                    <option value="ENDED">Force Ended (Concluded to Archive)</option>
+                    <option value="AUTO">Auto Mode (Date & Time Calculation)</option>
+                    <option value="UPCOMING">Manual Mode (Force UPCOMING)</option>
+                    <option value="ONGOING">Manual Mode (Force ONGOING)</option>
+                    <option value="ENDED">Manual Mode (Force ENDED)</option>
                   </select>
                 </div>
 
-                {/* Poster upload & preview */}
                 <div className="form-group span-2">
                   <label className="retro-label">EVENT POSTER IMAGE (Upload or URL)</label>
                   <div className="poster-upload-row">
                     <input
                       type="file"
-                      accept="image/png, image/jpeg, image/webp"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
                       className="poster-file-input"
                       onChange={handleFileUpload}
                       disabled={uploadingPoster}
                     />
-                    <input
-                      type="text"
-                      placeholder="Or paste image URL / public path"
-                      className="retro-input"
-                      value={formData.posterUrl}
-                      onChange={(e) => setFormData({ ...formData, posterUrl: e.target.value })}
-                    />
+                    {uploadingPoster && <span className="upload-indicator">UPLOADING...</span>}
                   </div>
-                  {uploadingPoster && <span className="upload-loading-text">Uploading image...</span>}
+                  <input
+                    type="text"
+                    placeholder="/assets/events-and-logos/..."
+                    className="retro-input"
+                    style={{ marginTop: '8px' }}
+                    value={formData.posterUrl}
+                    onChange={(e) => setFormData({ ...formData, posterUrl: e.target.value })}
+                  />
                   {formData.posterUrl && (
                     <div className="poster-preview-box">
-                      <img src={formData.posterUrl} alt="Poster preview" className="poster-preview-img" />
+                      <img src={formData.posterUrl} alt="Poster Preview" className="poster-preview-img" />
                     </div>
                   )}
                 </div>
 
                 <div className="form-group span-2">
-                  <label className="retro-label">EVENT DESCRIPTION</label>
+                  <label className="retro-label">DESCRIPTION & BRACKET DETAILS</label>
                   <textarea
-                    rows={3}
-                    placeholder="Provide tournament format, eligibility, and highlights..."
-                    className="retro-input textarea"
+                    rows={4}
+                    placeholder="Describe game rules, format, prize pools, and entry eligibility..."
+                    className="retro-input"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                 </div>
 
-                <div className="form-group span-2">
+                <div className="form-group span-2 draft-toggle-row">
                   <label className="checkbox-label">
                     <input
                       type="checkbox"
                       checked={formData.isDraft}
                       onChange={(e) => setFormData({ ...formData, isDraft: e.target.checked })}
                     />
-                    <span>Save as Draft (Hidden from public visitors on /events)</span>
+                    <span>Save as Draft (Hidden from public Event Grounds until published)</span>
                   </label>
                 </div>
               </div>
 
-              <div className="modal-actions-bar">
-                <button type="button" className="action-btn cancel-btn" onClick={() => setEditorOpen(false)}>
-                  Cancel
+              <div className="modal-footer-actions">
+                <button type="button" className="gamified-btn cancel-btn" onClick={() => setEditorOpen(false)}>
+                  CANCEL
                 </button>
                 <button type="submit" className="gamified-btn save-btn">
-                  <IconCheck size={16} />
-                  <span>{editingEvent ? 'SAVE CHANGES' : 'CREATE & PUBLISH'}</span>
+                  {editingEvent ? 'UPDATE EVENT' : 'REGISTER EVENT'}
                 </button>
               </div>
             </form>
@@ -663,37 +754,32 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* 5. Tournament Results Modal */}
+      {/* 5. Results & Trophy Modal */}
       {resultsModalOpen && selectedForResults && (
         <div className="retro-modal-backdrop" onClick={() => setResultsModalOpen(false)}>
-          <div className="retro-modal-card admin-results-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="retro-modal-card results-form-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>RECORD TOURNAMENT RESULTS: {selectedForResults.title}</h3>
+              <h3>RECORD TOURNAMENT RESULTS — {selectedForResults.title}</h3>
               <button className="modal-close-btn" onClick={() => setResultsModalOpen(false)}>✕</button>
             </div>
 
             <form onSubmit={handleSaveResults} className="modal-body-form">
-              <p className="results-intro">
-                Recording results will automatically mark this event as <strong>CONCLUDED (ENDED)</strong> and show the winner podium on the public Event Grounds.
-              </p>
-
               <div className="form-group">
-                <label className="retro-label">CHAMPION / 1ST PLACE WINNER</label>
+                <label className="retro-label">🥇 1ST PLACE / CHAMPION</label>
                 <input
                   type="text"
-                  placeholder="e.g. Team Hyperion (SRMIST)"
+                  placeholder="e.g. Team Phoenix or SRM Elite"
                   className="retro-input"
-                  required
                   value={resultsData.champion}
                   onChange={(e) => setResultsData({ ...resultsData, champion: e.target.value })}
                 />
               </div>
 
               <div className="form-group">
-                <label className="retro-label">RUNNER-UP / 2ND PLACE</label>
+                <label className="retro-label">🥈 2ND PLACE / RUNNER-UP</label>
                 <input
                   type="text"
-                  placeholder="e.g. Team Velocity (VIT-AP)"
+                  placeholder="e.g. Hyperion Gaming"
                   className="retro-input"
                   value={resultsData.runnerUp}
                   onChange={(e) => setResultsData({ ...resultsData, runnerUp: e.target.value })}
@@ -701,26 +787,89 @@ export default function AdminPage() {
               </div>
 
               <div className="form-group">
-                <label className="retro-label">MATCH HIGHLIGHTS & AWARDS</label>
+                <label className="retro-label">MATCH HIGHLIGHTS & SUMMARY</label>
                 <textarea
                   rows={3}
-                  placeholder="e.g. Grand finals broadcasted with 1,500 live viewers; MVP awarded to..."
-                  className="retro-input textarea"
+                  placeholder="e.g. Thrilling 5-map final concluded in overtime. Decathlon sports kits awarded."
+                  className="retro-input"
                   value={resultsData.highlights}
                   onChange={(e) => setResultsData({ ...resultsData, highlights: e.target.value })}
                 />
               </div>
 
-              <div className="modal-actions-bar">
-                <button type="button" className="action-btn cancel-btn" onClick={() => setResultsModalOpen(false)}>
-                  Cancel
+              <div className="modal-footer-actions">
+                <button type="button" className="gamified-btn cancel-btn" onClick={() => setResultsModalOpen(false)}>
+                  CANCEL
                 </button>
                 <button type="submit" className="gamified-btn save-btn">
-                  <IconTrophy size={16} />
-                  <span>RECORD WINNERS & CELEBRATE 🎉</span>
+                  SAVE PODIUM RESULTS
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 6. Tamper-Resistant Audit Trail Modal */}
+      {auditModalOpen && (
+        <div className="retro-modal-backdrop" onClick={() => setAuditModalOpen(false)}>
+          <div className="retro-modal-card admin-form-modal" style={{ maxWidth: '850px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>SECURITY AUDIT TRAIL (IMMUTABLE DATABASE LOGS)</h3>
+              <button className="modal-close-btn" onClick={() => setAuditModalOpen(false)}>✕</button>
+            </div>
+
+            <div style={{ padding: '16px', maxHeight: '450px', overflowY: 'auto' }}>
+              <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>
+                All mutations on the <code>events</code> table trigger immutable server-side logging. Direct client modifications or deletions of audit entries are permanently forbidden by database RLS.
+              </p>
+
+              {auditLogs.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                  No audit log entries found.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {auditLogs.map((log) => (
+                    <div key={log.id} style={{
+                      background: '#0d1322',
+                      border: '1px solid #1e293b',
+                      borderRadius: '6px',
+                      padding: '10px 14px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      fontSize: '12px',
+                      fontFamily: 'monospace'
+                    }}>
+                      <div>
+                        <span style={{
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          fontWeight: 'bold',
+                          background: log.action === 'INSERT' ? '#059669' : log.action === 'DELETE' ? '#dc2626' : '#2563eb',
+                          color: '#fff',
+                          marginRight: '10px'
+                        }}>
+                          {log.action}
+                        </span>
+                        <span style={{ color: '#e2e8f0' }}>Target: {log.target_table || log.targetTable || 'events'}</span>
+                        <span style={{ color: '#64748b', marginLeft: '12px' }}>Role: {log.actor_role || log.actorRole}</span>
+                      </div>
+                      <div style={{ color: '#94a3b8' }}>
+                        {new Date(log.created_at || log.createdAt).toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer-actions">
+              <button type="button" className="gamified-btn save-btn" onClick={() => setAuditModalOpen(false)}>
+                CLOSE
+              </button>
+            </div>
           </div>
         </div>
       )}

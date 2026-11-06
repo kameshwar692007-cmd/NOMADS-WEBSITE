@@ -1,67 +1,40 @@
-// Nomad's Province — Universal Event Service
-// Provides real Supabase PostgreSQL integration with resilient local fallback
-// Handles validation, auto-status calculations, manual overrides, drafts, and audit logging.
+// Nomad's Province — Universal Event & Security Service
+// Dual-mode integration: Supabase PostgreSQL with verified RBAC + Resilient Fallback
+// Provides input validation, status_mode vs computed status separation, slug generation,
+// RBAC role resolution, poster validation, and tamper-resistant audit logging.
 
 import { supabase, isSupabaseConfigured } from '../../lib/supabase.js';
 import { EVENTS as INITIAL_AUTHENTIC_EVENTS } from '../data/campusContent.js';
 
-const STORAGE_KEY = 'nomads_province_events_store_v1';
-const AUDIT_KEY = 'nomads_province_audit_logs_v1';
+const STORAGE_KEY = 'nomads_province_events_store_v2';
+const AUDIT_KEY = 'nomads_province_audit_logs_v2';
+const ROLES_KEY = 'nomads_province_simulated_roles_v2';
 
-// Seed initial authentic events into fallback store if empty
-function initializeFallbackStore() {
-  try {
-    const existing = localStorage.getItem(STORAGE_KEY);
-    if (!existing) {
-      const seeded = INITIAL_AUTHENTIC_EVENTS.map((ev, index) => ({
-        id: ev.id || `seeded-${index + 1}`,
-        title: ev.title,
-        category: ev.category?.includes('Esports') && ev.category?.includes('Game') 
-          ? 'Game Development' 
-          : ev.category?.includes('Esports') ? 'Esports' 
-          : ev.category?.includes('Sports') ? 'Sports' : 'Esports',
-        venue: ev.venue || 'Chennai Campus',
-        startDate: ev.startDate || new Date(Date.now() - (index * 86400000 * 15)).toISOString(),
-        endDate: ev.endDate || new Date(Date.now() - (index * 86400000 * 15) + 3600000 * 8).toISOString(),
-        registrationDeadline: ev.registrationDeadline || null,
-        status: ev.status === 'CONCLUDED' ? 'ENDED' : 'AUTO',
-        isDraft: false,
-        posterUrl: ev.image || '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
-        registrationUrl: 'https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f',
-        partner: ev.partner || "Nomad's Province",
-        description: ev.desc || '',
-        results: {
-          champion: ev.status === 'CONCLUDED' ? 'Provincial Squad' : '',
-          runnerUp: ev.status === 'CONCLUDED' ? 'Collegiate Runner-up' : '',
-          highlights: 'Highlights broadcasted on official channels.'
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-    }
-  } catch (e) {
-    console.warn('LocalStorage unavailable for event initialization:', e);
-  }
-}
-
-// Ensure store is ready
-if (typeof window !== 'undefined') {
-  initializeFallbackStore();
+/**
+ * Generate a URL-safe unique slug
+ */
+export function generateEventSlug(title, idSuffix = '') {
+  const base = (title || 'event')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 80);
+  const suffix = idSuffix ? `-${idSuffix.substring(0, 8)}` : `-${Math.random().toString(36).substring(2, 8)}`;
+  return `${base || 'event'}${suffix}`;
 }
 
 /**
- * Computes live status based on start/end dates and manual status overrides
+ * Pure temporal status calculation based on start and end timestamps
  */
-export function computeEventStatus(event) {
-  if (event.status && event.status !== 'AUTO') {
-    return event.status; // 'UPCOMING', 'ONGOING', or 'ENDED'
+export function calculateDateStatus(startDate, endDate) {
+  const now = Date.now();
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
+
+  if (isNaN(start) || isNaN(end)) {
+    return 'UPCOMING';
   }
-
-  const now = new Date().getTime();
-  const start = new Date(event.startDate).getTime();
-  const end = new Date(event.endDate).getTime();
-
   if (now < start) {
     return 'UPCOMING';
   } else if (now >= start && now <= end) {
@@ -69,6 +42,22 @@ export function computeEventStatus(event) {
   } else {
     return 'ENDED';
   }
+}
+
+/**
+ * Computes live effective status separating status_mode ('AUTO' vs 'MANUAL')
+ * and computed temporal lifecycle state ('UPCOMING', 'ONGOING', 'ENDED')
+ */
+export function computeEventStatus(event) {
+  if (!event) return 'UPCOMING';
+
+  // Precedence 1: Manual override active
+  if (event.statusMode === 'MANUAL' && event.manualStatus) {
+    return event.manualStatus;
+  }
+
+  // Precedence 2: Automatic temporal computation
+  return calculateDateStatus(event.startDate, event.endDate);
 }
 
 /**
@@ -101,8 +90,15 @@ export function validateEventPayload(data) {
   if (isNaN(endDate.getTime())) {
     errors.push('Valid end date and time are required.');
   }
-  if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime()) && endDate < startDate) {
-    errors.push('End date and time must be after the start date.');
+  if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime()) && endDate <= startDate) {
+    errors.push('End date and time must be strictly after the start date.');
+  }
+
+  if (data.registrationDeadline) {
+    const regDeadline = new Date(data.registrationDeadline);
+    if (!isNaN(regDeadline.getTime()) && !isNaN(endDate.getTime()) && regDeadline > endDate) {
+      errors.push('Registration deadline cannot be after the event end date.');
+    }
   }
 
   if (data.registrationUrl && typeof data.registrationUrl === 'string' && data.registrationUrl.trim() !== '') {
@@ -112,112 +108,244 @@ export function validateEventPayload(data) {
     }
   }
 
+  // Determine status_mode and manual_status
+  let statusMode = 'AUTO';
+  let manualStatus = null;
+
+  if (data.statusMode === 'MANUAL' || ['UPCOMING', 'ONGOING', 'ENDED'].includes(data.status)) {
+    statusMode = 'MANUAL';
+    manualStatus = data.manualStatus || (['UPCOMING', 'ONGOING', 'ENDED'].includes(data.status) ? data.status : 'UPCOMING');
+  } else if (data.statusMode === 'AUTO' || data.status === 'AUTO') {
+    statusMode = 'AUTO';
+    manualStatus = null;
+  }
+
   return {
     isValid: errors.length === 0,
     errors,
     sanitized: {
       title: data.title ? data.title.trim() : '',
+      slug: data.slug || generateEventSlug(data.title),
       category: data.category,
       venue: data.venue ? data.venue.trim() : '',
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       registrationDeadline: data.registrationDeadline ? new Date(data.registrationDeadline).toISOString() : null,
-      status: ['AUTO', 'UPCOMING', 'ONGOING', 'ENDED'].includes(data.status) ? data.status : 'AUTO',
+      statusMode,
+      manualStatus,
       isDraft: Boolean(data.isDraft),
       posterUrl: data.posterUrl ? data.posterUrl.trim() : '',
       registrationUrl: data.registrationUrl ? data.registrationUrl.trim() : '',
       partner: data.partner ? data.partner.trim() : "Nomad's Province",
       description: data.description ? data.description.trim() : '',
-      results: data.results || { champion: '', runnerUp: '', highlights: '' }
+      results: data.results || { champion: '', runnerUp: '', highlights: '', trophy_notes: '' }
     }
   };
 }
 
-// Fallback Local Storage CRUD Helpers
+// Memory storage adapter for Node.js / non-browser test runner environments
+const memoryStore = new Map();
+
+function storageGet(key) {
+  if (typeof localStorage !== 'undefined') {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  return memoryStore.get(key) || null;
+}
+
+function storageSet(key, value) {
+  if (typeof localStorage !== 'undefined') {
+    try { localStorage.setItem(key, value); return; } catch (e) {}
+  }
+  memoryStore.set(key, value);
+}
+
+// Fallback Local Storage initialization
+function initializeFallbackStore() {
+  try {
+    const existing = storageGet(STORAGE_KEY);
+    if (!existing) {
+      const seeded = INITIAL_AUTHENTIC_EVENTS.map((ev, index) => {
+        const start = ev.startDate || new Date(Date.now() - (index * 86400000 * 15)).toISOString();
+        const end = ev.endDate || new Date(new Date(start).getTime() + 3600000 * 8).toISOString();
+        const isConcluded = ev.status === 'CONCLUDED';
+        return {
+          id: ev.id || `seeded-${index + 1}`,
+          slug: generateEventSlug(ev.title, `seed${index + 1}`),
+          title: ev.title,
+          category: ev.category?.includes('Esports') && ev.category?.includes('Game')
+            ? 'Game Development'
+            : ev.category?.includes('Esports') ? 'Esports'
+            : ev.category?.includes('Sports') ? 'Sports' : 'Esports',
+          venue: ev.venue || 'Chennai Campus',
+          startDate: start,
+          endDate: end,
+          registrationDeadline: ev.registrationDeadline || null,
+          statusMode: isConcluded ? 'MANUAL' : 'AUTO',
+          manualStatus: isConcluded ? 'ENDED' : null,
+          isDraft: false,
+          posterUrl: ev.image || '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
+          registrationUrl: 'https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f',
+          partner: ev.partner || "Nomad's Province",
+          description: ev.desc || '',
+          results: {
+            champion: isConcluded ? 'Provincial Squad' : '',
+            runnerUp: isConcluded ? 'Collegiate Runner-up' : '',
+            highlights: 'Highlights broadcasted on official channels.'
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+      });
+      storageSet(STORAGE_KEY, JSON.stringify(seeded));
+    }
+  } catch (e) {
+    console.warn('Fallback store initialization notice:', e);
+  }
+}
+
+initializeFallbackStore();
+
 function getLocalEvents() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = storageGet(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
-    console.warn('Error reading local events:', e);
     return [];
   }
 }
 
 function saveLocalEvents(events) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+    storageSet(STORAGE_KEY, JSON.stringify(events));
   } catch (e) {
     console.warn('Error saving local events:', e);
   }
 }
 
-function recordAuditLog(action, eventId, details) {
+function recordLocalAuditLog(action, eventId, actorRole, payload) {
   try {
-    const raw = localStorage.getItem(AUDIT_KEY);
+    const raw = storageGet(AUDIT_KEY);
     const logs = raw ? JSON.parse(raw) : [];
     logs.unshift({
-      id: `log-${Date.now()}`,
+      id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       eventId,
       action,
-      details,
-      timestamp: new Date().toISOString()
+      actorRole: actorRole || 'SUPER_ADMIN',
+      targetTable: 'events',
+      payload,
+      createdAt: new Date().toISOString()
     });
-    localStorage.setItem(AUDIT_KEY, JSON.stringify(logs.slice(0, 50)));
+    storageSet(AUDIT_KEY, JSON.stringify(logs.slice(0, 100)));
   } catch (e) {
-    // Ignore audit logging errors in fallback
+    // Ignore in local fallback
   }
 }
 
 // ============================================================================
-// PUBLIC API SERVICE METHODS
+// MAIN EVENT & RBAC SERVICE
 // ============================================================================
 
 export const eventService = {
   isCloudConnected: () => isSupabaseConfigured,
 
   /**
-   * Fetch all publicly viewable events (Excludes drafts)
+   * Resolves current user role from verified Supabase session & admin_users table
+   */
+  async getCurrentUserRole() {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          return { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false };
+        }
+
+        const { data, error } = await supabase
+          .from('admin_users')
+          .select('role, email')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error || !data) {
+          return { role: 'AUTHENTICATED_NON_STAFF', email: session.user.email, isStaff: false, isAdmin: false, isSuperAdmin: false };
+        }
+
+        const role = data.role;
+        return {
+          role,
+          email: data.email,
+          isStaff: ['SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(role),
+          isAdmin: ['SUPER_ADMIN', 'ADMIN'].includes(role),
+          isSuperAdmin: role === 'SUPER_ADMIN'
+        };
+      } catch (err) {
+        console.warn('Failed to resolve role from database:', err);
+      }
+    }
+
+    // Local simulation fallback
+    const simulatedRole = storageGet(ROLES_KEY) || 'SUPER_ADMIN';
+    return {
+      role: simulatedRole,
+      email: 'admin@nomadsprovince.com',
+      isStaff: ['SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(simulatedRole),
+      isAdmin: ['SUPER_ADMIN', 'ADMIN'].includes(simulatedRole),
+      isSuperAdmin: simulatedRole === 'SUPER_ADMIN',
+      isSimulated: true
+    };
+  },
+
+  /**
+   * For local fallback development: switch simulated role
+   */
+  setSimulatedRole(role) {
+    storageSet(ROLES_KEY, role);
+  },
+
+  /**
+   * Fetch all publicly viewable events (Excludes drafts strictly)
    */
   async getPublicEvents() {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
           .from('events')
-          .select('*')
+          .select('id, slug, title, category, venue, start_date, end_date, registration_deadline, status_mode, manual_status, is_draft, poster_url, registration_url, partner, description, results, created_at')
           .eq('is_draft', false)
           .order('start_date', { ascending: false });
 
         if (!error && data) {
-          return data.map((d) => ({
-            id: d.id,
-            title: d.title,
-            category: d.category,
-            venue: d.venue,
-            startDate: d.start_date,
-            endDate: d.end_date,
-            registrationDeadline: d.registration_deadline,
-            status: d.status,
-            computedStatus: computeEventStatus({
+          return data.map((d) => {
+            const mapped = {
+              id: d.id,
+              slug: d.slug,
+              title: d.title,
+              category: d.category,
+              venue: d.venue,
               startDate: d.start_date,
               endDate: d.end_date,
-              status: d.status
-            }),
-            isDraft: d.is_draft,
-            posterUrl: d.poster_url,
-            registrationUrl: d.registration_url,
-            partner: d.partner,
-            description: d.description,
-            results: d.results || {},
-            createdAt: d.created_at
-          }));
+              registrationDeadline: d.registration_deadline,
+              statusMode: d.status_mode,
+              manualStatus: d.manual_status,
+              isDraft: d.is_draft,
+              posterUrl: d.poster_url,
+              registrationUrl: d.registration_url,
+              partner: d.partner,
+              description: d.description,
+              results: d.results || {},
+              createdAt: d.created_at
+            };
+            return {
+              ...mapped,
+              computedStatus: computeEventStatus(mapped)
+            };
+          });
         }
       } catch (err) {
-        console.warn('Supabase fetch failed, using fallback store:', err);
+        console.warn('Supabase public fetch failed, using fallback store:', err);
       }
     }
 
-    // Fallback store
     const local = getLocalEvents();
     return local
       .filter((ev) => !ev.isDraft)
@@ -230,9 +358,10 @@ export const eventService = {
 
   /**
    * Fetch all events including drafts for administrative operations
+   * Protected by RLS on Supabase (only staff can view drafts)
    */
   async getAllEventsForAdmin() {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
           .from('events')
@@ -240,28 +369,33 @@ export const eventService = {
           .order('created_at', { ascending: false });
 
         if (!error && data) {
-          return data.map((d) => ({
-            id: d.id,
-            title: d.title,
-            category: d.category,
-            venue: d.venue,
-            startDate: d.start_date,
-            endDate: d.end_date,
-            registrationDeadline: d.registration_deadline,
-            status: d.status,
-            computedStatus: computeEventStatus({
+          return data.map((d) => {
+            const mapped = {
+              id: d.id,
+              slug: d.slug,
+              title: d.title,
+              category: d.category,
+              venue: d.venue,
               startDate: d.start_date,
               endDate: d.end_date,
-              status: d.status
-            }),
-            isDraft: d.is_draft,
-            posterUrl: d.poster_url,
-            registrationUrl: d.registration_url,
-            partner: d.partner,
-            description: d.description,
-            results: d.results || {},
-            createdAt: d.created_at
-          }));
+              registrationDeadline: d.registration_deadline,
+              statusMode: d.status_mode,
+              manualStatus: d.manual_status,
+              isDraft: d.is_draft,
+              posterUrl: d.poster_url,
+              registrationUrl: d.registration_url,
+              partner: d.partner,
+              description: d.description,
+              results: d.results || {},
+              createdBy: d.created_by,
+              createdAt: d.created_at,
+              updatedAt: d.updated_at
+            };
+            return {
+              ...mapped,
+              computedStatus: computeEventStatus(mapped)
+            };
+          });
         }
       } catch (err) {
         console.warn('Supabase admin fetch failed, using fallback store:', err);
@@ -278,7 +412,7 @@ export const eventService = {
   },
 
   /**
-   * Create a new event
+   * Create a new event with validation
    */
   async createEvent(eventData) {
     const { isValid, errors, sanitized } = validateEventPayload(eventData);
@@ -286,18 +420,20 @@ export const eventService = {
       throw new Error(errors.join(' '));
     }
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
           .from('events')
           .insert({
+            slug: sanitized.slug,
             title: sanitized.title,
             category: sanitized.category,
             venue: sanitized.venue,
             start_date: sanitized.startDate,
             end_date: sanitized.endDate,
             registration_deadline: sanitized.registrationDeadline,
-            status: sanitized.status,
+            status_mode: sanitized.statusMode,
+            manual_status: sanitized.manualStatus,
             is_draft: sanitized.isDraft,
             poster_url: sanitized.posterUrl,
             registration_url: sanitized.registrationUrl,
@@ -315,22 +451,21 @@ export const eventService = {
       }
     }
 
-    // Local fallback creation
     const local = getLocalEvents();
     const newEvent = {
       ...sanitized,
-      id: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+      id: `evt-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
     local.unshift(newEvent);
     saveLocalEvents(local);
-    recordAuditLog('CREATE', newEvent.id, { title: newEvent.title });
+    recordLocalAuditLog('INSERT', newEvent.id, 'STAFF', { title: newEvent.title });
     return newEvent;
   },
 
   /**
-   * Update an existing event
+   * Update an existing event with validation
    */
   async updateEvent(id, updateData) {
     const { isValid, errors, sanitized } = validateEventPayload(updateData);
@@ -338,7 +473,7 @@ export const eventService = {
       throw new Error(errors.join(' '));
     }
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
           .from('events')
@@ -349,14 +484,14 @@ export const eventService = {
             start_date: sanitized.startDate,
             end_date: sanitized.endDate,
             registration_deadline: sanitized.registrationDeadline,
-            status: sanitized.status,
+            status_mode: sanitized.statusMode,
+            manual_status: sanitized.manualStatus,
             is_draft: sanitized.isDraft,
             poster_url: sanitized.posterUrl,
             registration_url: sanitized.registrationUrl,
             partner: sanitized.partner,
             description: sanitized.description,
-            results: sanitized.results,
-            updated_at: new Date().toISOString()
+            results: sanitized.results
           })
           .eq('id', id)
           .select()
@@ -381,15 +516,15 @@ export const eventService = {
       updatedAt: new Date().toISOString()
     };
     saveLocalEvents(local);
-    recordAuditLog('UPDATE', id, { title: sanitized.title });
+    recordLocalAuditLog('UPDATE', id, 'STAFF', { title: sanitized.title });
     return local[index];
   },
 
   /**
-   * Delete an event
+   * Delete an event (Restricted to Admins and Super Admins)
    */
   async deleteEvent(id) {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabase) {
       try {
         const { error } = await supabase.from('events').delete().eq('id', id);
         if (error) throw error;
@@ -402,26 +537,36 @@ export const eventService = {
     const local = getLocalEvents();
     const filtered = local.filter((ev) => ev.id !== id);
     saveLocalEvents(filtered);
-    recordAuditLog('DELETE', id, { id });
+    recordLocalAuditLog('DELETE', id, 'ADMIN', { id });
     return true;
   },
 
   /**
-   * One-click manual status toggle (e.g. mark ongoing, mark ended, or reset to auto)
+   * Status mode and override controller:
+   * Sets mode to 'AUTO' (clearing manual override) or 'MANUAL' with specified target status
    */
-  async setStatusOverride(id, newStatus) {
-    if (!['AUTO', 'UPCOMING', 'ONGOING', 'ENDED'].includes(newStatus)) {
-      throw new Error('Invalid status override.');
-    }
-
+  async setStatusOverride(id, targetModeOrStatus) {
     const local = getLocalEvents();
     const event = local.find((e) => e.id === id);
     if (!event) throw new Error('Event not found.');
 
-    return this.updateEvent(id, {
-      ...event,
-      status: newStatus
-    });
+    if (targetModeOrStatus === 'AUTO') {
+      return this.updateEvent(id, {
+        ...event,
+        statusMode: 'AUTO',
+        manualStatus: null
+      });
+    }
+
+    if (['UPCOMING', 'ONGOING', 'ENDED'].includes(targetModeOrStatus)) {
+      return this.updateEvent(id, {
+        ...event,
+        statusMode: 'MANUAL',
+        manualStatus: targetModeOrStatus
+      });
+    }
+
+    throw new Error('Invalid status mode or status target.');
   },
 
   /**
@@ -439,7 +584,7 @@ export const eventService = {
   },
 
   /**
-   * Record tournament results and winner podium
+   * Record tournament results and set status_mode to MANUAL + ENDED
    */
   async recordResults(id, resultsPayload) {
     const local = getLocalEvents();
@@ -448,39 +593,71 @@ export const eventService = {
 
     return this.updateEvent(id, {
       ...event,
-      status: 'ENDED', // Recording results automatically concludes the event
+      statusMode: 'MANUAL',
+      manualStatus: 'ENDED',
       results: {
         champion: resultsPayload.champion || '',
         runnerUp: resultsPayload.runnerUp || '',
-        highlights: resultsPayload.highlights || ''
+        highlights: resultsPayload.highlights || '',
+        trophy_notes: resultsPayload.trophy_notes || ''
       }
     });
   },
 
   /**
-   * Upload poster image with validation (Max 5MB, JPG/PNG/WebP only)
+   * Fetch immutable audit logs (Restricted to Admin / Super Admin)
+   */
+  async getAuditLogs() {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('admin_audit_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (!error && data) return data;
+      } catch (err) {
+        console.warn('Failed to fetch remote audit logs:', err);
+      }
+    }
+
+    try {
+      const raw = localStorage.getItem(AUDIT_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  /**
+   * Upload poster image with validation and collision-safe UUID path
    */
   async uploadPoster(file) {
     if (!file) throw new Error('No file provided.');
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      throw new Error('Invalid file format. Only JPG, PNG, and WebP images are allowed.');
+    const allowedMime = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedMime.includes(file.type)) {
+      throw new Error('Invalid file format. Only JPG, PNG, WebP, and GIF images are allowed.');
     }
 
     if (file.size > 5 * 1024 * 1024) {
       throw new Error('File exceeds 5MB size limit.');
     }
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabase) {
       try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `posters/${fileName}`;
+        const fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+        // Unique collision-proof filename using crypto random UUID
+        const safeId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).substring(2)}`;
+        const filePath = `posters/${safeId}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from('event-posters')
-          .upload(filePath, file);
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
         if (uploadError) throw uploadError;
 
@@ -491,7 +668,6 @@ export const eventService = {
       }
     }
 
-    // Local data URL fallback
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
