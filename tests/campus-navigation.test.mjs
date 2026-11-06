@@ -56,3 +56,27 @@ test('autotravel movement is time-based and never announces arrival before reach
   const dest=LOCATIONS.find(l=>l.id==='main-headquarters');
   assert.ok(Math.hypot(pos.x-dest.entranceX,pos.y-dest.entranceY)<2,'announced arrival before reaching endpoint');
 });
+
+
+test('decorations, forest, coastline, and event objects block player feet',()=>{
+  const blocked=[
+    ['ocean',20,750],['north cliff',830,110],['tree trunk',590,535],
+    ['bush',534,761],['north bench',630,415],['south lamp',650,555],
+    ['fountain',835,475],['event stage',830,725],['event tent',655,790],
+    ['dock water',80,780]
+  ];
+  for(const [name,x,y] of blocked){
+    assert.equal(checkFootCollision(x,y),true,`${name} at (${x},${y}) must block feet`);
+  }
+  for(const [name,x,y] of [
+    ['plaza path',835,555],['west event walkway',498,755],
+    ['east contact walkway',1370,712]
+  ]) assert.equal(checkFootCollision(x,y),false,`${name} should stay walkable`);
+});
+
+test('every entrance stays out of blocked zones',()=>{
+  for(const location of LOCATIONS){
+    assert.equal(checkFootCollision(location.entranceX,location.entranceY),false,
+      `Entrance inaccessible: ${location.id}`);
+  }
+});

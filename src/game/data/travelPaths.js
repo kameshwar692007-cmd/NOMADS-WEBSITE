@@ -64,8 +64,8 @@ function shortestPath(start,end){
 }
 // From the plaza, the Event Grounds entrance is reached via the western stone path.
 const WESTERN_EVENT_WALKWAY=[
- {x:720,y:584},{x:660,y:611},{x:580,y:650},
- {x:584,y:706},{x:584,y:785},{x:622,y:803},{x:700,y:807}
+ {x:715,y:585},{x:650,y:619},{x:550,y:655},
+ {x:510,y:699},{x:504,y:783},{x:510,y:815},{x:550,y:817}
 ];
 function eventPath(start,end){
  if(distance(start,end)<14)return [];
@@ -104,7 +104,9 @@ function eventPath(start,end){
 export function buildTravelPath(fromX,fromY,destinationId){
  const destination=LOCATION_MAP[destinationId];if(!destination)return [];
  const start={x:fromX,y:fromY},end={x:destination.entranceX,y:destination.entranceY};
- return destinationId==='event-grounds'?eventPath(start,end):shortestPath(start,end);
+ // The dedicated west-side paving is the only accessible Event Grounds route.
+ // Let A* select the nearest path from the CURRENT position, without a forced detour.
+ return shortestPath(start,end);
 }
 export function getSpawnPoint(){return {...PLAZA_CENTER};}
 
