@@ -44,7 +44,16 @@ export default function AboutPage() {
                 <polygon points="60,10 108,35 108,85 60,110 12,85 12,35" stroke="#e84537" strokeWidth="4" fill="rgba(232, 69, 55, 0.12)" />
                 <polygon points="60,22 96,42 96,80 60,98 24,80 24,42" stroke="#38bdf8" strokeWidth="2" strokeDasharray="4 2" fill="none" />
                 <path d="M42 45 L60 35 L78 45 L78 72 L60 85 L42 72 Z" fill="#e84537" opacity="0.8" />
-                <text x="60" y="66" textAnchor="middle" fill="#ffffff" fontSize="16" fontWeight="bold" fontFamily="monospace">NP</text>
+                <image
+                  href="/assets/game/np-emblem.webp"
+                  xlinkHref="/assets/game/np-emblem.png"
+                  x="43"
+                  y="47.5"
+                  width="34"
+                  height="26.3"
+                  preserveAspectRatio="xMidYMid meet"
+                  style={{ filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.7))' }}
+                />
                 <circle cx="60" cy="60" r="38" stroke="#ffffff" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
               </svg>
               <div className="hologram-ring" />

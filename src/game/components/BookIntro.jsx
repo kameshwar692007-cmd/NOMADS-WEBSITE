@@ -38,7 +38,9 @@ export default function BookIntro({onComplete}){
       <div className="np-book-spine"/>
       <div className="np-book-paper np-book-paper-left">
         <span className="np-book-ornament">✦</span>
-        <div className="np-book-seal">NP</div>
+        <div className="np-book-seal">
+          <img src="/assets/game/np-emblem.webp" alt="NP" style={{ width: '28px', height: 'auto', display: 'inline-block', verticalAlign: 'middle' }} />
+        </div>
         <div className="np-book-small">THE WORLD AWAITS</div>
         <div className="np-book-rule"/>
         <div className="np-book-mini-art" aria-hidden="true">✧ ✧ ✧</div>
@@ -56,7 +58,9 @@ export default function BookIntro({onComplete}){
       </div>
       <div className="np-book-hardcover" aria-hidden="true">
         <div className="np-book-hardcover-label">
-         <span className="np-book-hardcover-emblem">NP</span>
+         <span className="np-book-hardcover-emblem">
+           <img src="/assets/game/np-emblem.webp" alt="NP" style={{ width: '32px', height: 'auto', display: 'inline-block', verticalAlign: 'middle' }} />
+         </span>
          <strong>NOMAD'S<br/>PROVINCE</strong>
          <small>HEADQUARTERS</small>
         </div>
