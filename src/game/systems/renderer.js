@@ -9,11 +9,11 @@ function drawArtwork(ctx, image) {
 // Stable timeline: frame advances only while feet actually travel.
 // Idle always uses the fixed first cell, no jump from global clock.
 const WALK_CYCLE = [1, 2, 3, 2];
-export const HERO_DRAW_WIDTH = 40;
-export const HERO_DRAW_HEIGHT = 60;
+export const HERO_DRAW_WIDTH = 36;
+export const HERO_DRAW_HEIGHT = 52;
 
 export function getHeroFrame(player) {
-  const row = { down:0, up:1, left:2, right:3 }[player.direction] ?? 0;
+  const row = { down:0, left:1, right:2, up:3 }[player.direction] ?? 0;
   const phase = player.moving ? Math.floor((player.walkCycleTime ?? 0) / 155) % WALK_CYCLE.length : 0;
   const col = player.moving ? WALK_CYCLE[phase] : 0;
   return { row, col };
@@ -24,12 +24,12 @@ function drawPlayer(ctx, assets, player) {
   // World collision coordinates stay at (x+16,y+40), independent of sprite size.
   const footX = Math.round(x + 16), footY = Math.round(y + 40);
   const drawX = footX - HERO_DRAW_WIDTH/2;
-  const drawY = footY - HERO_DRAW_HEIGHT + 4;
+  const drawY = footY - HERO_DRAW_HEIGHT + 2;
   ctx.fillStyle = 'rgba(4,8,14,.24)';
   ctx.beginPath();
   ctx.ellipse(footX,footY+1,11,3.1,0,0,Math.PI*2);
   ctx.fill();
-  const hero = assets['player/nomad-hero-v2'];
+  const hero = assets['player/nomad-goggles'];
   if (!hero?.width) return;
   const {row,col} = getHeroFrame(player);
   const fw=hero.width/4,fh=hero.height/4;
