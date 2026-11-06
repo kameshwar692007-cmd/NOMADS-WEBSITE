@@ -108,7 +108,8 @@ export const RECT_OBSTACLES = [
 // Only the fountain garden is fully solid; scenery uses smaller foot-based hitboxes.
 export const ELLIPSE_OBSTACLES = [
  {name:'fountain flowers left',x:751,y:476,rx:18,ry:25},
- {name:'fountain flowers right',x:919,y:478,rx:18,ry:25}
+ {name:'fountain flowers right',x:919,y:478,rx:18,ry:25},
+ {name:'event-side shrub base',x:534,y:761,rx:14,ry:15}
 ];
 
 function distanceToSegment(px,py,x1,y1,x2,y2) {
