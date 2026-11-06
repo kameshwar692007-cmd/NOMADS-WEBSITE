@@ -1,34 +1,27 @@
-/* Dedicated RPG overlays. No changes to AGY's pages or their styling. */
-.np-dialogue-backdrop{position:fixed;inset:0;z-index:120;display:flex;align-items:flex-end;justify-content:center;padding:clamp(12px,4vh,40px) 14px;background:linear-gradient(180deg,rgba(4,9,20,.07),rgba(4,9,20,.55));}
-.np-dialogue{position:relative;width:min(940px,100%);color:#f4f7ff;background:linear-gradient(125deg,#192943f7,#101a30f8);border:3px solid #c6d5f0;border-radius:13px;padding:clamp(13px,2.5vw,24px);box-shadow:0 0 0 4px #101d38,0 0 0 6px #627b9d,0 20px 70px #03060dd9;animation:np-dialogue-rise .24s both;overflow:hidden;}
-.np-dialogue::before{content:'';position:absolute;inset:6px;pointer-events:none;border:1px solid #ffffff21;border-radius:8px;}
-.np-dialogue-main{display:flex;align-items:flex-start;gap:clamp(12px,2vw,28px);}
-.np-portrait{width:clamp(95px,15vw,152px);height:clamp(95px,15vw,152px);flex:none;border:2px solid #a8c0e8;border-radius:10px;background-image:url('/assets/onboarding/npc-portraits-atlas.webp');background-size:400% 200%;background-position:var(--np-portrait-x) var(--np-portrait-y);background-color:#202e4c;image-rendering:auto;box-shadow:0 0 0 3px #0d162a,inset 0 0 18px #0003;}
-.np-dialogue-copy{min-width:0;padding-top:2px;}
-.np-dialogue-role{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:#ff677f;}
-.np-dialogue-copy h2{font-size:clamp(19px,2.8vw,26px);color:#fff;margin:4px 0 11px;line-height:1.15;}
-.np-dialogue-copy p{font-size:clamp(15px,1.75vw,19px);line-height:1.48;margin:0;max-width:650px;white-space:normal;}
-.np-dialogue-copy .np-dialogue-note{font-size:13px;color:#b9c9e5;margin-top:14px;}
-.np-caret{color:#f75b78;animation:np-blink .8s infinite;}
-.np-dialogue-actions{display:flex;align-items:center;justify-content:flex-end;gap:11px;margin-top:20px;position:relative;}
+.np-dialogue-backdrop{position:fixed;inset:0;z-index:120;display:flex;align-items:flex-end;justify-content:center;padding:clamp(12px,4vh,40px) 14px;background:linear-gradient(180deg,#060c1906,#040a18a8);backdrop-filter:blur(2px);}
+.np-dialogue{position:relative;width:min(940px,100%);box-sizing:border-box;color:#f4f7ff;background:linear-gradient(130deg,#172c4bf7,#0d172bf9 75%);border:2px solid #bed5f5;border-radius:13px;padding:clamp(15px,3vw,28px);box-shadow:0 0 0 4px #0b152c,0 0 0 6px #6b83a8,0 25px 70px #02040cba, inset 0 0 40px #41628b20;animation:np-dialogue-rise .25s both;overflow:hidden;}
+.np-dialogue:before{content:'';position:absolute;inset:7px;border:1px solid #a8d0ef23;pointer-events:none;border-radius:8px;}
+.np-dialogue-main{display:flex;align-items:flex-start;gap:clamp(16px,2.6vw,28px);}
+.np-portrait-frame{width:clamp(132px,20vw,180px);height:clamp(142px,21vw,190px);flex:none;position:relative;border:2px solid #bdc9e9;border-radius:13px;background:radial-gradient(circle at 50% 26%,#3e5c83,#131b30 76%);box-shadow:0 0 0 4px #0b152b,0 8px 18px #0008;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.np-portrait-image{width:100%;height:100%;display:block;object-fit:contain;object-position:center;image-rendering:auto;filter:drop-shadow(0 4px 4px #0004);}
+.np-portrait-loading{font-size:40px;color:#d7bb88;}
+.np-dialogue-copy{min-width:0;padding-top:3px;flex:1;}
+.np-dialogue-role{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;color:#ff7184;}
+.np-dialogue-copy h2{font-size:clamp(23px,3vw,31px);color:white;line-height:1.1;margin:6px 0 14px;letter-spacing:.02em;}
+.np-dialogue-copy p{font-size:clamp(15px,1.85vw,18px);line-height:1.6;margin:0;max-width:670px;}
+.np-dialogue-copy .np-dialogue-note{font-size:13px;color:#b9cce9;margin-top:13px;}
+.np-caret{color:#ff6888;animation:np-blink .7s infinite;}
+.np-dialogue-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:16px;position:relative;}
 .np-dialogue button{cursor:pointer;touch-action:manipulation;}
-.np-dialogue-later,.np-dialogue-enter{border:2px solid #b7c8e9;border-radius:7px;padding:10px 18px;min-height:42px;font-weight:800;font-size:13px;}
-.np-dialogue-later{background:#111a2c;color:#dae5f8;}
-.np-dialogue-enter{background:#ce304d;color:#fff;border-color:#ff899a;box-shadow:0 3px 0 #77162d;}
-.np-dialogue-enter:hover{background:#f23d5a;}
-.np-dialogue-later:hover{background:#263752;}
-.np-dialogue-close{position:absolute;z-index:3;top:9px;right:10px;border:0;background:none;color:#c7d5ea;font-size:26px;width:36px;height:36px;}
-.np-dialogue :focus-visible{outline:3px solid #f7bd65;outline-offset:3px;}
-@keyframes np-dialogue-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.np-dialogue-later,.np-dialogue-enter{border:1.5px solid #b7c8e9;border-radius:8px;padding:11px 19px;min-height:45px;font-weight:800;font-size:14px;}
+.np-dialogue-later{background:#101c32;color:#d9e8ff;}
+.np-dialogue-enter{background:linear-gradient(#ec4965,#b91e41);color:white;border-color:#f5abb9;box-shadow:0 3px 0 #691027,0 0 20px #e8496440;}
+.np-dialogue-enter:hover{background:#f13c63;}
+.np-dialogue-later:hover{background:#2a4061;}
+.np-dialogue-close{position:absolute;z-index:3;right:12px;top:9px;border:0;background:#15243c8c;color:#cfdeee;font-size:26px;width:38px;height:38px;}
+.np-dialogue :focus-visible{outline:3px solid #f7c577;outline-offset:3px;}
+@keyframes np-dialogue-rise{from{opacity:0;transform:translateY(19px)}to{opacity:1;transform:translateY(0)}}
 @keyframes np-blink{50%{opacity:0}}
-@media(max-width:600px){
- .np-dialogue-backdrop{padding:12px 9px 88px;}
- .np-dialogue{padding:13px;}
- .np-dialogue-main{gap:10px;}
- .np-portrait{width:90px;height:90px;}
- .np-dialogue-copy h2{font-size:18px;margin:3px 0 7px;}
- .np-dialogue-copy p{font-size:14px;}
- .np-dialogue-actions{margin-top:14px;}
- .np-dialogue-later,.np-dialogue-enter{font-size:12px;min-height:40px;padding:8px 12px;}
-}
-@media(prefers-reduced-motion:reduce){.np-dialogue,.np-caret{animation:none}}
+@media(max-width:600px){.np-dialogue-backdrop{padding:10px 8px 88px;}.np-dialogue{padding:15px 13px;}.np-dialogue-main{gap:12px;}.np-portrait-frame{width:105px;height:125px;}.np-dialogue-copy h2{font-size:19px;margin:4px 0 9px;}.np-dialogue-copy p{font-size:14px;line-height:1.45;}.np-dialogue-actions{margin-top:15px;}.np-dialogue-later,.np-dialogue-enter{font-size:12px;min-height:42px;padding:9px 13px;}}
+@media(max-width:375px){.np-portrait-frame{width:83px;height:102px;}}
+@media(prefers-reduced-motion:reduce){.np-dialogue,.np-caret{animation:none;}}
