@@ -3,7 +3,7 @@ import { LOCATION_MAP } from './locationData.js';
 import { WORLD_WIDTH, WORLD_HEIGHT } from './mapData.js';
 import { checkFootCollision } from '../systems/collision.js';
 export const PLAZA_CENTER = { x:835, y:555 };
-const CELL=12,COLS=Math.ceil(WORLD_WIDTH/CELL),ROWS=Math.ceil(WORLD_HEIGHT/CELL);
+const CELL=8,COLS=Math.ceil(WORLD_WIDTH/CELL),ROWS=Math.ceil(WORLD_HEIGHT/CELL);
 // Four orthogonal grid directions follow the paved routes without diagonal grass shortcuts.
 const DIRECTIONS=[[1,0],[-1,0],[0,1],[0,-1]];
 const idOf=(x,y)=>y*COLS+x;
@@ -26,7 +26,7 @@ function nearestFree(p){
  const cy=Math.max(0,Math.min(ROWS-1,Math.floor(p.y/CELL)));
  const valid=(x,y)=>x>=0&&y>=0&&x<COLS&&y<ROWS&&!checkFootCollision((x+.5)*CELL,(y+.5)*CELL);
  if(valid(cx,cy))return idOf(cx,cy);
- for(let r=1;r<=12;r++)for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++)
+ for(let r=1;r<=14;r++)for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++)
   if(Math.max(Math.abs(x-cx),Math.abs(y-cy))===r&&valid(x,y))return idOf(x,y);
  return null;
 }
@@ -52,7 +52,7 @@ function shortestPath(start,end){
   for(const [dx,dy] of DIRECTIONS){
    const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=COLS||ny>=ROWS)continue;
    const target=idOf(nx,ny),p=pointOf(target);
-   if(checkFootCollision(p.x,p.y))continue;
+   if(checkFootCollision(p.x,p.y) || !clearSegment(pointOf(id),p))continue;
    // Never traverse a blocked cement/obstacle cell; all moves are orthogonal.
    const newCost=costs[id]+CELL;
    if(newCost<costs[target]){costs[target]=newCost;parents[target]=id;queue.push(target,newCost+h(target));}

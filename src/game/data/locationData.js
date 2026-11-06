@@ -12,7 +12,7 @@ export const LOCATIONS = [
     id:'esports-arena', displayName:'Esports Arena', shortName:'Arena',
     description:'Explore tournaments, competitions and our esports ecosystem.', tagline:'Tournaments & Gaming Events', route:'/esports', accentColor:'#e84537',
     badgeAsset:'/assets/game/ui/badge-esports.png', worldX:1180, worldY:120, buildingWidth:390, buildingHeight:285,
-    entranceX:1370, entranceY:410, interactionRadius:64, collisionBox:{x:25,y:28,w:340,h:220},
+    entranceX:1164, entranceY:436, interactionRadius:64, collisionBox:{x:25,y:28,w:340,h:220},
     enterLabel:'ENTER ARENA', secondaryLabel:'VIEW EVENTS',
     sectionDetails:{highlights:['Upcoming tournaments and competitions','Gaming events and activations','Results, winners and highlights','Esports partnerships and achievements'],quickStats:[{label:'Category',value:'Esports'},{label:'Events',value:'Upcoming + Past'},{label:'Registration',value:'External Links'}]}
   },
@@ -20,7 +20,7 @@ export const LOCATIONS = [
     id:'game-dev-studio', displayName:'Game Development Studio', shortName:'Studio',
     description:'Discover games, projects and interactive experiences built by our studio.', tagline:'Games & Projects', route:'/studio', accentColor:'#38bdf8',
     badgeAsset:'/assets/game/ui/badge-games.png', worldX:155, worldY:125, buildingWidth:395, buildingHeight:290,
-    entranceX:355, entranceY:410, interactionRadius:64, collisionBox:{x:28,y:28,w:330,h:220},
+    entranceX:516, entranceY:436, interactionRadius:64, collisionBox:{x:28,y:28,w:330,h:220},
     enterLabel:'ENTER STUDIO', secondaryLabel:'VIEW PROJECTS',
     sectionDetails:{highlights:['Original games and prototypes','Interactive experiences and products','Development portfolio and devlogs','Developers and contributors'],quickStats:[{label:'Focus',value:'Original Games'},{label:'Projects',value:'Studio Portfolio'},{label:'Collaboration',value:'Open'}]}
   },
@@ -44,7 +44,7 @@ export const LOCATIONS = [
     id:'event-grounds', displayName:'Event Grounds', shortName:'Events',
     description:'Explore upcoming events, past events, results and highlights.', tagline:'Upcoming & Past Events', route:'/events', accentColor:'#fdbe53',
     badgeAsset:'/assets/game/ui/badge-events.png', worldX:575, worldY:650, buildingWidth:520, buildingHeight:225,
-    entranceX:550, entranceY:817, interactionRadius:68, collisionBox:{x:55,y:18,w:410,h:125},
+    entranceX:500, entranceY:812, interactionRadius:68, collisionBox:{x:55,y:18,w:410,h:125},
     enterLabel:'ENTER GROUNDS', secondaryLabel:'VIEW EVENTS',
     sectionDetails:{highlights:['Upcoming and past events','Schedules and announcements','Gallery, videos and highlights','Results, winners, organizers and partners'],quickStats:[{label:'Categories',value:'Esports • Game Dev • Sports'},{label:'Status',value:'Dynamic'},{label:'Registration',value:'External'}]}
   }
