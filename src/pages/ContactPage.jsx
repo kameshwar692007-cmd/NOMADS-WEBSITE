@@ -75,7 +75,7 @@ export default function ContactPage() {
     >
       <div className="contact-main-grid">
         {/* Left Column: Interactive Dispatch Terminal */}
-        <div className="gamified-card contact-form-card">
+        <div className="gamified-card contact-form-card stitch-target" data-stitch-label="Constructing Inquiry Terminal...">
           <div className="terminal-header">
             <span className="terminal-dot red" />
             <span className="terminal-dot yellow" />
@@ -170,7 +170,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <button type="submit" className="gamified-btn submit-dispatch-btn" onMouseEnter={() => sound.playBlip()}>
+              <button type="submit" className="gamified-btn submit-dispatch-btn stitch-target" data-stitch-label="Compiling Dispatch Button..." onMouseEnter={() => sound.playBlip()}>
                 <IconRocket size={16} />
                 <span>{dispatchMethod === 'whatsapp' ? 'TRANSMIT VIA WHATSAPP →' : 'TRANSMIT VIA EMAIL →'}</span>
               </button>

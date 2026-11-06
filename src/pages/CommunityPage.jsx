@@ -26,7 +26,7 @@ export default function CommunityPage() {
       accentColor="#84c669"
     >
       {/* 1. Guild Welcome Hero */}
-      <section className="gamified-card community-hero-card">
+      <section className="gamified-card community-hero-card stitch-target" data-stitch-label="Constructing Community Guild Hub...">
         <div className="guild-beacon">
           <span>CHENNAI ANIME CLUB • OTAKU NADU • FREE FIRE COMMUNITY • DRUSHYA (DAG)</span>
         </div>
@@ -37,7 +37,7 @@ export default function CommunityPage() {
         </p>
 
         <div className="community-links-row">
-          <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="gamified-btn comm-btn whatsapp-comm" onMouseEnter={() => sound.playBlip()}>
+          <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="gamified-btn comm-btn whatsapp-comm stitch-target" data-stitch-label="Compiling WhatsApp Community CTA..." onMouseEnter={() => sound.playBlip()}>
             <IconWhatsApp size={16} />
             <span>JOIN WHATSAPP CHANNEL</span>
           </a>

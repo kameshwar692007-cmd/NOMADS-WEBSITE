@@ -23,8 +23,8 @@ export default function EsportsPage() {
       subtitle="Competitive Tournament Circuits, Collegiate Scrims & Community Showdowns"
       accentColor="#ff4444"
     >
-      {/* 1. Arena Live Radar Banner */}
-      <section className="gamified-card arena-hero-card">
+      {/* 1. Arena Live Radar Banner (Stitch Target) */}
+      <section className="gamified-card arena-hero-card stitch-target" data-stitch-label="Constructing Esports Radar Hub...">
         <div className="arena-pulse-header">
           <div className="arena-status-pill">
             <span className="live-radar-dot" />
@@ -49,7 +49,7 @@ export default function EsportsPage() {
       </div>
 
       <div className="tournaments-grid">
-        {TOURNAMENTS.map((t) => (
+        {TOURNAMENTS.map((t, idx) => (
           <div 
             key={t.id} 
             className="gamified-card tournament-card"
@@ -82,7 +82,8 @@ export default function EsportsPage() {
               </div>
 
               <button
-                className="gamified-btn tourney-btn"
+                className={`gamified-btn tourney-btn ${idx === 0 ? 'stitch-target' : ''}`}
+                data-stitch-label={idx === 0 ? "Compiling Tournament Register CTA..." : undefined}
                 style={{ backgroundColor: t.accent }}
                 onClick={() => handleRegisterClick(t)}
                 onMouseEnter={() => sound.playBlip()}

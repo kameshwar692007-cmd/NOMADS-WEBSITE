@@ -53,7 +53,7 @@ export default function EventsPage() {
       accentColor="#fdbe53"
     >
       {/* 1. Event Grounds Festival Hero */}
-      <section className="gamified-card events-hero-card">
+      <section className="gamified-card events-hero-card stitch-target" data-stitch-label="Synthesizing Event Grounds Festival Hub...">
         <div className="events-partner-strip">
           SRMIST • EASWARI • VIT-AP • CRESCENT • HUDDLE GLOBAL • DECATHLON • PLAYO • GDAI
         </div>
@@ -271,7 +271,7 @@ export default function EventsPage() {
           Partner with Nomad's Province for complete tournament operations, rulebooks, live streaming, and verified certificates.
         </p>
         <div className="host-actions">
-          <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="gamified-btn host-btn" onMouseEnter={() => sound.playBlip()}>
+          <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="gamified-btn host-btn stitch-target" data-stitch-label="Compiling Co-Host Action Button..." onMouseEnter={() => sound.playBlip()}>
             <IconWhatsApp size={16} />
             <span>CO-HOST AN EVENT VIA WHATSAPP</span>
           </a>

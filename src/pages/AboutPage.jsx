@@ -16,8 +16,8 @@ export default function AboutPage() {
       subtitle="Vision, Ecosystem Governance & Core Provincial Guild"
       accentColor="#e84537"
     >
-      {/* 1. Core Mission Hologram Card */}
-      <section className="gamified-card hero-citadel-card">
+      {/* 1. Core Mission Hologram Card (Stitch Target) */}
+      <section className="gamified-card hero-citadel-card stitch-target" data-stitch-label="Constructing Citadel Headquarters...">
         <div className="card-glitch-border" />
         <div className="citadel-grid">
           <div className="citadel-text">
@@ -54,10 +54,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 2. Interactive Navigation Tabs */}
+      {/* 2. Interactive Navigation Tabs (Stitch Target on Button) */}
       <div className="gamified-tabs-bar">
         <button
-          className={`tab-btn ${activeTab === 'lore' ? 'active' : ''}`}
+          className={`tab-btn stitch-target ${activeTab === 'lore' ? 'active' : ''}`}
+          data-stitch-label="Compiling Mission Tab Button..."
           onClick={() => { sound.playSelect(); setActiveTab('lore'); }}
           onMouseEnter={() => sound.playBlip()}
         >
@@ -181,7 +182,14 @@ export default function AboutPage() {
           <div className="gamified-card join-team-callout">
             <h4>JOIN THE NOMAD'S PROVINCE TEAM</h4>
             <p>We are always expanding our team with student developers, tournament referees, casters, and collegiate ambassadors.</p>
-            <a href="https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f" target="_blank" rel="noreferrer" className="gamified-btn" onMouseEnter={() => sound.playBlip()}>
+            <a
+              href="https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f"
+              target="_blank"
+              rel="noreferrer"
+              className="gamified-btn stitch-target"
+              data-stitch-label="Compiling WhatsApp Connect Button..."
+              onMouseEnter={() => sound.playBlip()}
+            >
               <IconWhatsApp size={16} /> CONNECT WITH OUR TEAM ON WHATSAPP
             </a>
           </div>

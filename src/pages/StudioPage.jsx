@@ -27,8 +27,8 @@ export default function StudioPage() {
       subtitle="Original Games, Interactive Experiences & Tech Prototypes"
       accentColor="#38bdf8"
     >
-      {/* 1. Studio Holo Header */}
-      <section className="gamified-card studio-hero-card">
+      {/* 1. Studio Holo Header (Stitch Target) */}
+      <section className="gamified-card studio-hero-card stitch-target" data-stitch-label="Constructing Studio Alliance Hub...">
         <div className="studio-alliance-badge">
           <span>PARTNERED WITH GDAI (GAME DEVELOPERS ASSOCIATION OF INDIA)</span>
         </div>
@@ -172,7 +172,12 @@ export default function StudioPage() {
               />
             </div>
 
-            <button type="submit" className="gamified-btn submit-pitch-btn" onMouseEnter={() => sound.playBlip()}>
+            <button
+              type="submit"
+              className="gamified-btn submit-pitch-btn stitch-target"
+              data-stitch-label="Compiling Studio Submission CTA..."
+              onMouseEnter={() => sound.playBlip()}
+            >
               <IconRocket size={16} />
               <span>TRANSMIT STUDIO PITCH</span>
             </button>

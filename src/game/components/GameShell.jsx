@@ -1,9 +1,11 @@
 // Nomad's Province — Interactive Gamified Page Shell
 // Clean themed vector icons, animated HUD, warp navigation, cyber scanlines & scroll reveals
+// Stitch AI Cursor Page Builder integration for progressive component assembly
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { sound } from '../systems/soundFx.js';
+import StitchCursorBuilder from './StitchCursorBuilder.jsx';
 import {
   IconHQ,
   IconEsports,
@@ -81,40 +83,40 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
   };
 
   const toggleAudio = () => {
-    const isNowMuted = sound.toggleMute();
-    setMuted(isNowMuted);
+    const nextState = !muted;
+    sound.setMuted(nextState);
+    setMuted(nextState);
+    if (!nextState) sound.playSelect();
   };
 
   return (
-    <div className={`gamified-shell ${warping ? 'shell-warping' : ''} ${pageLoaded ? 'shell-ready' : 'shell-loading'}`}>
-      {/* 1. Cyber Ambient Background & Scanlines */}
+    <div className={`gamified-shell ${warping ? 'shell-warping' : ''}`} style={{ '--accent-color': accentColor }}>
+      {/* Stitch AI Cursor Page Builder */}
+      <StitchCursorBuilder accentColor={accentColor} />
+
+      {/* Cyber Ambient Grid & Background Orbs */}
       <div className="shell-grid-bg" />
       <div className="shell-scanlines" />
-      <div className="shell-glow-orb" style={{ background: `radial-gradient(circle, ${accentColor}22 0%, transparent 70%)` }} />
+      <div className="shell-glow-orb" style={{ backgroundColor: `${accentColor}18` }} />
 
-      {/* 2. Top Interactive Game HUD */}
+      {/* 1. Fixed Top HUD Navigation Bar */}
       <header className="shell-hud-bar">
         <div className="hud-left">
-          <button 
-            className="hud-return-btn"
-            onClick={handleReturnToCampus}
-            onMouseEnter={() => sound.playBlip()}
-            title="Return to 2D Campus Map"
-          >
-            <span className="hud-btn-arrow">◀</span>
-            <span className="hud-btn-text">RETURN TO CAMPUS</span>
+          <button className="hud-return-btn" onClick={handleReturnToCampus} onMouseEnter={() => sound.playBlip()}>
+            <span className="return-arrow">◀</span>
+            <span className="return-text">RETURN TO CAMPUS</span>
           </button>
         </div>
 
-        {/* Warp Switcher Navigation */}
-        <nav className="hud-warp-nav">
+        {/* Destination Quick Travel Ports */}
+        <nav className="hud-center-nav">
           {DESTINATIONS.map((dest) => {
             const isActive = location.pathname === dest.path;
             const Icon = dest.Icon;
             return (
               <button
                 key={dest.path}
-                className={`hud-warp-btn ${isActive ? 'active' : ''}`}
+                className={`hud-dest-btn ${isActive ? 'active' : ''}`}
                 style={{ '--dest-color': dest.color }}
                 onClick={() => handleNav(dest.path)}
                 onMouseEnter={() => sound.playBlip()}
@@ -168,15 +170,15 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
         </div>
       </div>
 
-      {/* 4. Page Dynamic Content Area */}
-      <main className="shell-content-container">
+      {/* 4. Page Inner Body */}
+      <main className="shell-main-content">
         {children}
       </main>
 
-      {/* 5. Sleek Cyber Footer */}
+      {/* 5. Cyber Footer */}
       <footer className="shell-footer">
         <div className="footer-inner">
-          <div className="footer-brand">
+          <div className="footer-meta">
             <span className="footer-diamond" style={{ color: accentColor }}>◆</span>
             <span className="footer-name">NOMAD'S PROVINCE</span>
             <span className="footer-version">ESPORTS & GAME DEV ECOSYSTEM • CHENNAI, INDIA</span>
