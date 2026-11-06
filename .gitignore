@@ -24,3 +24,7 @@ public/debug-anime-boy/
 *.njsproj
 *.sln
 *.sw?
+
+# Environment
+.env
+.env*.local

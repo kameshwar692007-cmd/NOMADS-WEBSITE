@@ -339,7 +339,7 @@ export default function AdminPage() {
         subtitle="Internal Staff Authentication Gateway"
         accentColor="#ef4444"
       >
-        <section className="gamified-card admin-telemetry-card" style={{ maxWidth: '480px', margin: '40px auto 60px', padding: '32px' }}>
+        <section className="gamified-card admin-login-card">
           <div className="terminal-header" style={{ marginBottom: '20px' }}>
             <span className="terminal-dot red" />
             <span className="terminal-dot yellow" />
@@ -509,7 +509,7 @@ export default function AdminPage() {
           ))}
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="admin-header-actions">
           {(userRoleState.isAdmin || userRoleState.isSuperAdmin) && (
             <button
               className="gamified-btn secondary"
@@ -947,14 +947,11 @@ export default function AdminPage() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {auditLogs.map((log) => (
-                    <div key={log.id} style={{
+                    <div key={log.id} className="audit-log-row" style={{
                       background: '#0d1322',
                       border: '1px solid #1e293b',
                       borderRadius: '6px',
                       padding: '10px 14px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
                       fontSize: '12px',
                       fontFamily: 'monospace'
                     }}>
