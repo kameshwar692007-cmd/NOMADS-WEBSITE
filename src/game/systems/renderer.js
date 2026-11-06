@@ -2,6 +2,7 @@
 // All coordinates are in world pixels; gameplay remains on a separate moving layer.
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../data/mapData.js';
 import { drawForegroundForPlayer } from '../data/sceneObjects.js';
+import {CAMPUS_NPCS} from '../data/npcDialogues.js';
 
 function drawArtwork(ctx, image) {
   ctx.drawImage(image, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -39,6 +40,28 @@ function drawPlayer(ctx, assets, player) {
   }
 }
 
+// Most NPC sprites are already painted into the approved campus map.
+// Only the HQ receptionist is added dynamically; markers signal interaction.
+function drawNpcInteractions(ctx,assets,elapsed=0){
+ const receptionist=assets['npc/receptionist-sprite'];
+ if(!receptionist?.width)return;
+ const hq=CAMPUS_NPCS[0];
+ ctx.drawImage(receptionist,hq.x-16,hq.y-44,32,44);
+ for(const npc of CAMPUS_NPCS){
+   const rise=Math.sin(elapsed/400+npc.x*.02)*1.7;
+   ctx.save();
+   ctx.fillStyle='#10213a';
+   ctx.strokeStyle='#f8d29b';
+   ctx.lineWidth=2;
+   ctx.beginPath();ctx.arc(npc.x,npc.y-48+rise,10,0,Math.PI*2);
+   ctx.fill();ctx.stroke();
+   ctx.textAlign='center';ctx.textBaseline='middle';
+   ctx.fillStyle='#fff4d1';ctx.font='bold 14px sans-serif';
+   ctx.fillText('!',npc.x,npc.y-48+rise);
+   ctx.restore();
+ }
+}
+
 export function renderWorld(ctx, assets, camera, player, zoom, width, height, elapsed) {
   ctx.save();
   ctx.imageSmoothingEnabled = false;
@@ -60,6 +83,7 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   // clean reference pavement, before drawing the moving player.
   const plazaPatch = assets['world/plaza-patch'];
   if (plazaPatch?.width) ctx.drawImage(plazaPatch, 788, 511);
+  drawNpcInteractions(ctx,assets,elapsed);
   drawPlayer(ctx, assets, player);
   drawForegroundForPlayer(ctx,assets['world/foreground-pixels'],player.x+16,player.y+40,HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
   ctx.restore();

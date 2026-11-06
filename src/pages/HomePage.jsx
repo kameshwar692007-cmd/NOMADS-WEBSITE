@@ -9,6 +9,9 @@ import Directory from '../game/components/Directory.jsx';
 import MapModal from '../game/components/MapModal.jsx';
 import MenuDrawer from '../game/components/MenuDrawer.jsx';
 import ControlHints from '../game/components/ControlHints.jsx';
+import NpcDialogue from '../game/components/NpcDialogue.jsx';
+import BookIntro from '../game/components/BookIntro.jsx';
+import {HERO_GUIDE} from '../game/data/npcDialogues.js';
 
 export default function HomePage() {
   const [activeLocation, setActiveLocation] = useState(null);
@@ -17,6 +20,18 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [travelTarget, setTravelTarget] = useState(null);
+  // First visit of this tab only; returning from AGY's section pages must not
+  // force visitors to replay the book or tutorial.
+  const [introOpen, setIntroOpen] = useState(()=>{
+    try { return sessionStorage.getItem('np-campus-welcomed-v1')!=='yes'; }
+    catch { return true; }
+  });
+  const [npcDialogue, setNpcDialogue] = useState(null);
+  const completeIntro=useCallback(()=>{
+    try { sessionStorage.setItem('np-campus-welcomed-v1','yes'); } catch { /* private mode */ }
+    setIntroOpen(false);
+    setNpcDialogue(HERO_GUIDE);
+  },[]);
 
   // Responsive device check
   useEffect(() => {
@@ -46,6 +61,7 @@ export default function HomePage() {
   }, []);
 
   const handleLocationInteract = useCallback((loc) => {
+    setNpcDialogue(null);
     setActiveLocation(loc);
   }, []);
 
@@ -73,8 +89,9 @@ export default function HomePage() {
       <main className="game-viewport">
         <GameCanvas 
           onLocationInteract={handleLocationInteract}
+          onNpcInteract={setNpcDialogue}
           isMobile={isMobile}
-          paused={Boolean(activeLocation || directoryOpen || mapOpen || menuOpen)}
+          paused={Boolean(introOpen || npcDialogue || activeLocation || directoryOpen || mapOpen || menuOpen)}
           directoryTravelTarget={travelTarget}
           onDirectoryTravelConsumed={handleTravelConsumed}
         />
@@ -105,6 +122,10 @@ export default function HomePage() {
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
       />
+
+      {/* Cinematic onboarding and reusable NPC dialogue only cover the campus. */}
+      {introOpen && <BookIntro onComplete={completeIntro}/>}
+      <NpcDialogue npc={npcDialogue} onClose={()=>setNpcDialogue(null)}/>
 
       {/* 7. Desktop Unobtrusive Bottom Control Hints */}
       <ControlHints isMobile={isMobile} />

@@ -8,13 +8,14 @@ function loadImage(url){
  });
 }
 export async function loadAllAssets(){
- const [campus,hero,plazaPatch,headerLeft,headerRight,foregroundMask]=await Promise.all([
+ const [campus,hero,plazaPatch,headerLeft,headerRight,foregroundMask,receptionistSprite]=await Promise.all([
   loadImage('/assets/game/campus-world.png'),
   loadImage('/assets/game/characters/player/nomad-goggles-v4.png'),
   loadImage('/assets/game/plaza-clean-patch.png'),
   loadImage('/assets/game/header-clean-left.webp'),
   loadImage('/assets/game/header-clean-right.webp'),
-  loadImage('/assets/game/foreground-pixel-mask.png')
+  loadImage('/assets/game/foreground-pixel-mask.png'),
+  loadImage('/assets/game/characters/npcs/npc-guide.png')
  ]);
  // Compose exact-alpha foreground once at load. Draw the campus through the
  // transparent mask; rendering may then copy only the masked object pixels.
@@ -28,6 +29,6 @@ export async function loadAllAssets(){
  context.globalCompositeOperation='destination-in';
  context.drawImage(foregroundMask,0,0,canvas.width,canvas.height);
  context.globalCompositeOperation='source-over';
- return {'world/foreground-pixels':canvas,'world/campus':campus,'player/nomad-goggles-v4':hero,'world/plaza-patch':plazaPatch,
+ return {'npc/receptionist-sprite':receptionistSprite,'world/foreground-pixels':canvas,'world/campus':campus,'player/nomad-goggles-v4':hero,'world/plaza-patch':plazaPatch,
    'world/header-left':headerLeft,'world/header-right':headerRight};
 }

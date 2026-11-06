@@ -9,6 +9,7 @@ import { resolveMovement, resolvePathMovement } from '../systems/collision.js';
 import { loadAllAssets } from '../systems/assetLoader.js';
 import { renderWorld, screenToWorld } from '../systems/renderer.js';
 import './GameControls.css';
+import {getNpcAtWorldPoint,getNearbyNpc} from '../data/npcDialogues.js';
 
 const MOBILE_ZOOM=1.15;
 const SPEED=135;
@@ -25,7 +26,7 @@ function isTypingTarget(target){
   return !!target?.closest?.('input,textarea,select,[contenteditable="true"]');
 }
 export default function GameCanvas({
-  onLocationInteract,isMobile,directoryTravelTarget,onDirectoryTravelConsumed,paused=false
+  onLocationInteract,onNpcInteract,isMobile,directoryTravelTarget,onDirectoryTravelConsumed,paused=false
 }){
   const canvasRef=useRef(null);
   const assetsRef=useRef(null);
@@ -33,6 +34,7 @@ export default function GameCanvas({
   const travelRef=useRef(new AutoTravelSystem());
   const playerRef=useRef({x:0,y:0,direction:'down',moving:false,walkCycleTime:0});
   const interactRef=useRef(onLocationInteract);
+  const npcRef=useRef(onNpcInteract);
   const keyRef=useRef(new Set());
   const touchRef=useRef(null);
   const pausedRef=useRef(paused);
@@ -42,6 +44,7 @@ export default function GameCanvas({
   const [message,setMessage]=useState('');
   const [loadError,setLoadError]=useState('');
   useEffect(()=>{interactRef.current=onLocationInteract;},[onLocationInteract]);
+  useEffect(()=>{npcRef.current=onNpcInteract;},[onNpcInteract]);
   useEffect(()=>{pausedRef.current=paused;if(paused){keyRef.current.clear();touchRef.current=null;}},[paused]);
 
   useEffect(()=>{
@@ -81,6 +84,12 @@ export default function GameCanvas({
 
   useEffect(()=>{
     const onKeyDown=e=>{
+      if((e.key==='e'||e.key==='E')&&!e.repeat&&!pausedRef.current&&!isTypingTarget(e.target)){
+        const player=playerRef.current;
+        const nearby=getNearbyNpc(player.x+16,player.y+40,55);
+        if(nearby){e.preventDefault();travelRef.current.cancel();setTraveling(false);npcRef.current?.(nearby);}
+        return;
+      }
       const direction=KEY_TO_DIRECTION[e.key];
       if(!direction||isTypingTarget(e.target)||pausedRef.current||!assetsRef.current)return;
       e.preventDefault();
@@ -107,6 +116,8 @@ export default function GameCanvas({
       (e.clientX-rect.left)*dpr,(e.clientY-rect.top)*dpr,
       cameraRef.current,getZoom(rect,isMobile)*dpr,canvas.width,canvas.height
     );
+    const npc=getNpcAtWorldPoint(point.x,point.y,39);
+    if(npc){travelRef.current.cancel();setTraveling(false);npcRef.current?.(npc);return;}
     const building=findClickedBuilding(point.x,point.y);
     if(building){goToLocation(building.id);return;}
     const player=playerRef.current;
