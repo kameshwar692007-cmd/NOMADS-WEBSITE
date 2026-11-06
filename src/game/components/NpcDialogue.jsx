@@ -1,37 +1,17 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import './NpcDialogue.css';
 
-// Convert the existing 4x2 portrait sheet into a separate image for each NPC.
-// Each portrait is independently cropped at its native 128x128 resolution;
-// no CSS offsets, atlas bleed or accidentally mixed characters.
-const portraitCache=new Map();
+// Render the original high-quality 512×256 portrait atlas directly. The
+// previous canvas conversion flow could fail and leave portrait boxes blank.
+// A clipped <img> avoids canvas conversion and aligns all seven 128px portraits.
 const ATLAS='/assets/onboarding/npc-portraits-atlas.webp';
-function usePortrait(index){
- const [src,setSrc]=useState(()=>portraitCache.get(index)||null);
- useEffect(()=>{
-  let alive=true;
-  if(portraitCache.has(index)){setSrc(portraitCache.get(index));return;}
-  const img=new Image();
-  img.onload=()=>{
-   if(!alive)return;
-   const canvas=document.createElement('canvas');
-   canvas.width=128;canvas.height=128;
-   const ctx=canvas.getContext('2d');
-   ctx?.drawImage(img,(index%4)*128,Math.floor(index/4)*128,128,128,0,0,128,128);
-   const url=canvas.toDataURL('image/png');
-   portraitCache.set(index,url);setSrc(url);
-  };
-  img.src=ATLAS;
-  return ()=>{alive=false;};
- },[index]);
- return src;
-}
 export function NpcPortrait({portraitIndex=0,name='Character',className=''}) {
- const src=usePortrait(portraitIndex);
- return <div className={'np-portrait-frame '+className}>
-  {src?<img className="np-portrait-image" src={src} alt={name} draggable="false"/>:
-    <span className="np-portrait-loading" aria-hidden="true">✦</span>}
+ const index=Number.isInteger(portraitIndex)&&portraitIndex>=0&&portraitIndex<7?portraitIndex:0;
+ const col=index%4,row=Math.floor(index/4);
+ return <div className={'np-portrait-frame '+className} role="img" aria-label={name}>
+   <img className="np-portrait-sheet" src={ATLAS} alt="" draggable="false"
+      style={{left:(-col*100)+'%',top:(-row*100)+'%'}}/>
  </div>;
 }
 export default function NpcDialogue({npc,onClose}) {

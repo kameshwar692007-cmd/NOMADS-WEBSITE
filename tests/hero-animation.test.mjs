@@ -26,9 +26,9 @@ test('every one of the 16 extracted hero frames contains visible pixels',()=>{
   assert.ok(visible>400,`invisible sprite frame ${row}:${col} (${visible} opaque pixels)`);
  }
 });
-test('hero size matches NPC proportions while preserving collision feet',()=>{
- assert.equal(HERO_DRAW_WIDTH,32);
- assert.equal(HERO_DRAW_HEIGHT,48);
+test('hero visual is scaled to match NPC perceived height while collision feet stay fixed',()=>{
+ assert.equal(HERO_DRAW_WIDTH,40);
+ assert.equal(HERO_DRAW_HEIGHT,60);
  assert.ok(game.includes('spawn.x-16,y:spawn.y-40'));
 });
 test('idle frame fixed and moving phases advance deterministically',()=>{

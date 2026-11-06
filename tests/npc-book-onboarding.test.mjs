@@ -60,7 +60,9 @@ test('checked-in portrait atlas and book cover have valid signatures',()=>{
  assert.ok(cover.includes('<svg')&&cover.includes("NOMAD'S"));
  const css=read('src/game/components/NpcDialogue.css');
  assert.ok(read('src/game/components/NpcDialogue.jsx').includes('npc-portraits-atlas.webp'));
- assert.ok(css.includes('np-portrait-image'));
+ assert.ok(css.includes('np-portrait-sheet'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('src={ATLAS}'));
+ assert.ok(!read('src/game/components/NpcDialogue.jsx').includes('canvas.toDataURL'));
  const sprites=readFileSync(new URL('../public/assets/onboarding/npc-complete-atlas.png',import.meta.url));
  assert.equal(sprites.toString('ascii',1,4),'PNG');
  assert.equal(sprites.readUInt32BE(16),192);
@@ -88,13 +90,15 @@ test('all six complete 32x48 sprites actually decode and contain visible body pi
   assert.ok(lower>=35,'sprite '+col+' only contains a head, missing torso/feet');
  }
 });
-test('NPC clean-patch atlas is valid and dimensions match source strips',async()=>{
- const {PNG}=await import('pngjs');
- const atlas=PNG.sync.read(readFileSync(new URL('../public/assets/onboarding/npc-clean-patch-atlas.png',import.meta.url)));
- assert.equal(atlas.width,280);
- assert.equal(atlas.height,80);
+test('character-free reference tile atlas is valid and replaces all obsolete smudge overlays',()=>{
+ const atlas=readFileSync(new URL('../public/assets/game/reference-clean-tiles.webp',import.meta.url));
+ assert.equal(atlas.toString('ascii',0,4),'RIFF');
+ assert.equal(atlas.toString('ascii',8,12),'WEBP');
  const loader=read('src/game/systems/assetLoader.js');
- assert.ok(loader.includes('createCleanCampus(campus,npcPatches)'));
- assert.ok(loader.includes('npc-clean-patch-atlas.png'));
+ const renderer=read('src/game/systems/renderer.js');
+ assert.ok(loader.includes('createCleanCampus(campus,cleanTiles)'));
+ assert.ok(loader.includes('reference-clean-tiles.webp'));
  assert.ok(loader.includes('npc-complete-atlas.png'));
+ assert.ok(!loader.includes('npc-clean-patch-atlas.png'));
+ assert.ok(!renderer.includes("assets['world/plaza-patch']"));
 });

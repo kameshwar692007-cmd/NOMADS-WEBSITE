@@ -1,14 +1,27 @@
 // Feet-based collision coordinates for the 32x48 player avatar.
 import { LOCATIONS } from '../data/locationData.js';
+import { CAMPUS_NPCS } from '../data/npcDialogues.js';
 import { isWorldCollision } from '../data/mapData.js';
 export const PLAYER_COLLISION_W=14;
 export const PLAYER_COLLISION_H=10;
 export const PLAYER_COLLISION_OFFSET_X=9;
 export const PLAYER_COLLISION_OFFSET_Y=35;
 
+// Keep the NPC collider separate so tests can distinguish NPC hitboxes from
+// the existing terrain/building boundaries around them.
+export function hitsNpcFoot(footX,footY){
+ const x=footX-PLAYER_COLLISION_W/2,y=footY-PLAYER_COLLISION_H/2;
+ return CAMPUS_NPCS.some(npc=>{
+  const nearX=Math.max(x,Math.min(npc.x,x+PLAYER_COLLISION_W));
+  const nearY=Math.max(y,Math.min(npc.y,y+PLAYER_COLLISION_H));
+  const dx=(nearX-npc.x)/13,dy=(nearY-npc.y)/8;
+  return dx*dx+dy*dy<1;
+ });
+}
 export function checkFootCollision(footX, footY) {
   const x=footX-PLAYER_COLLISION_W/2,y=footY-PLAYER_COLLISION_H/2;
   if(isWorldCollision(x,y,PLAYER_COLLISION_W,PLAYER_COLLISION_H))return true;
+  if(hitsNpcFoot(footX,footY))return true;
   for(const loc of LOCATIONS){
     const box=loc.collisionBox;
     const bx=loc.worldX+box.x,by=loc.worldY+box.y;

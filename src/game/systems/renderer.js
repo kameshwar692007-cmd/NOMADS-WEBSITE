@@ -11,8 +11,8 @@ function drawArtwork(ctx, image) {
 // Stable timeline: frame advances only while feet actually travel.
 // Idle always uses the fixed first cell, no jump from global clock.
 const WALK_CYCLE = [1, 2, 3, 2];
-export const HERO_DRAW_WIDTH = 32;
-export const HERO_DRAW_HEIGHT = 48;
+export const HERO_DRAW_WIDTH = 40;
+export const HERO_DRAW_HEIGHT = 60;
 
 export function getHeroFrame(player) {
   const row = { down:0, left:1, right:2, up:3 }[player.direction] ?? 0;
@@ -82,8 +82,7 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   if(cleanRight?.width) ctx.drawImage(cleanRight,1380,0,292,100);
   // Correct the permanently baked character/smudge using the matching
   // clean reference pavement, before drawing the moving player.
-  const plazaPatch = assets['world/plaza-patch'];
-  if (plazaPatch?.width) ctx.drawImage(plazaPatch, 788, 511);
+  // The cleaned campus tiles already contain original paving under the old hero.
   drawNpcInteractions(ctx,assets,player,elapsed);
   drawForegroundForPlayer(ctx,assets['world/foreground-pixels'],player.x+16,player.y+40,HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
   ctx.restore();

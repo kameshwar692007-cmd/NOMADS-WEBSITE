@@ -1,63 +1,65 @@
-// One coherent campus illustration + procedural character. No 135 unused sprite requests.
-function loadImage(url){
- return new Promise((resolve,reject)=>{
-  const image=new Image();
-  image.onload=()=>resolve(image);
-  image.onerror=()=>reject(new Error('Failed to load campus artwork: '+url));
-  image.src=url;
- });
-}
-
-// Several older NPCs were flattened into the original background illustration.
-// Remove only their tiny painted rectangles before drawing the actual full sprites.
-// This precomputation runs ONCE during image loading, never per animation frame.
-export const BAKED_NPC_RECTS=Object.freeze([
- [478,336,522,394],   // studio
- [1473,365,1517,427], // arena
- [465,605,507,664],   // community
- [1190,608,1236,672], // contact
- [723,751,767,817]    // event grounds
+// Character-free reference artwork preserves the original user's approved map.
+// Compose five baked-character clean tiles and one plaza tile exactly once.
+const CLEAN_TILE_RECTS=Object.freeze([
+  [471,327,528,406], [1459,351,1528,438],
+  [453,590,521,675], [1177,594,1242,686],
+  [708,738,780,832], [790,511,875,611]
 ]);
-// Use artist-inspected image patches instead of runtime interpolation that
-// could create new blurry smudges in the approved campus painting.
-export function createCleanCampus(campus,patchAtlas){
- const canvas=document.createElement('canvas');
- canvas.width=campus.naturalWidth||campus.width;
- canvas.height=campus.naturalHeight||campus.height;
- const ctx=canvas.getContext('2d');
- ctx.imageSmoothingEnabled=false;
- ctx.drawImage(campus,0,0);
- if(patchAtlas?.width){
-  BAKED_NPC_RECTS.forEach(([x1,y1,x2,y2],i)=>{
-   const width=x2-x1+8,height=y2-y1+8;
-   ctx.drawImage(patchAtlas,i*56,0,width,height,x1-4,y1-4,width,height);
+const TILE_STRIDE=96;
+export { CLEAN_TILE_RECTS };
+function loadImage(url){
+  return new Promise((resolve,reject)=>{
+    const image=new Image();
+    image.onload=()=>resolve(image);
+    image.onerror=()=>reject(new Error('Failed to load game image: '+url));
+    image.src=url;
   });
- }
- return canvas;
+}
+export function createCleanCampus(campus,cleanTiles){
+  const canvas=document.createElement('canvas');
+  canvas.width=campus.naturalWidth||campus.width;
+  canvas.height=campus.naturalHeight||campus.height;
+  const ctx=canvas.getContext('2d');
+  if(!ctx)throw new Error('Unable to compose clean campus canvas');
+  ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(campus,0,0,canvas.width,canvas.height);
+  // Each clean tile is cropped directly from the supplied character-free
+  // reference map, with a transparent feather at its outside boundary.
+  if(cleanTiles?.width){
+    CLEAN_TILE_RECTS.forEach(([x1,y1,x2,y2],i)=>{
+      const w=x2-x1,h=y2-y1;
+      ctx.drawImage(cleanTiles,i*TILE_STRIDE,0,w,h,x1,y1,w,h);
+    });
+  }
+  return canvas;
 }
 export async function loadAllAssets(){
- const [campus,hero,plazaPatch,headerLeft,headerRight,foregroundMask,npcSprites,npcPatches]=await Promise.all([
+ const [campus,hero,headerLeft,headerRight,foregroundMask,npcSprites,cleanTiles]=await Promise.all([
   loadImage('/assets/game/campus-world.png'),
   loadImage('/assets/game/characters/player/nomad-goggles-v4.png'),
-  loadImage('/assets/game/plaza-clean-patch.png'),
   loadImage('/assets/game/header-clean-left.webp'),
   loadImage('/assets/game/header-clean-right.webp'),
   loadImage('/assets/game/foreground-pixel-mask.png'),
   loadImage('/assets/onboarding/npc-complete-atlas.png'),
-  loadImage('/assets/onboarding/npc-clean-patch-atlas.png')
+  loadImage('/assets/game/reference-clean-tiles.webp'),
  ]);
- // Compose cleaned world once, then its alpha-masked foreground layer.
- const cleanCampus=createCleanCampus(campus,npcPatches);
- const canvas=document.createElement('canvas');
- canvas.width=campus.naturalWidth||campus.width;
- canvas.height=campus.naturalHeight||campus.height;
- const context=canvas.getContext('2d');
- if(!context)throw new Error('Unable to create foreground mask canvas');
- context.imageSmoothingEnabled=false;
- context.drawImage(cleanCampus,0,0,canvas.width,canvas.height);
- context.globalCompositeOperation='destination-in';
- context.drawImage(foregroundMask,0,0,canvas.width,canvas.height);
- context.globalCompositeOperation='source-over';
- return {'npc/complete-sprites':npcSprites,'world/campus-clean':cleanCampus,'world/foreground-pixels':canvas,'world/campus':campus,'player/nomad-goggles-v4':hero,'world/plaza-patch':plazaPatch,
-   'world/header-left':headerLeft,'world/header-right':headerRight};
+ const cleanCampus=createCleanCampus(campus,cleanTiles);
+ const foreground=document.createElement('canvas');
+ foreground.width=cleanCampus.width; foreground.height=cleanCampus.height;
+ const ctx=foreground.getContext('2d');
+ if(!ctx)throw new Error('Unable to compose foreground mask');
+ ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(cleanCampus,0,0);
+ ctx.globalCompositeOperation='destination-in';
+ ctx.drawImage(foregroundMask,0,0,foreground.width,foreground.height);
+ ctx.globalCompositeOperation='source-over';
+ return {
+  'npc/complete-sprites':npcSprites,
+  'world/campus-clean':cleanCampus,
+  'world/foreground-pixels':foreground,
+  'world/campus':campus,
+  'player/nomad-goggles-v4':hero,
+  'world/header-left':headerLeft,
+  'world/header-right':headerRight
+ };
 }
