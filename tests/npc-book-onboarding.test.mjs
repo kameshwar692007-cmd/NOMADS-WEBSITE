@@ -59,9 +59,9 @@ test('checked-in portrait atlas and book cover have valid signatures',()=>{
  const cover=read('public/assets/onboarding/nomads-book-cover.svg');
  assert.ok(cover.includes('<svg')&&cover.includes("NOMAD'S"));
  const css=read('src/game/components/NpcDialogue.css');
- assert.ok(read('src/game/components/NpcDialogue.jsx').includes('/assets/onboarding/portraits/'));
- assert.ok(css.includes('np-portrait-image'));
- assert.ok(read('src/game/components/NpcDialogue.jsx').includes('src={PORTRAITS[index]}'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('npc-portraits-atlas.webp'));
+ assert.ok(css.includes('np-portrait-sheet'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('src={PORTRAIT_ATLAS}'));
  assert.ok(!read('src/game/components/NpcDialogue.jsx').includes('canvas.toDataURL'));
  const sprites=readFileSync(new URL('../public/assets/onboarding/npc-complete-atlas.png',import.meta.url));
  assert.equal(sprites.toString('ascii',1,4),'PNG');
