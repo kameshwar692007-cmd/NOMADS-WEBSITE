@@ -1,0 +1,22 @@
+/* Campus-only controls. No dependency on the AGY page design system. */
+.campus-dpad {
+ position:absolute;left:clamp(12px,4vw,32px);bottom:clamp(80px,11vh,110px);
+ z-index:45;display:grid;grid-template-columns:repeat(3,48px);
+ grid-template-rows:repeat(3,48px);gap:3px;pointer-events:none;
+}
+.campus-dpad-key{
+ pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;
+ background:rgba(15,25,48,.91);color:#e6edf9;
+ border:2px solid #acbdd6;border-radius:12px;
+ font-size:20px;font-weight:900;box-shadow:0 3px 0 #0b1426,0 8px 18px #02061175;
+ cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.campus-dpad-key:active{background:#d8334d;color:white;transform:translateY(2px);}
+.campus-dpad-up{grid-area:1/2;}
+.campus-dpad-left{grid-area:2/1;}
+.campus-dpad-down{grid-area:2/2;}
+.campus-dpad-right{grid-area:2/3;}
+@media(max-width:420px){
+ .campus-dpad{grid-template-columns:repeat(3,43px);grid-template-rows:repeat(3,43px);bottom:85px;left:12px;}
+ .campus-dpad-key{font-size:18px;}
+}
