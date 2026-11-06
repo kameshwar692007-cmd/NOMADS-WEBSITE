@@ -20,7 +20,7 @@ test('loaded player image is drawn above terrain, not silently skipped',()=>{
  assert.deepEqual(calls[0].slice(1,5),[0,0,32,48]);
 });
 test('collision-locked movement cannot move feet onto trees, water or stage',()=>{
- for(const position of [[20,750],[590,535],[830,725]])
+ for(const position of [[20,750],[595,555],[830,725]])
   assert.equal(checkFootCollision(...position),true);
  const pos=getSpawnPoint();
  const moved=resolvePathMovement(pos.x-16,pos.y-40,0,12);
