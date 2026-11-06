@@ -41,6 +41,6 @@ test('idle frame fixed and moving phases advance deterministically',()=>{
    assert.equal(walk.col,[1,2,3,2][index]);
   }
  }
- assert.ok(game.includes('if (moved) player.walkCycleTime'));
- assert.ok(game.includes('else player.walkCycleTime = 0'));
+ assert.match(game,/if\s*\(moved\)\s*player\.walkCycleTime/);
+ assert.match(game,/else\s+player\.walkCycleTime\s*=\s*0/);
 });
