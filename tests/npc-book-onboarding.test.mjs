@@ -61,6 +61,8 @@ test('checked-in portrait atlas and book cover have valid signatures',()=>{
  const css=read('src/game/components/NpcDialogue.css');
  assert.ok(read('src/game/components/NpcDialogue.jsx').includes('npc-portraits-atlas.webp'));
  assert.ok(css.includes('np-portrait-sheet'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('PORTRAIT_NAMES[index]'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('onError={() => setFailed(true)}'));
  assert.ok(read('src/game/components/NpcDialogue.jsx').includes('src={PORTRAIT_ATLAS}'));
  assert.ok(!read('src/game/components/NpcDialogue.jsx').includes('canvas.toDataURL'));
  const sprites=readFileSync(new URL('../public/assets/onboarding/npc-complete-atlas.png',import.meta.url));
