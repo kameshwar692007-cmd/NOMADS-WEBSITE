@@ -46,8 +46,8 @@ export async function loadAllAssets(){
   loadImage('/assets/onboarding/npc-complete-atlas.png'),
   loadImage('/assets/onboarding/npc-clean-patch-atlas.png')
  ]);
- // Compose exact-alpha foreground once at load. Draw the campus through the
- // transparent mask; rendering may then copy only the masked object pixels.
+ // Compose cleaned world once, then its alpha-masked foreground layer.
+ const cleanCampus=createCleanCampus(campus,npcPatches);
  const canvas=document.createElement('canvas');
  canvas.width=campus.naturalWidth||campus.width;
  canvas.height=campus.naturalHeight||campus.height;
