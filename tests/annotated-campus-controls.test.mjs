@@ -13,7 +13,7 @@ test('marked grass and event sand are walkable while water and scenery remain bl
   for(const [x,y] of [[835,555],[600,500],[835,610],[500,812],[1380,712]]){
     assert.equal(checkFootCollision(x,y),false,'accessible point '+x+','+y);
   }
-  for(const [x,y] of [[20,750],[830,110],[835,475],[830,725],[534,761]]){
+  for(const [x,y] of [[20,750],[830,110],[835,475],[830,725],[548,838]]){
     assert.equal(checkFootCollision(x,y),true,'solid obstacle '+x+','+y);
   }
   assert.equal(isGroundPixel(600,500),true);
@@ -51,15 +51,15 @@ test('manual movement respects collision boundaries and can move through open gr
 
 test('marked props have ground collisions plus depth-correct foreground redraw',()=>{
  assert.ok(SCENE_OBJECTS.length>=20);
- const obj=SCENE_OBJECTS.find(o=>o.id==='west courtyard tree');
+ const obj=SCENE_OBJECTS.find(o=>o.id==='west-courtyard-tree');
  assert.ok(obj);
  const campus={width:1672,height:941};
  const draw=[];
  const ctx={save(){},beginPath(){},ellipse(){},clip(){},drawImage(...args){draw.push(args);},restore(){}};
- drawForegroundForPlayer(ctx,campus,obj.x,obj.baseY-20);
+ drawForegroundForPlayer(ctx,campus,obj.footX,obj.baseY-20);
  assert.ok(draw.length>0,'tree should obscure player walking behind it');
  draw.length=0;
- drawForegroundForPlayer(ctx,campus,obj.x,obj.baseY+10);
+ drawForegroundForPlayer(ctx,campus,obj.footX,obj.baseY+10);
  assert.equal(draw.length,0,'player in front should render above tree canopy');
 });
 

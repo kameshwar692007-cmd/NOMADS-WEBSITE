@@ -75,49 +75,31 @@ export const WALKABLE_PLAZAS = [
 
 // Precise bases/feet of visually tall objects. Tree canopy pixels may overlap
 // the avatar visually, but only their solid trunks/bases collide.
+// Only large, truly structural pieces remain rectangular. Trees, flowers,
+// small benches, lamp posts and flags use their tiny actual ground contacts
+// from sceneObjects.js, NOT full canopy/illustration rectangles.
 export const RECT_OBSTACLES = [
- // Fountain and surrounding flower ring (raised stone)
  {name:'fountain pedestal',x:766,y:410,w:138,h:112},
- // Northern benches
- {name:'west bench',x:606,y:400,w:49,h:35},
- {name:'east bench',x:1008,y:399,w:51,h:38},
- // Lamp bases, along both sides of the plaza
- {name:'HQ west lamp',x:729,y:337,w:26,h:41},
- {name:'HQ east lamp',x:906,y:336,w:27,h:42},
- {name:'southwest lamp',x:637,y:531,w:29,h:49},
- {name:'southeast lamp',x:999,y:530,w:29,h:49},
- // Flagpole bases and stands (not the fabric)
- {name:'northwest banner',x:687,y:353,w:24,h:51},
- {name:'northeast banner',x:946,y:353,w:24,h:51},
- {name:'plaza west banner',x:689,y:492,w:26,h:69},
- {name:'plaza east banner',x:944,y:491,w:28,h:70},
- // Community patio fence, tables, cafe umbrella and benches
- {name:'community fence',x:515,y:552,w:44,h:107},
- {name:'community tables',x:382,y:605,w:107,h:60},
- // Event grounds is fenced; no shortcut through its stage/tents
- {name:'event left fence',x:582,y:716,w:24,h:126},
- {name:'event entrance tent',x:615,y:734,w:83,h:103},
- {name:'event main stage',x:728,y:680,w:214,h:101},
- {name:'event red tent',x:962,y:732,w:100,h:99},
- {name:'event lower fence',x:588,y:836,w:483,h:17},
- // Contact building exterior decorations
- {name:'contact shrub row',x:1192,y:629,w:35,h:35}
+ // Community café: furniture base only, not the whole patio.
+ {name:'community table A',x:407,y:644,w:18,h:10},
+ {name:'community table B',x:450,y:642,w:18,h:10},
+ {name:'community western fence',x:512,y:616,w:11,h:36},
+ // Event grounds stage, pitched tents and physical fences are solid.
+ {name:'event western fence',x:582,y:742,w:13,h:95},
+ {name:'event blue tent',x:615,y:747,w:77,h:88},
+ {name:'event stage',x:728,y:694,w:214,h:88},
+ {name:'event red tent',x:962,y:748,w:96,h:82},
+ // The event fence consists of separate posts/rails, not a sealed
+ // 483-pixel wall. Leave the marked entry gap clear for walking.
+ {name:'event lower fence west',x:587,y:837,w:72,h:12},
+ {name:'event lower fence east',x:960,y:837,w:113,h:12}
 ];
-
-// Large hand-estimated tree-canopy blockers previously caused invisible lock zones.
-// Only the fountain garden is fully solid; scenery uses smaller foot-based hitboxes.
 export const ELLIPSE_OBSTACLES = [
+ // Raised planted stone border, not tree canopies.
  {name:'fountain flowers left',x:751,y:476,rx:18,ry:25},
- {name:'fountain flowers right',x:919,y:478,rx:18,ry:25},
- {name:'event-side shrub base',x:534,y:761,rx:14,ry:15}
+ {name:'fountain flowers right',x:919,y:478,rx:18,ry:25}
 ];
 
-function distanceToSegment(px,py,x1,y1,x2,y2) {
- const vx=x2-x1,vy=y2-y1;
- const denom=vx*vx+vy*vy;
- const t=denom?Math.max(0,Math.min(1,((px-x1)*vx+(py-y1)*vy)/denom)):0;
- return Math.hypot(px-x1-t*vx,py-y1-t*vy);
-}
 export function isWalkablePoint(x,y) {
   // Free exploration follows the user's annotated red perimeter, including lawns
   // and event sand. Guided travel uses the stricter cement-only route graph.
