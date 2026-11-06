@@ -24,15 +24,15 @@ function drawPlayer(ctx, assets, player) {
   // World collision coordinates stay at (x+16,y+40), independent of sprite size.
   const footX = Math.round(x + 16), footY = Math.round(y + 40);
   const drawX = footX - HERO_DRAW_WIDTH/2;
-  const drawY = footY - HERO_DRAW_HEIGHT + 2;
+  const drawY = footY - HERO_DRAW_HEIGHT;
   ctx.fillStyle = 'rgba(4,8,14,.24)';
   ctx.beginPath();
   ctx.ellipse(footX,footY+1,11,3.1,0,0,Math.PI*2);
   ctx.fill();
-  const hero = assets['player/nomad-goggles'];
-  if (!hero?.width) return;
+  const hero = assets['player/nomad-goggles-v3'];
+  if (!hero?.complete || hero.naturalWidth!==128 || hero.naturalHeight!==192) return;
   const {row,col} = getHeroFrame(player);
-  const fw=hero.width/4,fh=hero.height/4;
+  const fw=hero.naturalWidth/4,fh=hero.naturalHeight/4;
   ctx.drawImage(hero,col*fw,row*fh,fw,fh,
     Math.round(drawX),Math.round(drawY),HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
 }
