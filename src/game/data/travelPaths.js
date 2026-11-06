@@ -72,12 +72,36 @@ function shortestPath(start,end){
  }
  return result;
 }
+// Colored routes on the annotated reference identify which main approach the
+// player should use when leaving the central plaza. They are NAVIGATION HINTS,
+// never teleport points: each is connected using collision-checked A*.
+export const PLAZA_ROUTE_GUIDES = Object.freeze({
+ 'main-headquarters':{x:735,y:445},
+ 'esports-arena':{x:1100,y:448},
+ 'game-dev-studio':{x:620,y:448},
+ 'community-hub':{x:540,y:685},
+ 'contact-centre':{x:1140,y:690},
+ 'event-grounds':{x:505,y:710},
+});
+function pathLength(start,waypoints){
+ let total=0,previous=start;
+ for(const point of waypoints){total+=distance(previous,point);previous=point;}
+ return total;
+}
 export function buildTravelPath(fromX,fromY,destinationId){
  const destination=LOCATION_MAP[destinationId];if(!destination)return [];
  const start={x:fromX,y:fromY},end={x:destination.entranceX,y:destination.entranceY};
- // The dedicated west-side paving is the only accessible Event Grounds route.
- // Let A* select the nearest path from the CURRENT position, without a forced detour.
- return shortestPath(start,end);
+ const shortest=shortestPath(start,end);
+ if(distance(start,PLAZA_CENTER)>50)return shortest;
+ const guide=PLAZA_ROUTE_GUIDES[destinationId];
+ if(!guide || checkFootCollision(guide.x,guide.y))return shortest;
+ const first=shortestPath(start,guide);
+ if(!first.length||distance(first.at(-1),guide)>15)return shortest;
+ const second=shortestPath(guide,end);
+ if(!second.length||distance(second.at(-1),end)>15)return shortest;
+ const guided=[...first,...second];
+ // Ignore any hint that would cause a circuitous trip or inaccessible section.
+ return pathLength(start,guided)<=pathLength(start,shortest)*1.85?guided:shortest;
 }
 export function getSpawnPoint(){return {...PLAZA_CENTER};}
 
