@@ -1,4 +1,6 @@
 import { isCementPixel } from './cementMask.js';
+import { isGroundPixel } from './groundMask.js';
+import { hitsSceneObject } from './sceneObjects.js';
 // Campus collision map: coordinates match 1672 × 941 approved illustration.
 // Gameplay is deliberately confined to visible roads, plaza and building approaches:
 // trees, water, cliffs, grass, fences and decorations are not walkable.
@@ -102,21 +104,12 @@ export const RECT_OBSTACLES = [
  {name:'contact shrub row',x:1192,y:629,w:35,h:35}
 ];
 
+// Large hand-estimated tree-canopy blockers previously caused invisible lock zones.
+// Only the fountain garden is fully solid; scenery uses smaller foot-based hitboxes.
 export const ELLIPSE_OBSTACLES = [
- // Fountain floral borders beyond the rectangular pedestal
- {name:'fountain flowers left',x:751,y:476,rx:20,ry:29},
- {name:'fountain flowers right',x:919,y:478,rx:21,ry:30},
- // Trees along the walkways
- {name:'studio approach tree',x:577,y:417,rx:11,ry:12},
- {name:'west mid tree',x:590,y:535,rx:34,ry:34},
- {name:'east mid tree',x:1090,y:534,rx:36,ry:35},
- {name:'community path shrub',x:534,y:761,rx:26,ry:29},
- {name:'southwest two trees',x:394,y:765,rx:66,ry:36},
- {name:'event-side shrub',x:564,y:750,rx:19,ry:29},
- {name:'contact-side tree',x:1156,y:783,rx:41,ry:38},
- {name:'esports lawn tree',x:1504,y:457,rx:29,ry:34},
- // No cutting across patio / stages
- {name:'community parasol',x:525,y:601,rx:30,ry:35}
+ {name:'fountain flowers left',x:751,y:476,rx:18,ry:25},
+ {name:'fountain flowers right',x:919,y:478,rx:18,ry:25},
+ {name:'event-side shrub base',x:534,y:761,rx:14,ry:15}
 ];
 
 function distanceToSegment(px,py,x1,y1,x2,y2) {
@@ -126,9 +119,9 @@ function distanceToSegment(px,py,x1,y1,x2,y2) {
  return Math.hypot(px-x1-t*vx,py-y1-t*vy);
 }
 export function isWalkablePoint(x,y) {
-  // The accessible world is the actual pale cement walkway, not the earlier
-  // oversized elliptical shortcuts that incorrectly included grass.
-  return isCementPixel(x,y);
+  // Free exploration follows the user's annotated red perimeter, including lawns
+  // and event sand. Guided travel uses the stricter cement-only route graph.
+  return isCementPixel(x,y) || isGroundPixel(x,y);
 }
 
 export function isWorldCollision(x,y,w,h) {
@@ -139,6 +132,7 @@ export function isWorldCollision(x,y,w,h) {
  ];
  if(points.some(([px,py])=>!isWalkablePoint(px,py)))return true;
  if(RECT_OBSTACLES.some(b=>x<b.x+b.w&&x+w>b.x&&y<b.y+b.h&&y+h>b.y))return true;
+ if(hitsSceneObject(x,y,w,h))return true;
  return ELLIPSE_OBSTACLES.some(b=>{
   // Closest point of rectangle to ellipse center.
   const cx=Math.max(x,Math.min(b.x,x+w)),cy=Math.max(y,Math.min(b.y,y+h));

@@ -74,6 +74,7 @@ export default function HomePage() {
         <GameCanvas 
           onLocationInteract={handleLocationInteract}
           isMobile={isMobile}
+          paused={Boolean(activeLocation || directoryOpen || mapOpen || menuOpen)}
           directoryTravelTarget={travelTarget}
           onDirectoryTravelConsumed={handleTravelConsumed}
         />

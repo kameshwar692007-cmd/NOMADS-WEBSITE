@@ -29,12 +29,14 @@ test('all destinations use cement-constrained paths without long diagonal grass 
   }
  }
 });
-test('clicking water, bushes, trees, stage or grass cannot start travel',()=>{
+test('blocked objects reject travel but the marked red-outline lawns remain explorable',()=>{
  const spawn=getSpawnPoint();
  for(const [x,y] of [[20,750],[830,110],[590,535],[534,761],[835,475],[830,725]]){
   assert.equal(checkFootCollision(x,y),true);
   assert.deepEqual(buildPathToPoint(spawn.x,spawn.y,x,y),[]);
  }
+ // The user's annotated map intentionally makes lawns walkable.
+ assert.equal(checkFootCollision(600,500),false);
  const path=buildPathToPoint(spawn.x,spawn.y,835,610);
  assert.ok(path.length>0,'reachable cement point should start walking');
  checkRoute(spawn,path,'ground click');
