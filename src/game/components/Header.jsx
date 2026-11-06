@@ -10,8 +10,8 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen }) {
         />
       </a>
       <nav className="campus-fixed-nav" aria-label="Campus controls">
-        <button type="button" className="campus-fixed-button campus-directory-button" onClick={onDirectoryOpen} aria-label="Open campus directory">
-          <span aria-hidden="true">☷</span> <span>Directory</span>
+        <button type="button" className="campus-fixed-button campus-contact-button" onClick={onDirectoryOpen} aria-label="Contact Us">
+          <span aria-hidden="true">✉</span> <span>Contact Us</span>
         </button>
         <button type="button" className="campus-fixed-button" onClick={onMapOpen} aria-label="Open campus map">
           <span aria-hidden="true">⌖</span> <span>Map</span>

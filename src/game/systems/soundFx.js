@@ -4,7 +4,13 @@
 class SoundManager {
   constructor() {
     this.ctx = null;
-    this.muted = false;
+    let savedMute = false;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        savedMute = window.localStorage.getItem('nomads_sfx_muted') === 'true';
+      }
+    } catch (_) {}
+    this.muted = savedMute;
   }
 
   init() {
@@ -19,14 +25,25 @@ class SoundManager {
     }
   }
 
+  setMuted(mutedState) {
+    this.muted = Boolean(mutedState);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('nomads_sfx_muted', this.muted ? 'true' : 'false');
+      }
+    } catch (_) {}
+    return this.muted;
+  }
+
   toggleMute() {
-    this.muted = !this.muted;
-    if (!this.muted) this.playSelect();
+    const next = !this.muted;
+    this.setMuted(next);
+    if (!next) this.playSelect();
     return this.muted;
   }
 
   isMuted() {
-    return this.muted;
+    return Boolean(this.muted);
   }
 
   playBlip() {

@@ -31,7 +31,12 @@ const DESTINATIONS = [
 export default function GameShell({ title, subtitle, accentColor = '#e84537', children }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [muted, setMuted] = useState(sound.isMuted());
+  const [muted, setMuted] = useState(() => sound.isMuted());
+
+  // Keep muted state synchronized across route transitions
+  useEffect(() => {
+    setMuted(sound.isMuted());
+  }, [location.pathname]);
   const [warping, setWarping] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -103,7 +108,7 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
   };
 
   const toggleAudio = () => {
-    const nextState = !muted;
+    const nextState = !sound.isMuted();
     sound.setMuted(nextState);
     setMuted(nextState);
     if (!nextState) sound.playSelect();

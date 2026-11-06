@@ -2,6 +2,7 @@
 // Main game viewport with all overlays
 
 import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GameCanvas from '../game/components/GameCanvas.jsx';
 import Header from '../game/components/Header.jsx';
 import LocationPanel from '../game/components/LocationPanel.jsx';
@@ -11,27 +12,28 @@ import MenuDrawer from '../game/components/MenuDrawer.jsx';
 import ControlHints from '../game/components/ControlHints.jsx';
 import NpcDialogue from '../game/components/NpcDialogue.jsx';
 import BookIntro from '../game/components/BookIntro.jsx';
-import {HERO_GUIDE} from '../game/data/npcDialogues.js';
+import { HERO_GUIDE } from '../game/data/npcDialogues.js';
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const [activeLocation, setActiveLocation] = useState(null);
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [travelTarget, setTravelTarget] = useState(null);
-  // First visit of this tab only; returning from AGY's section pages must not
+  // First visit of this tab only; returning from section pages must not
   // force visitors to replay the book or tutorial.
-  const [introOpen, setIntroOpen] = useState(()=>{
-    try { return sessionStorage.getItem('np-campus-welcomed-v2')!=='yes'; }
+  const [introOpen, setIntroOpen] = useState(() => {
+    try { return sessionStorage.getItem('np-campus-welcomed-v2') !== 'yes'; }
     catch { return true; }
   });
   const [npcDialogue, setNpcDialogue] = useState(null);
-  const completeIntro=useCallback(()=>{
-    try { sessionStorage.setItem('np-campus-welcomed-v2','yes'); } catch { /* private mode */ }
+  const completeIntro = useCallback(() => {
+    try { sessionStorage.setItem('np-campus-welcomed-v2', 'yes'); } catch { /* private mode */ }
     setIntroOpen(false);
     setNpcDialogue(HERO_GUIDE);
-  },[]);
+  }, []);
 
   // Responsive device check
   useEffect(() => {
@@ -79,9 +81,9 @@ export default function HomePage() {
 
   return (
     <div className="homepage-frame">
-      {/* Fixed header stays above the camera on desktop and mobile. */}
+      {/* Fixed header: Contact Us navigates directly to /contact */}
       <Header
-        onDirectoryOpen={() => setDirectoryOpen(true)}
+        onDirectoryOpen={() => navigate('/contact')}
         onMapOpen={() => setMapOpen(true)}
         onMenuOpen={() => setMenuOpen(true)}
       />
@@ -98,13 +100,13 @@ export default function HomePage() {
       </main>
 
       {/* 3. Location Details Panel Modal (on arrival or manual reach) */}
-      <LocationPanel 
-        location={activeLocation} 
+      <LocationPanel
+        location={activeLocation}
         onClose={handleLocationClose}
       />
 
-      {/* 4. Directory Overlay (with badge icons and click-to-travel) */}
-      <Directory 
+      {/* 4. Campus Directory Modal */}
+      <Directory
         isOpen={directoryOpen}
         onClose={() => setDirectoryOpen(false)}
         onTravel={handleTravelRequest}
@@ -124,12 +126,11 @@ export default function HomePage() {
       />
 
       {/* Cinematic onboarding and reusable NPC dialogue only cover the campus. */}
-      {introOpen && <BookIntro onComplete={completeIntro}/>}
-      <NpcDialogue npc={npcDialogue} onClose={()=>setNpcDialogue(null)}/>
+      {introOpen && <BookIntro onComplete={completeIntro} />}
+      <NpcDialogue npc={npcDialogue} onClose={() => setNpcDialogue(null)} />
 
       {/* 7. Desktop Unobtrusive Bottom Control Hints */}
       <ControlHints isMobile={isMobile} />
-
     </div>
   );
 }
