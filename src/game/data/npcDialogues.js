@@ -4,7 +4,7 @@ const dialogue = (id, name, title, portrait, x, y, message, actionLabel, route) 
   Object.freeze({id,name,title,portrait,x,y,message,actionLabel,route});
 
 export const CAMPUS_NPCS = Object.freeze([
-  dialogue('receptionist','Mira','Headquarters Receptionist','receptionist',836,375,
+  dialogue('receptionist','Mira','Headquarters Receptionist','receptionist',796,382,
     "Welcome to Nomad's Province! Discover our story, the people behind it, and what we're building together.",
     'Discover Our Story','/about'),
   dialogue('arena-host','Rex','Esports Arena Host','arena-host',1453,444,
