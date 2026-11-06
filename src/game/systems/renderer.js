@@ -55,6 +55,10 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   ctx.translate(-Math.round(camera.x), -Math.round(camera.y));
   const campus = assets['world/campus'];
   if (campus?.width) drawArtwork(ctx, campus);
+  // Correct the permanently baked character/smudge using the matching
+  // clean reference pavement, before drawing the moving player.
+  const plazaPatch = assets['world/plaza-patch'];
+  if (plazaPatch?.width) ctx.drawImage(plazaPatch, 788, 511);
   drawWorldDirectory(ctx);
   drawPlayer(ctx, assets, player, elapsed);
   ctx.restore();
