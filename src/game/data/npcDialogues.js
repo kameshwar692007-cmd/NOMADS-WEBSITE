@@ -1,47 +1,56 @@
-// NPCs occupy existing characters and building entrances in the approved campus art.
-// Keep this data independent of AGY's page content and routing.
-const dialogue = (id, name, title, portrait, x, y, message, actionLabel, route) =>
-  Object.freeze({id,name,title,portrait,x,y,message,actionLabel,route});
+// One source of truth for each campus character, their complete game sprite,
+// matching portrait, clickable location and existing destination route.
+const PORTRAIT_ATLAS='/assets/onboarding/npc-portraits-atlas.webp';
+export const NPC_SPRITE_ATLAS='/assets/onboarding/npc-complete-atlas.png';
+export const NPC_SPRITE_WIDTH=32, NPC_SPRITE_HEIGHT=48;
 
-export const CAMPUS_NPCS = Object.freeze([
-  dialogue('receptionist','Mira','Headquarters Receptionist','receptionist',796,382,
-    "Welcome to Nomad's Province! Discover our story, the people behind it, and what we're building together.",
+const npc=(id,name,title,portraitIndex,spriteIndex,x,y,message,actionLabel,route)=>
+  Object.freeze({id,name,title,portraitIndex,spriteIndex,x,y,message,actionLabel,route,
+    portraitAtlas:PORTRAIT_ATLAS});
+
+export const CAMPUS_NPCS=Object.freeze([
+  npc('receptionist','Mira','Headquarters Receptionist',1,0,785,398,
+    "Welcome to Nomad's Province! Meet our team and discover the world we're building together.",
     'Discover Our Story','/about'),
-  dialogue('arena-host','Rex','Esports Arena Host','arena-host',1453,444,
-    'Ready for competition? Explore our tournaments, gaming events and esports community.',
+  npc('arena-host','Rex','Esports Arena Host',2,2,1494,415,
+    "Ready to compete? Explore tournaments, esports events and our champions.",
     'Explore Esports','/esports'),
-  dialogue('developer','Kai','Game Studio Developer','developer',505,440,
-    'This is where ideas become playable worlds. Check out our game projects and development studio.',
+  npc('developer','Kai','Game Studio Developer',3,1,499,386,
+    'We turn ideas into playable worlds. Explore our original games and development projects.',
     'View Our Games','/studio'),
-  dialogue('event-coordinator','Nova','Event Coordinator','event-coordinator',723,801,
-    'Something exciting is always happening here! Discover upcoming events and past highlights.',
+  npc('event-coordinator','Nova','Event Coordinator',4,3,745,808,
+    'Something exciting is always happening! Discover upcoming events and our best moments.',
     'View Events','/events'),
-  dialogue('community-manager','Ari','Community Manager','community-manager',486,685,
-    'Our community connects gamers, creators, colleges and industry collaborators. Come meet everyone!',
+  npc('community-manager','Ari','Community Manager',5,4,485,655,
+    'This is where gamers, creators, colleges and collaborators become a community.',
     'Explore Community','/community'),
-  dialogue('partnership-rep','Ezra','Partnership Representative','partnership-rep',1122,686,
-    'Want to partner, sponsor, collaborate or get in touch? We would love to hear from you.',
+  npc('partnership-rep','Ezra','Partnership Representative',6,5,1212,670,
+    'Interested in partnering, sponsoring or collaborating? Get in touch with our team.',
     'Contact Us','/contact')
 ]);
 
-export const HERO_GUIDE = Object.freeze({
-  id:'hero-guide',name:'Your Guide',title:'Campus Explorer',portrait:'hero-guide',
-  message:"Hey there! Welcome to Nomad's Province Headquarters. Explore the campus and meet our team!",
-  note:'Desktop: WASD or arrow keys, or click to walk. Mobile: hold the directional buttons or tap a destination. Tap an NPC to talk.',
+export const HERO_GUIDE=Object.freeze({
+  id:'hero-guide',name:'Your Guide',title:'Campus Explorer',portraitIndex:0,
+  portraitAtlas:PORTRAIT_ATLAS,
+  message:"Hey! Welcome to Nomad's Province Headquarters. Ready to explore the campus?",
+  note:'Desktop: WASD, arrow keys or click to move. Mobile: hold the four arrow buttons or tap a location. Click an NPC or press E nearby to talk.',
   actionLabel:"Let's Explore",route:null
 });
 
-export function getNpcAtWorldPoint(x,y,radius=31){
+// NPC hitboxes are foot-based. The floating interaction marker is centered 56px above.
+export function getNpcAtWorldPoint(x,y,radius=32){
   if(!Number.isFinite(x)||!Number.isFinite(y))return null;
-  return CAMPUS_NPCS.find(npc=>Math.hypot(npc.x-x,npc.y-y)<=radius ||
-    Math.hypot(npc.x-x,npc.y-48-y)<=Math.min(radius,20))||null;
+  return CAMPUS_NPCS.find(n=>
+    Math.abs(x-n.x)<=radius && y>=n.y-50-radius*.30 && y<=n.y+radius*.25 ||
+    Math.hypot(x-n.x,y-(n.y-60))<=Math.min(radius,17)
+  )||null;
 }
-export function getNearbyNpc(x,y,radius=54){
-  return getNpcAtWorldPoint(x,y,radius);
+export function getNearbyNpc(x,y,radius=55){
+  if(!Number.isFinite(x)||!Number.isFinite(y))return null;
+  return CAMPUS_NPCS.find(n=>Math.hypot(x-n.x,y-n.y)<=radius)||null;
 }
 export function dialogueForLocation(location){
   if(!location)return null;
-  const match=CAMPUS_NPCS.find(npc=>npc.route===location.route);
-  if(!match)return null;
-  return {...match, id:location.id, locationName:location.displayName};
+  const npc=CAMPUS_NPCS.find(n=>n.route===location.route);
+  return npc?{...npc,id:location.id,locationName:location.displayName}:null;
 }

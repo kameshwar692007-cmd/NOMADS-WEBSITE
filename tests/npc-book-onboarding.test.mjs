@@ -34,7 +34,7 @@ test('onboarding is skippable and first-session only with a short control tutori
  assert.ok(home.includes('sessionStorage.setItem('));
  assert.ok(home.includes('onNpcInteract={setNpcDialogue}'));
  assert.ok(home.includes('paused={Boolean(introOpen || npcDialogue'));
- assert.ok(book.includes('Skip intro'));
+ assert.match(book,/SKIP INTRO|Skip intro/);
  assert.ok(book.includes("e.key==='Escape'"));
  assert.ok(book.includes('prefers-reduced-motion'));
 });
@@ -59,7 +59,42 @@ test('checked-in portrait atlas and book cover have valid signatures',()=>{
  const cover=read('public/assets/onboarding/nomads-book-cover.svg');
  assert.ok(cover.includes('<svg')&&cover.includes("NOMAD'S"));
  const css=read('src/game/components/NpcDialogue.css');
- assert.ok(css.includes('npc-portraits-atlas.webp'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('npc-portraits-atlas.webp'));
+ assert.ok(css.includes('np-portrait-image'));
+ const sprites=readFileSync(new URL('../public/assets/onboarding/npc-complete-atlas.png',import.meta.url));
+ assert.equal(sprites.toString('ascii',1,4),'PNG');
+ assert.equal(sprites.readUInt32BE(16),192);
+ assert.equal(sprites.readUInt32BE(20),48);
  assert.ok(css.includes('@media(max-width:600px)'));
- assert.ok(read('src/game/components/BookIntro.css').includes('nomads-book-cover.svg'));
+ assert.ok(read('src/game/components/BookIntro.css').includes('np-book-hardcover'));
+ assert.ok(read('src/game/components/BookIntro.css').includes('perspective:1500px'));
+ assert.ok(read('src/game/components/BookIntro.jsx').includes('np-book-turn-page'));
+ assert.ok(read('src/game/components/BookIntro.jsx').includes('np-cinematic-progress'));
+});
+
+test('all six complete 32x48 sprites actually decode and contain visible body pixels',async()=>{
+ const {PNG}=await import('pngjs');
+ const file=readFileSync(new URL('../public/assets/onboarding/npc-complete-atlas.png',import.meta.url));
+ const png=PNG.sync.read(file);
+ assert.equal(png.width,192);
+ assert.equal(png.height,48);
+ for(let col=0;col<6;col++){
+  let total=0,lower=0;
+  for(let y=0;y<48;y++)for(let x=col*32;x<(col+1)*32;x++){
+   const alpha=png.data[(y*png.width+x)*4+3];
+   if(alpha>24){total++;if(y>=26)lower++;}
+  }
+  assert.ok(total>=100,'sprite '+col+' unexpectedly empty');
+  assert.ok(lower>=35,'sprite '+col+' only contains a head, missing torso/feet');
+ }
+});
+test('NPC clean-patch atlas is valid and dimensions match source strips',async()=>{
+ const {PNG}=await import('pngjs');
+ const atlas=PNG.sync.read(readFileSync(new URL('../public/assets/onboarding/npc-clean-patch-atlas.png',import.meta.url)));
+ assert.equal(atlas.width,280);
+ assert.equal(atlas.height,80);
+ const loader=read('src/game/systems/assetLoader.js');
+ assert.ok(loader.includes('createCleanCampus(campus,npcPatches)'));
+ assert.ok(loader.includes('npc-clean-patch-atlas.png'));
+ assert.ok(loader.includes('npc-complete-atlas.png'));
 });

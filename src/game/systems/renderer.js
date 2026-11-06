@@ -2,7 +2,7 @@
 // All coordinates are in world pixels; gameplay remains on a separate moving layer.
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../data/mapData.js';
 import { drawForegroundForPlayer } from '../data/sceneObjects.js';
-import {CAMPUS_NPCS} from '../data/npcDialogues.js';
+import {CAMPUS_NPCS,NPC_SPRITE_WIDTH,NPC_SPRITE_HEIGHT} from '../data/npcDialogues.js';
 
 function drawArtwork(ctx, image) {
   ctx.drawImage(image, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -40,25 +40,26 @@ function drawPlayer(ctx, assets, player) {
   }
 }
 
-// Most NPC sprites are already painted into the approved campus map.
-// Only the HQ receptionist is added dynamically; markers signal interaction.
-function drawNpcInteractions(ctx,assets,elapsed=0){
- const receptionist=assets['npc/receptionist-sprite'];
- if(!receptionist?.width)return;
- const hq=CAMPUS_NPCS[0];
- ctx.drawImage(receptionist,hq.x-16,hq.y-44,32,44);
- for(const npc of CAMPUS_NPCS){
-   const rise=Math.sin(elapsed/400+npc.x*.02)*1.7;
-   ctx.save();
-   ctx.fillStyle='#10213a';
-   ctx.strokeStyle='#f8d29b';
-   ctx.lineWidth=2;
-   ctx.beginPath();ctx.arc(npc.x,npc.y-48+rise,10,0,Math.PI*2);
-   ctx.fill();ctx.stroke();
-   ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.fillStyle='#fff4d1';ctx.font='bold 14px sans-serif';
-   ctx.fillText('!',npc.x,npc.y-48+rise);
-   ctx.restore();
+// Six complete 32x48 sprites, all tied to the same definitions as their
+// dialogue portraits. Foot-based painter ordering prevents cut-off heads.
+function drawNpcInteractions(ctx,assets,player,elapsed=0){
+ const spriteAtlas=assets['npc/complete-sprites'];
+ if(!spriteAtlas?.width){drawPlayer(ctx,assets,player);return;}
+ const sorted=[...CAMPUS_NPCS.map(n=>({type:'npc',y:n.y,n})),{type:'hero',y:player.y+40}].sort((a,b)=>a.y-b.y);
+ for(const item of sorted){
+  if(item.type==='hero'){drawPlayer(ctx,assets,player);continue;}
+  const n=item.n;
+  ctx.save();
+  ctx.fillStyle='rgba(3,8,20,.24)';
+  ctx.beginPath();ctx.ellipse(n.x,n.y+1,11,3,0,0,Math.PI*2);ctx.fill();
+  ctx.drawImage(spriteAtlas,n.spriteIndex*NPC_SPRITE_WIDTH,0,NPC_SPRITE_WIDTH,NPC_SPRITE_HEIGHT,
+    Math.round(n.x-NPC_SPRITE_WIDTH/2),Math.round(n.y-NPC_SPRITE_HEIGHT),NPC_SPRITE_WIDTH,NPC_SPRITE_HEIGHT);
+  const markerY=n.y-59+Math.sin(elapsed/550+n.x*.02)*1.6;
+  ctx.fillStyle='#14233b';ctx.strokeStyle='#eec77f';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(n.x,markerY,8.6,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#fff5ce';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('!',n.x,markerY);
+  ctx.restore();
  }
 }
 
@@ -70,7 +71,7 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   ctx.translate(Math.round(width / 2), Math.round(height / 2));
   ctx.scale(zoom, zoom);
   ctx.translate(-Math.round(camera.x), -Math.round(camera.y));
-  const campus = assets['world/campus'];
+  const campus = assets['world/campus-clean'] || assets['world/campus'];
   if (campus?.width) drawArtwork(ctx, campus);
   // Restore unbranded scenery using the matching clean reference artwork.
   // These are WORLD-space pixels and therefore move with the map, while
@@ -83,8 +84,7 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   // clean reference pavement, before drawing the moving player.
   const plazaPatch = assets['world/plaza-patch'];
   if (plazaPatch?.width) ctx.drawImage(plazaPatch, 788, 511);
-  drawNpcInteractions(ctx,assets,elapsed);
-  drawPlayer(ctx, assets, player);
+  drawNpcInteractions(ctx,assets,player,elapsed);
   drawForegroundForPlayer(ctx,assets['world/foreground-pixels'],player.x+16,player.y+40,HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
   ctx.restore();
 }
