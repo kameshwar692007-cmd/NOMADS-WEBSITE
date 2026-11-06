@@ -539,10 +539,23 @@ export default function AdminPage() {
           </div>
         ) : filteredEvents.length === 0 ? (
           <div className="admin-empty-pane">
-            <IconEvents size={36} color="#64748b" />
-            <p>No events found for category: {statusFilter}</p>
+            <div className="empty-icon-halo">
+              <IconEvents size={38} color="#ef4444" />
+            </div>
+            <h3 className="empty-title">NO EVENTS FOUND</h3>
+            <p className="empty-desc">
+              No tournament or campus records match the <strong>{statusFilter}</strong> sector filter.
+              {userRoleState.isStaff ? ' Register a new event to publish it live to the public Event Grounds.' : ''}
+            </p>
             {userRoleState.isStaff && (
-              <button className="gamified-btn" onClick={handleOpenCreate}>CREATE AN EVENT</button>
+              <button
+                className="gamified-btn create-event-btn admin-empty-create-btn"
+                onClick={handleOpenCreate}
+                onMouseEnter={() => sound.playBlip()}
+              >
+                <IconRocket size={16} />
+                <span>+ CREATE AN EVENT</span>
+              </button>
             )}
           </div>
         ) : (
