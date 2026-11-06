@@ -6,26 +6,35 @@ function drawArtwork(ctx, image) {
   ctx.drawImage(image, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 }
 
-// 4-phase natural walk cycle: Left Stride (1) -> Passing/Neutral (2) -> Right Stride (3) -> Passing/Neutral (2)
+// Stable timeline: frame advances only while feet actually travel.
+// Idle always uses the fixed first cell, no jump from global clock.
 const WALK_CYCLE = [1, 2, 3, 2];
+export const HERO_DRAW_WIDTH = 40;
+export const HERO_DRAW_HEIGHT = 60;
 
-function drawPlayer(ctx, assets, player, elapsed) {
-  const { x, y, direction, moving } = player;
-  const row = { down: 0, up: 1, left: 2, right: 3 }[direction] ?? 0;
-  const column = moving ? WALK_CYCLE[Math.floor(elapsed / 135) % 4] : 0;
-  const px = Math.round(x), py = Math.round(y);
+export function getHeroFrame(player) {
+  const row = { down:0, up:1, left:2, right:3 }[player.direction] ?? 0;
+  const phase = player.moving ? Math.floor((player.walkCycleTime ?? 0) / 155) % WALK_CYCLE.length : 0;
+  const col = player.moving ? WALK_CYCLE[phase] : 0;
+  return { row, col };
+}
 
-  ctx.fillStyle = 'rgba(4,8,14,.22)';
+function drawPlayer(ctx, assets, player) {
+  const { x, y } = player;
+  // World collision coordinates stay at (x+16,y+40), independent of sprite size.
+  const footX = Math.round(x + 16), footY = Math.round(y + 40);
+  const drawX = footX - HERO_DRAW_WIDTH/2;
+  const drawY = footY - HERO_DRAW_HEIGHT + 4;
+  ctx.fillStyle = 'rgba(4,8,14,.24)';
   ctx.beginPath();
-  ctx.ellipse(px + 16, py + 40, 9, 2.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(footX,footY+1,11,3.1,0,0,Math.PI*2);
   ctx.fill();
-
-  const hero = assets['player/uploaded-hero'] || assets['player/nomad-hero'];
-  if (hero?.width) {
-    const fw = hero.width / 4;
-    const fh = hero.height / 4;
-    ctx.drawImage(hero, column * fw, row * fh, fw, fh, px + 2, py - 2, 28, 42);
-  }
+  const hero = assets['player/nomad-hero-v2'];
+  if (!hero?.width) return;
+  const {row,col} = getHeroFrame(player);
+  const fw=hero.width/4,fh=hero.height/4;
+  ctx.drawImage(hero,col*fw,row*fh,fw,fh,
+    Math.round(drawX),Math.round(drawY),HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
 }
 
 export function renderWorld(ctx, assets, camera, player, zoom, width, height, elapsed) {
@@ -49,7 +58,7 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   // clean reference pavement, before drawing the moving player.
   const plazaPatch = assets['world/plaza-patch'];
   if (plazaPatch?.width) ctx.drawImage(plazaPatch, 788, 511);
-  drawPlayer(ctx, assets, player, elapsed);
+  drawPlayer(ctx, assets, player);
   ctx.restore();
 }
 
