@@ -1371,3 +1371,45 @@ html, body {
  .directory-panel{max-width:min(340px,calc(100vw - 18px));max-height:calc(100dvh - 116px);}
  .directory-item{padding:10px 8px;}
 }
+
+
+/* Official Nomad's Province badge and controls are always on top of the
+   moving canvas.  Do not reserve space above the world or repeat map artwork. */
+.campus-fixed-header{
+ position:fixed;inset:0 0 auto;z-index:60;
+ display:flex;justify-content:space-between;align-items:flex-start;
+ gap:12px;padding:9px clamp(8px,1.2vw,22px);
+ background:none;pointer-events:none;
+}
+.campus-fixed-header > *{pointer-events:auto;}
+.campus-fixed-brand{
+ display:block;width:clamp(185px,26vw,340px);flex-shrink:1;
+ line-height:0;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45));
+}
+.campus-fixed-brand img{display:block;width:100%;height:auto;image-rendering:auto;}
+.campus-fixed-nav{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.campus-fixed-button{
+ appearance:none;display:inline-flex;align-items:center;justify-content:center;
+ gap:6px;min-height:39px;padding:8px 13px;
+ color:#f4f6fb;font-size:12px;font-weight:800;
+ letter-spacing:.4px;background:#14223e;
+ border:2px solid #e2e6f3;border-radius:9px;
+ outline:2px solid #101a32;box-shadow:0 4px 0 #0b1123,0 5px 12px rgba(0,0,0,.45);
+ cursor:pointer;touch-action:manipulation;
+}
+.campus-fixed-button:hover,.campus-fixed-button:focus-visible{
+ background:#273b62;border-color:#fff;
+}
+.campus-fixed-button:focus-visible{outline:3px solid #ff556d;outline-offset:3px;}
+.campus-fixed-button span[aria-hidden]{font-size:16px;line-height:1;}
+@media(max-width:680px){
+ .campus-fixed-header{padding:8px;gap:5px;align-items:flex-start;}
+ .campus-fixed-brand{width:clamp(125px,35vw,178px);}
+ .campus-fixed-nav{gap:4px;}
+ .campus-fixed-button{min-height:34px;font-size:10px;padding:6px 7px;border-width:1px;border-radius:6px;gap:3px;}
+ .campus-fixed-button span[aria-hidden]{font-size:12px;}
+}
+@media(max-width:390px){
+ .campus-fixed-brand{width:120px;}
+ .campus-fixed-button{font-size:9px;padding:6px 5px;}
+}
