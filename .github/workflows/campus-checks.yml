@@ -13,5 +13,5 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: node --test tests/campus-navigation.test.mjs
+      - run: node --test tests/*.test.mjs
       - run: npm run build
