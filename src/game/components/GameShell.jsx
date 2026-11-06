@@ -1,6 +1,6 @@
 // Nomad's Province — Interactive Gamified Page Shell
 // Clean themed vector icons, animated HUD, warp navigation, cyber scanlines & scroll reveals
-// Stitch AI Cursor Page Builder integration for progressive component assembly
+// Responsive sandwich drawer menu for tablet & mobile navigation
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -14,7 +14,9 @@ import {
   IconCommunity,
   IconContact,
   IconSoundOn,
-  IconSoundOff
+  IconSoundOff,
+  IconMenu,
+  IconClose
 } from './Icons.jsx';
 
 const DESTINATIONS = [
@@ -32,14 +34,27 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
   const [muted, setMuted] = useState(sound.isMuted());
   const [warping, setWarping] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Scroll to top & trigger sleek page entrance loader
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setPageLoaded(false);
+    setMobileMenuOpen(false);
     const timer = setTimeout(() => setPageLoaded(true), 120);
     return () => clearTimeout(timer);
   }, [location.pathname]);
+
+  // Close mobile drawer on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
 
   // Automated Scroll Reveal using Intersection Observer
   useEffect(() => {
@@ -64,9 +79,13 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
   }, [location.pathname, pageLoaded]);
 
   const handleNav = (targetPath) => {
-    if (location.pathname === targetPath) return;
+    if (location.pathname === targetPath) {
+      setMobileMenuOpen(false);
+      return;
+    }
     sound.playWarp();
     setWarping(true);
+    setMobileMenuOpen(false);
     setTimeout(() => {
       navigate(targetPath);
       setWarping(false);
@@ -76,6 +95,7 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
   const handleReturnToCampus = () => {
     sound.playWarp();
     setWarping(true);
+    setMobileMenuOpen(false);
     setTimeout(() => {
       navigate('/');
       setWarping(false);
@@ -108,7 +128,7 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
           </button>
         </div>
 
-        {/* Destination Quick Travel Ports */}
+        {/* Desktop Destination Quick Travel Ports */}
         <nav className="hud-center-nav">
           {DESTINATIONS.map((dest) => {
             const isActive = location.pathname === dest.path;
@@ -131,7 +151,7 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
           })}
         </nav>
 
-        {/* Audio FX Toggle */}
+        {/* Audio FX Toggle & Tablet/Mobile Sandwich Menu Button */}
         <div className="hud-right">
           <button
             className={`hud-sound-btn ${muted ? 'muted' : 'active'}`}
@@ -151,8 +171,99 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
               </div>
             )}
           </button>
+
+          {/* Sandwich Button for Tablet & Mobile Users */}
+          <button
+            className={`hud-sandwich-btn ${mobileMenuOpen ? 'active' : ''}`}
+            onClick={() => {
+              sound.playSelect();
+              setMobileMenuOpen(!mobileMenuOpen);
+            }}
+            aria-label="Toggle Navigation Menu"
+            title="Warp Navigation Menu"
+          >
+            {mobileMenuOpen ? (
+              <IconClose size={20} color="#38bdf8" />
+            ) : (
+              <IconMenu size={20} color="#38bdf8" />
+            )}
+            <span className="sandwich-label">{mobileMenuOpen ? 'CLOSE' : 'MENU'}</span>
+          </button>
         </div>
       </header>
+
+      {/* Cyber Mobile/Tablet Sandwich Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div className="hud-mobile-backdrop" onClick={() => setMobileMenuOpen(false)}>
+          <div className="hud-mobile-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-drawer-header">
+              <div className="mobile-drawer-title">
+                <span className="drawer-title-dot" />
+                <span>DESTINATION WARP CONSOLE</span>
+              </div>
+              <button
+                className="mobile-drawer-close-btn"
+                onClick={() => {
+                  sound.playBlip();
+                  setMobileMenuOpen(false);
+                }}
+                aria-label="Close menu"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mobile-dest-list">
+              {DESTINATIONS.map((dest) => {
+                const isActive = location.pathname === dest.path;
+                const Icon = dest.Icon;
+                return (
+                  <button
+                    key={dest.path}
+                    className={`mobile-dest-btn ${isActive ? 'active' : ''}`}
+                    style={{ '--dest-color': dest.color }}
+                    onClick={() => handleNav(dest.path)}
+                  >
+                    <span className="mobile-dest-icon-frame" style={{ borderColor: dest.color }}>
+                      <Icon size={18} color={dest.color} />
+                    </span>
+                    <div className="mobile-dest-info">
+                      <span className="mobile-dest-name">{dest.label}</span>
+                      <span className="mobile-dest-sub">{dest.path}</span>
+                    </div>
+                    {isActive ? (
+                      <span className="mobile-active-chip" style={{ backgroundColor: dest.color }}>
+                        ACTIVE
+                      </span>
+                    ) : (
+                      <span className="mobile-warp-arrow">→</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Mobile Footer Actions */}
+            <div className="mobile-drawer-footer">
+              <button
+                className="hud-return-btn mobile-return-btn"
+                onClick={handleReturnToCampus}
+              >
+                <span className="return-arrow">◀</span>
+                <span>RETURN TO CAMPUS MAP</span>
+              </button>
+
+              <button
+                className={`hud-sound-btn mobile-sound-btn ${muted ? 'muted' : 'active'}`}
+                onClick={toggleAudio}
+              >
+                {muted ? <IconSoundOff size={16} color="#64748b" /> : <IconSoundOn size={16} color="#38bdf8" />}
+                <span>{muted ? 'SOUND EFFECTS: OFF' : 'SOUND EFFECTS: ACTIVE'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cyber Beam Loading Line */}
       <div className="cyber-loading-line" style={{ '--accent-glow': accentColor }} />
