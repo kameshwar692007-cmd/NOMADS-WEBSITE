@@ -14,8 +14,8 @@ test('provided 4×4 character atlas is valid transparent PNG and loaded by the g
  assert.ok(!loader.includes('nomad-hero-v2.svg'));
 });
 test('hero size matches NPC proportions while preserving collision feet',()=>{
- assert.equal(HERO_DRAW_WIDTH,36);
- assert.equal(HERO_DRAW_HEIGHT,52);
+ assert.equal(HERO_DRAW_WIDTH,32);
+ assert.equal(HERO_DRAW_HEIGHT,48);
  assert.ok(game.includes('spawn.x-16,y:spawn.y-40'));
 });
 test('idle frame fixed and moving phases advance deterministically',()=>{
