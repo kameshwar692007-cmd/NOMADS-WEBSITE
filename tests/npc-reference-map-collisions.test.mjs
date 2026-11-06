@@ -60,9 +60,12 @@ test('player is appropriately enlarged visually but keeps collision feet at fixe
  assert.match(renderer,/footX\s*=\s*Math\.round\(x\s*\+\s*16\)/);
  assert.match(renderer,/footY\s*=\s*Math\.round\(y\s*\+\s*40\)/);
 });
-test('NPC dialogue loads the WebP atlas directly without blank SVG wrappers',()=>{
+test('NPC dialogue loads HD portraits and gracefully falls back to the checked-in atlas',()=>{
  const portrait=read('src/game/components/NpcDialogue.jsx');
+ assert.ok(portrait.includes('np-portrait-image'));
  assert.ok(portrait.includes('np-portrait-sheet'));
+ assert.ok(portrait.includes('portraits-hd/'));
+ assert.ok(portrait.includes('onError={() => setFailed(true)}'));
  assert.ok(portrait.includes('src={PORTRAIT_ATLAS}'));
  assert.ok(!portrait.includes('toDataURL('));
  const hq=CAMPUS_NPCS.find(n=>n.id==='receptionist');
