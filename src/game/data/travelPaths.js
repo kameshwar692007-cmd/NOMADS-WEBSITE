@@ -4,7 +4,8 @@ import { WORLD_WIDTH, WORLD_HEIGHT } from './mapData.js';
 import { checkFootCollision } from '../systems/collision.js';
 export const PLAZA_CENTER = { x:835, y:555 };
 const CELL=12,COLS=Math.ceil(WORLD_WIDTH/CELL),ROWS=Math.ceil(WORLD_HEIGHT/CELL);
-const DIRECTIONS=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+// Four orthogonal grid directions follow the paved routes without diagonal grass shortcuts.
+const DIRECTIONS=[[1,0],[-1,0],[0,1],[0,-1]];
 const idOf=(x,y)=>y*COLS+x;
 const pointOf=id=>({x:(id%COLS)*CELL+CELL/2,y:Math.floor(id/COLS)*CELL+CELL/2});
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -13,6 +14,12 @@ function clearSegment(a,b){
  for(let d=0;d<=length;d+=1){const t=length?Math.min(1,d/length):1;
   if(checkFootCollision(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t))return false;}
  return !checkFootCollision(b.x,b.y);
+}
+// Long route segments must stay axis-aligned with the mapped cement walkways.
+// Only one-cell diagonal corrections are allowed when aligning a click to the grid.
+function canFollowCement(a,b){
+ const dx=Math.abs(a.x-b.x),dy=Math.abs(a.y-b.y);
+ return (dx<0.01||dy<0.01||Math.hypot(dx,dy)<=18) && clearSegment(a,b);
 }
 function nearestFree(p){
  const cx=Math.max(0,Math.min(COLS-1,Math.floor(p.x/CELL)));
@@ -31,7 +38,7 @@ class MinHeap{
 }
 function shortestPath(start,end){
  if(distance(start,end)<10)return [];
- if(clearSegment(start,end))return [end];
+ if(canFollowCement(start,end))return [end];
  const source=nearestFree(start),goal=nearestFree(end);if(source===null||goal===null)return [];
  const costs=new Float64Array(COLS*ROWS).fill(Infinity);
  const parents=new Int32Array(COLS*ROWS).fill(-1);
@@ -46,60 +53,21 @@ function shortestPath(start,end){
    const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=COLS||ny>=ROWS)continue;
    const target=idOf(nx,ny),p=pointOf(target);
    if(checkFootCollision(p.x,p.y))continue;
-   if(dx&&dy&&(checkFootCollision((x+dx+.5)*CELL,(y+.5)*CELL)||checkFootCollision((x+.5)*CELL,(y+dy+.5)*CELL)))continue;
-   const newCost=costs[id]+CELL*(dx&&dy?Math.SQRT2:1);
+   // Never traverse a blocked cement/obstacle cell; all moves are orthogonal.
+   const newCost=costs[id]+CELL;
    if(newCost<costs[target]){costs[target]=newCost;parents[target]=id;queue.push(target,newCost+h(target));}
   }
  }
  if(!Number.isFinite(costs[goal]))return [];
  const raw=[];for(let id=goal;id!==source&&id>=0;id=parents[id])raw.push(pointOf(id));raw.reverse();
- if(clearSegment(raw.at(-1)||start,end))raw.push(end);
+ if(canFollowCement(raw.at(-1)||start,end))raw.push(end);
  const result=[];let current=start;
  for(let i=0;i<raw.length;){
-  let next=i;for(let j=raw.length-1;j>=i;j--)if(clearSegment(current,raw[j])){next=j;break;}
-  if(!clearSegment(current,raw[next]))return [];
+  let next=i;for(let j=raw.length-1;j>=i;j--)if(canFollowCement(current,raw[j])){next=j;break;}
+  if(!canFollowCement(current,raw[next]))return [];
   result.push(raw[next]);current=raw[next];i=next+1;
  }
  return result;
-}
-// From the plaza, the Event Grounds entrance is reached via the western stone path.
-const WESTERN_EVENT_WALKWAY=[
- {x:715,y:585},{x:650,y:619},{x:550,y:655},
- {x:510,y:699},{x:504,y:783},{x:510,y:815},{x:550,y:817}
-];
-function eventPath(start,end){
- if(distance(start,end)<14)return [];
- if(start.y>=750&&start.x>550&&start.x<725&&clearSegment(start,end))return [end];
- const fromPlaza=start.x>745&&start.x<940&&start.y>=525&&start.y<635;
- let selected=fromPlaza&&clearSegment(start,WESTERN_EVENT_WALKWAY[0])?0:-1;
- let score=Infinity;
- for(let i=0;selected<0&&i<WESTERN_EVENT_WALKWAY.length;i++){
-  const p=WESTERN_EVENT_WALKWAY[i];if(!clearSegment(start,p))continue;
-  const travel=distance(start,p);
-  const remaining=WESTERN_EVENT_WALKWAY.slice(i).reduce((sum,v,j,a)=>sum+(j?distance(a[j-1],v):0),0);
-  if(travel+remaining<score){score=travel+remaining;selected=i;}
- }
- let prefix=[];
- if(selected<0){
-  let best=Infinity;
-  for(let i=0;i<WESTERN_EVENT_WALKWAY.length;i++){
-   const path=shortestPath(start,WESTERN_EVENT_WALKWAY[i]);if(!path.length)continue;
-   const cost=path.reduce((sum,p,j)=>sum+distance(j?path[j-1]:start,p),0);
-   if(cost<best){best=cost;selected=i;prefix=path;}
-  }
- }
- if(selected<0)return [];
- const points=[...prefix,...WESTERN_EVENT_WALKWAY.slice(prefix.length?selected+1:selected),end];
- const checked=[];let previous=start;
- for(const p of points){
-  if(distance(previous,p)<3)continue;
-  if(!clearSegment(previous,p)){
-   const detour=shortestPath(previous,p);if(!detour.length)return [];
-   checked.push(...detour);
-  }else checked.push(p);
-  previous=p;
- }
- return checked;
 }
 export function buildTravelPath(fromX,fromY,destinationId){
  const destination=LOCATION_MAP[destinationId];if(!destination)return [];
@@ -110,20 +78,11 @@ export function buildTravelPath(fromX,fromY,destinationId){
 }
 export function getSpawnPoint(){return {...PLAZA_CENTER};}
 
-/**
- * Click/tap-to-move on arbitrary walkable ground.
- * Clamp the requested point and snap inaccessible taps to the nearest
- * navigable grid center instead of allowing the player inside obstacles.
- */
+/** Click/tap on existing accessible cement tiles. Grass/water taps are rejected. */
 export function buildPathToPoint(fromX,fromY,targetX,targetY){
  const start={x:fromX,y:fromY};
- const desired={
-  x:Math.max(48,Math.min(WORLD_WIDTH-48,targetX)),
-  y:Math.max(100,Math.min(WORLD_HEIGHT-64,targetY))
- };
- const goalId=nearestFree(desired);
- if(goalId===null)return [];
- let end=desired;
- if(checkFootCollision(end.x,end.y))end=pointOf(goalId);
+ if(!Number.isFinite(targetX)||!Number.isFinite(targetY))return [];
+ const end={x:targetX,y:targetY};
+ if(checkFootCollision(end.x,end.y))return [];
  return shortestPath(start,end);
 }
