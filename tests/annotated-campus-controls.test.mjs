@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { getSpawnPoint,buildTravelPath,PLAZA_ROUTE_GUIDES } from '../src/game/data/travelPaths.js';
+import { getSpawnPoint,buildTravelPath,buildPathToPoint,PLAZA_ROUTE_GUIDES } from '../src/game/data/travelPaths.js';
+import { LOCATION_MAP } from '../src/game/data/locationData.js';
 import { isCementPixel } from '../src/game/data/cementMask.js';
 import { isGroundPixel } from '../src/game/data/groundMask.js';
 import { checkFootCollision,resolveMovement,resolvePathMovement } from '../src/game/systems/collision.js';
@@ -75,4 +76,17 @@ test('WASD, arrow keys, mobile D-pad, and automatic arrival popup are wired',()=
  assert.ok(canvas.includes('travelRef.current.cancel()'));
  assert.ok(css.includes('touch-action:none'));
  assert.ok(read('src/pages/HomePage.jsx').includes('paused={Boolean(activeLocation'));
+});
+
+test('central plaza honors all six colored guide corridors, elsewhere takes direct A*',()=>{
+ const start=getSpawnPoint();
+ for(const [id,guide] of Object.entries(PLAZA_ROUTE_GUIDES)){
+  const path=buildTravelPath(start.x,start.y,id);
+  assert.ok(path.some(p=>Math.hypot(p.x-guide.x,p.y-guide.y)<=1),'plaza missed route guide '+id);
+ }
+ const other=LOCATION_MAP['game-dev-studio'];
+ const destination=LOCATION_MAP['contact-centre'];
+ const shortest=buildPathToPoint(other.entranceX,other.entranceY,destination.entranceX,destination.entranceY);
+ assert.deepEqual(buildTravelPath(other.entranceX,other.entranceY,destination.id),shortest,
+  'from another location use the current-position shortest route, without plaza guide');
 });
