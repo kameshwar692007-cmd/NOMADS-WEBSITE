@@ -2,6 +2,7 @@
 import { LOCATION_MAP } from './locationData.js';
 import { WORLD_WIDTH, WORLD_HEIGHT } from './mapData.js';
 import { checkFootCollision } from '../systems/collision.js';
+import { isCementPixel } from './cementMask.js';
 export const PLAZA_CENTER = { x:835, y:555 };
 const CELL=8,COLS=Math.ceil(WORLD_WIDTH/CELL),ROWS=Math.ceil(WORLD_HEIGHT/CELL);
 // Four orthogonal grid directions follow the paved routes without diagonal grass shortcuts.
@@ -54,7 +55,9 @@ function shortestPath(start,end){
    const target=idOf(nx,ny),p=pointOf(target);
    if(checkFootCollision(p.x,p.y) || !clearSegment(pointOf(id),p))continue;
    // Never traverse a blocked cement/obstacle cell; all moves are orthogonal.
-   const newCost=costs[id]+CELL;
+   // Follow the pictured stone walkway. Grass incurs a substantial cost,
+   // but a short step across it is allowed to reach the nearest road from a lawn.
+   const newCost=costs[id]+CELL*(isCementPixel(p.x,p.y)?1:12);
    if(newCost<costs[target]){costs[target]=newCost;parents[target]=id;queue.push(target,newCost+h(target));}
   }
  }
