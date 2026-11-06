@@ -1,3 +1,4 @@
+import { isCementPixel } from './cementMask.js';
 // Campus collision map: coordinates match 1672 × 941 approved illustration.
 // Gameplay is deliberately confined to visible roads, plaza and building approaches:
 // trees, water, cliffs, grass, fences and decorations are not walkable.
@@ -106,7 +107,7 @@ export const ELLIPSE_OBSTACLES = [
  {name:'fountain flowers left',x:751,y:476,rx:20,ry:29},
  {name:'fountain flowers right',x:919,y:478,rx:21,ry:30},
  // Trees along the walkways
- {name:'studio approach tree',x:577,y:425,rx:24,ry:26},
+ {name:'studio approach tree',x:577,y:417,rx:11,ry:12},
  {name:'west mid tree',x:590,y:535,rx:34,ry:34},
  {name:'east mid tree',x:1090,y:534,rx:36,ry:35},
  {name:'community path shrub',x:534,y:761,rx:26,ry:29},
@@ -125,9 +126,9 @@ function distanceToSegment(px,py,x1,y1,x2,y2) {
  return Math.hypot(px-x1-t*vx,py-y1-t*vy);
 }
 export function isWalkablePoint(x,y) {
- if(x<90||x>WORLD_WIDTH-90||y<300||y>876)return false;
- if(WALKABLE_CORRIDORS.some(([ax,ay,bx,by,r])=>distanceToSegment(x,y,ax,ay,bx,by)<=r))return true;
- return WALKABLE_PLAZAS.some(([cx,cy,rx,ry])=>((x-cx)/rx)**2+((y-cy)/ry)**2<=1);
+  // The accessible world is the actual pale cement walkway, not the earlier
+  // oversized elliptical shortcuts that incorrectly included grass.
+  return isCementPixel(x,y);
 }
 
 export function isWorldCollision(x,y,w,h) {
