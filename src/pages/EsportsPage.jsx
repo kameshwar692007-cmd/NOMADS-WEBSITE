@@ -5,6 +5,7 @@ import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
 import { TOURNAMENTS, ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
+import { IconCrosshair, IconWhatsApp, IconInstagram } from '../game/components/Icons.jsx';
 
 export default function EsportsPage() {
   const [selectedTournament, setSelectedTournament] = useState(TOURNAMENTS[0]);
@@ -29,7 +30,7 @@ export default function EsportsPage() {
             <span className="live-radar-dot" />
             <span>COLLEGIATE & COMMUNITY CIRCUITS ACTIVE</span>
           </div>
-          <div className="arena-scrim-alert">OFFICIAL SQUAD REGISTRATIONS OPEN</div>
+          <div className="arena-scrim-alert">REGISTRATIONS OPEN VIA OFFICIAL CHANNELS</div>
         </div>
 
         <div className="arena-headline-wrap">
@@ -44,7 +45,7 @@ export default function EsportsPage() {
       {/* 2. Active Tournaments Battle Grid */}
       <div className="section-title-wrap">
         <h3 className="section-title">FEATURED TOURNAMENT CIRCUITS</h3>
-        <span className="section-badge">NOMAD'S PROVINCE BRACKETS</span>
+        <span className="section-badge">TOURNAMENT BRACKETS</span>
       </div>
 
       <div className="tournaments-grid">
@@ -86,7 +87,8 @@ export default function EsportsPage() {
                 onClick={() => handleRegisterClick(t)}
                 onMouseEnter={() => sound.playBlip()}
               >
-                <span>⚔️ REGISTER FOR TOURNAMENT</span>
+                <IconCrosshair size={16} />
+                <span>REGISTER FOR TOURNAMENT</span>
               </button>
             </div>
           </div>
@@ -115,7 +117,7 @@ export default function EsportsPage() {
         </div>
       </section>
 
-      {/* 4. Registration Modal with Official Free Channels */}
+      {/* 4. Registration Modal with Official Channels */}
       {modalOpen && (
         <div className="retro-modal-backdrop" onClick={() => { sound.playCancel(); setModalOpen(false); }}>
           <div className="retro-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -133,7 +135,8 @@ export default function EsportsPage() {
                   className="modal-action-btn whatsapp-btn"
                   onClick={() => sound.playSelect()}
                 >
-                  💬 Register via WhatsApp Channel
+                  <IconWhatsApp size={18} />
+                  <span>Register via WhatsApp Channel</span>
                 </a>
                 <a 
                   href={ORG_INFO.instagram} 
@@ -142,7 +145,8 @@ export default function EsportsPage() {
                   className="modal-action-btn insta-btn"
                   onClick={() => sound.playSelect()}
                 >
-                  📸 Check Updates on Instagram (@nomadsprovince)
+                  <IconInstagram size={18} />
+                  <span>View Updates on Instagram (@nomadsprovince)</span>
                 </a>
               </div>
             </div>

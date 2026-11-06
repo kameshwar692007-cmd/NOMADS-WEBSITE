@@ -5,6 +5,7 @@ import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
 import { ORG_INFO, PARTNERS, TEAM_STRUCTURE } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
+import { ThemedIcon, IconTrophy, IconCode, IconZap, IconGraduation, IconSparkles, IconRocket, IconWhatsApp } from '../game/components/Icons.jsx';
 
 export default function AboutPage() {
   const [activeTab, setActiveTab] = useState('lore');
@@ -20,7 +21,7 @@ export default function AboutPage() {
         <div className="card-glitch-border" />
         <div className="citadel-grid">
           <div className="citadel-text">
-            <span className="quest-code">ORGANIZATION PROFILE // CHENNAI, INDIA</span>
+            <span className="quest-code">ABOUT NOMAD'S PROVINCE • CHENNAI</span>
             <h2 className="citadel-heading">Building a Unified Esports & Game Development Ecosystem</h2>
             <p className="citadel-desc">
               <strong>Nomad's Province</strong> is an organization working across <strong>Sports, Esports, and Game Development</strong>. 
@@ -48,7 +49,7 @@ export default function AboutPage() {
               </svg>
               <div className="hologram-ring" />
             </div>
-            <div className="emblem-caption">NOMAD'S PROVINCE OFFICIAL CITADEL</div>
+            <div className="emblem-caption">NOMAD'S PROVINCE CITADEL</div>
           </div>
         </div>
       </section>
@@ -60,21 +61,21 @@ export default function AboutPage() {
           onClick={() => { sound.playSelect(); setActiveTab('lore'); }}
           onMouseEnter={() => sound.playBlip()}
         >
-          📜 MISSION & PILLARS
+          <span className="tab-glyph">◈</span> MISSION & PILLARS
         </button>
         <button
           className={`tab-btn ${activeTab === 'team' ? 'active' : ''}`}
           onClick={() => { sound.playSelect(); setActiveTab('team'); }}
           onMouseEnter={() => sound.playBlip()}
         >
-          👥 CORE TEAM & ROLES
+          <span className="tab-glyph">◆</span> CORE TEAM & ROLES
         </button>
         <button
           className={`tab-btn ${activeTab === 'allies' ? 'active' : ''}`}
           onClick={() => { sound.playSelect(); setActiveTab('allies'); }}
           onMouseEnter={() => sound.playBlip()}
         >
-          🛡️ STRATEGIC PARTNERS ({PARTNERS.length})
+          <span className="tab-glyph">✦</span> STRATEGIC PARTNERS ({PARTNERS.length})
         </button>
       </div>
 
@@ -83,7 +84,9 @@ export default function AboutPage() {
         <div className="tab-pane fade-in">
           <div className="grid-3-col">
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-              <div className="pillar-icon">🏆</div>
+              <div className="pillar-icon-box">
+                <IconTrophy size={26} color="#f59e0b" />
+              </div>
               <h3 className="pillar-title">Esports & Tournaments</h3>
               <p className="pillar-text">
                 Orchestrating competitive tournament circuits, collegiate scrims, and live-streamed matches across Free Fire Max, CODM, Indus, and BGMI.
@@ -92,7 +95,9 @@ export default function AboutPage() {
             </div>
 
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-              <div className="pillar-icon">💻</div>
+              <div className="pillar-icon-box">
+                <IconCode size={26} color="#38bdf8" />
+              </div>
               <h3 className="pillar-title">Game Development Studio</h3>
               <p className="pillar-text">
                 Creating original indie games, interactive WebGL experiences, and hosting 24-hr game dev hackathons in partnership with GDAI.
@@ -101,7 +106,9 @@ export default function AboutPage() {
             </div>
 
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-              <div className="pillar-icon">⚡</div>
+              <div className="pillar-icon-box">
+                <IconZap size={26} color="#10b981" />
+              </div>
               <h3 className="pillar-title">Sports & Active Gaming</h3>
               <p className="pillar-text">
                 Combining physical turf sports activations and digital gaming tournaments in partnership with Decathlon and Playo.
@@ -110,7 +117,9 @@ export default function AboutPage() {
             </div>
 
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-              <div className="pillar-icon">🎓</div>
+              <div className="pillar-icon-box">
+                <IconGraduation size={26} color="#f97316" />
+              </div>
               <h3 className="pillar-title">Collegiate Network</h3>
               <p className="pillar-text">
                 Partnering with institutions like SRMIST, Easwari Engineering, VIT-AP, Crescent, and St. Lourdes to nurture campus talent.
@@ -119,7 +128,9 @@ export default function AboutPage() {
             </div>
 
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-              <div className="pillar-icon">✨</div>
+              <div className="pillar-icon-box">
+                <IconSparkles size={26} color="#a855f7" />
+              </div>
               <h3 className="pillar-title">Pop-Culture Communities</h3>
               <p className="pillar-text">
                 Collaborating with regional cultural groups like Chennai Anime Club and Otaku Nadu for anime screenings, cosplay, and gaming fests.
@@ -128,7 +139,9 @@ export default function AboutPage() {
             </div>
 
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-              <div className="pillar-icon">🚀</div>
+              <div className="pillar-icon-box">
+                <IconRocket size={26} color="#ef4444" />
+              </div>
               <h3 className="pillar-title">Startup & Innovation</h3>
               <p className="pillar-text">
                 Supported by Huddle Global (KSUM) and Easwari Startup Incubator to connect gaming creators with industry and venture opportunities.
@@ -166,10 +179,10 @@ export default function AboutPage() {
           </div>
 
           <div className="gamified-card join-team-callout">
-            <h4>JOIN THE NOMAD'S PROVINCE GUILD</h4>
+            <h4>JOIN THE NOMAD'S PROVINCE TEAM</h4>
             <p>We are always expanding our team with student developers, tournament referees, casters, and collegiate ambassadors.</p>
             <a href="https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f" target="_blank" rel="noreferrer" className="gamified-btn" onMouseEnter={() => sound.playBlip()}>
-              CONNECT WITH OUR TEAM ON WHATSAPP 💬
+              <IconWhatsApp size={16} /> CONNECT WITH OUR TEAM ON WHATSAPP
             </a>
           </div>
         </div>
@@ -182,7 +195,9 @@ export default function AboutPage() {
             {PARTNERS.map((p) => (
               <div key={p.id} className="gamified-card partner-card" style={{ '--partner-accent': p.accent }} onMouseEnter={() => sound.playBlip()}>
                 <div className="partner-header">
-                  <span className="partner-emoji">{p.icon}</span>
+                  <span className="partner-icon-frame">
+                    <ThemedIcon name={p.iconType} size={20} color={p.accent} />
+                  </span>
                   <div className="partner-badge" style={{ borderColor: p.accent, color: p.accent }}>{p.category}</div>
                 </div>
                 <h4 className="partner-name">{p.name}</h4>

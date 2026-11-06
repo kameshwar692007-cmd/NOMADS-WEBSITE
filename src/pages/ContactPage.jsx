@@ -5,6 +5,7 @@ import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
 import { ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
+import { IconWhatsApp, IconInstagram, IconMail, IconMapPin, IconRocket, IconCheck } from '../game/components/Icons.jsx';
 
 const FAQS = [
   {
@@ -65,7 +66,7 @@ export default function ContactPage() {
             <span className="terminal-dot red" />
             <span className="terminal-dot yellow" />
             <span className="terminal-dot green" />
-            <span className="terminal-title">TRANSMISSION TERMINAL // DIRECT DISPATCH</span>
+            <span className="terminal-title">DIRECT INQUIRY DISPATCH</span>
           </div>
 
           <h3 className="section-title">CONNECT WITH NOMAD'S PROVINCE</h3>
@@ -75,8 +76,8 @@ export default function ContactPage() {
 
           {submitted ? (
             <div className="pitch-success-msg" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>
-              <span className="success-icon">✓</span>
-              <div>TRANSMISSION DISPATCHED: Our team will respond to your inquiry via email / WhatsApp!</div>
+              <span className="success-icon"><IconCheck size={18} /></span>
+              <div>MESSAGE SENT: Our team will respond to your inquiry via email / WhatsApp!</div>
             </div>
           ) : (
             <form className="contact-form" onSubmit={handleSubmit}>
@@ -93,7 +94,7 @@ export default function ContactPage() {
               </div>
 
               <div className="form-group">
-                <label className="retro-label">COMMUNICATION FREQUENCY (EMAIL)</label>
+                <label className="retro-label">EMAIL ADDRESS</label>
                 <input 
                   type="email" 
                   placeholder="your.email@example.com" 
@@ -133,7 +134,8 @@ export default function ContactPage() {
               </div>
 
               <button type="submit" className="gamified-btn submit-dispatch-btn" onMouseEnter={() => sound.playBlip()}>
-                DISPATCH TRANSMISSION 📡
+                <IconRocket size={16} />
+                <span>SEND INQUIRY</span>
               </button>
             </form>
           )}
@@ -145,7 +147,9 @@ export default function ContactPage() {
             <h4 className="sidebar-title">VERIFIED DIRECT CHANNELS</h4>
 
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
-              <span className="channel-icon">💬</span>
+              <span className="channel-icon-frame">
+                <IconWhatsApp size={20} color="#22c55e" />
+              </span>
               <div>
                 <div className="channel-label">Official WhatsApp Channel</div>
                 <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="channel-link">
@@ -155,7 +159,9 @@ export default function ContactPage() {
             </div>
 
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
-              <span className="channel-icon">📸</span>
+              <span className="channel-icon-frame">
+                <IconInstagram size={20} color="#ec4899" />
+              </span>
               <div>
                 <div className="channel-label">Official Instagram (@nomadsprovince)</div>
                 <a href={ORG_INFO.instagram} target="_blank" rel="noreferrer" className="channel-link">
@@ -165,7 +171,9 @@ export default function ContactPage() {
             </div>
 
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
-              <span className="channel-icon">✉️</span>
+              <span className="channel-icon-frame">
+                <IconMail size={20} color="#38bdf8" />
+              </span>
               <div>
                 <div className="channel-label">Official Contact Email</div>
                 <a href={`mailto:${ORG_INFO.email}`} className="channel-link">
@@ -175,7 +183,9 @@ export default function ContactPage() {
             </div>
 
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
-              <span className="channel-icon">📍</span>
+              <span className="channel-icon-frame">
+                <IconMapPin size={20} color="#f59e0b" />
+              </span>
               <div>
                 <div className="channel-label">Operational Headquarters</div>
                 <div className="channel-val">{ORG_INFO.location}</div>
@@ -185,7 +195,7 @@ export default function ContactPage() {
 
           {/* Quick FAQ Terminal */}
           <div className="gamified-card faq-card">
-            <h4 className="sidebar-title">KNOWLEDGE TERMINAL (FAQ)</h4>
+            <h4 className="sidebar-title">FREQUENTLY ASKED QUESTIONS</h4>
             <div className="faq-list">
               {FAQS.map((faq, idx) => (
                 <div key={idx} className={`faq-item ${activeFaq === idx ? 'expanded' : ''}`}>

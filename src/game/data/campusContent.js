@@ -27,7 +27,7 @@ export const PARTNERS = [
     category: 'Game Development Partner',
     desc: 'National game dev mentorship, developer showcase, and official Game Jam Partner for GameJam X Esports.',
     accent: '#ff4d4d',
-    icon: '💻',
+    iconType: 'code',
     image: '/assets/events-and-logos/img_13_2026-11-05_at_10.30.15_AM__1_.jpeg'
   },
   {
@@ -37,7 +37,7 @@ export const PARTNERS = [
     category: 'Sports Partner',
     desc: 'Physical sports venue activations, community sporting culture, and active lifestyle crossovers.',
     accent: '#0284c7',
-    icon: '⚡',
+    iconType: 'zap',
     image: '/assets/events-and-logos/img_15_2026-11-05_at_10.30.15_AM__3_.jpeg'
   },
   {
@@ -47,7 +47,7 @@ export const PARTNERS = [
     category: 'Sports Partner',
     desc: 'Sports tech collaborations, turf tournament integrations, and active community tournaments.',
     accent: '#10b981',
-    icon: '🎯',
+    iconType: 'zap',
     image: '/assets/events-and-logos/img_8_2026-11-05_at_10.30.13_AM__1_.jpeg'
   },
   {
@@ -57,7 +57,7 @@ export const PARTNERS = [
     category: 'Event & Academic Partner',
     desc: 'Autonomous institution partnering for collegiate hackathons, esports events, and youth symposiums.',
     accent: '#b91c1c',
-    icon: '🏛️',
+    iconType: 'graduation',
     image: '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg'
   },
   {
@@ -67,7 +67,7 @@ export const PARTNERS = [
     category: 'Event & Academic Partner',
     desc: 'Campus host for GameJam X Esports hackathons and intercollegiate gaming tournaments.',
     accent: '#f59e0b',
-    icon: '🎓',
+    iconType: 'graduation',
     image: '/assets/events-and-logos/img_4_2026-11-05_at_10.30.10_AM__1_.jpeg'
   },
   {
@@ -77,7 +77,7 @@ export const PARTNERS = [
     category: 'Tech Summit Partner',
     desc: 'Premier startup summit partner connecting esports innovation, creators, and gaming entrepreneurship.',
     accent: '#ef4444',
-    icon: '🌐',
+    iconType: 'globe',
     image: '/assets/events-and-logos/img_6_2026-11-05_at_10.30.10_AM.jpeg'
   },
   {
@@ -87,7 +87,7 @@ export const PARTNERS = [
     category: 'Academic & Collegiate Partner',
     desc: 'Collaborating on intercollegiate gaming tournaments and student esports chapter outreach.',
     accent: '#38bdf8',
-    icon: '🏫',
+    iconType: 'graduation',
     image: '/assets/events-and-logos/img_9_2026-11-05_at_10.30.13_AM.jpeg'
   },
   {
@@ -97,7 +97,7 @@ export const PARTNERS = [
     category: 'Academic & Collegiate Partner',
     desc: 'Collegiate partner for campus esports championships and gaming community events.',
     accent: '#0284c7',
-    icon: '🌙',
+    iconType: 'graduation',
     image: '/assets/events-and-logos/img_12_2026-11-05_at_10.30.14_AM.jpeg'
   },
   {
@@ -107,7 +107,7 @@ export const PARTNERS = [
     category: 'Community & Culture Partner',
     desc: 'Youth pop-culture, anime watch parties, cosplay fests, and casual gaming crossovers.',
     accent: '#e11d48',
-    icon: '✨',
+    iconType: 'sparkles',
     image: '/assets/events-and-logos/img_16_2026-11-05_at_10.30.15_AM.jpeg'
   },
   {
@@ -117,7 +117,7 @@ export const PARTNERS = [
     category: 'Community & Culture Partner',
     desc: 'Regional manga, gaming, and anime community organizing interactive grassroots fan conventions.',
     accent: '#ec4899',
-    icon: '🎌',
+    iconType: 'sparkles',
     image: '/assets/events-and-logos/img_11_2026-11-05_at_10.30.14_AM__2_.jpeg'
   },
   {
@@ -127,7 +127,7 @@ export const PARTNERS = [
     category: 'Community Partner',
     desc: 'Gaming community co-organizing esports challenges, tournament brackets, and casual gaming meetups.',
     accent: '#84cc16',
-    icon: '🎮',
+    iconType: 'crosshair',
     image: '/assets/events-and-logos/img_5_2026-11-05_at_10.30.10_AM__2_.jpeg'
   },
   {
@@ -137,7 +137,7 @@ export const PARTNERS = [
     category: 'Animation & Gaming Partner',
     desc: 'Student animation and game design collective collaborating on digital creative arts and game jams.',
     accent: '#f97316',
-    icon: '🎨',
+    iconType: 'code',
     image: '/assets/events-and-logos/img_14_2026-11-05_at_10.30.15_AM__2_.jpeg'
   },
   {
@@ -147,7 +147,7 @@ export const PARTNERS = [
     category: 'Academic Partner',
     desc: 'Collegiate partner for grassroots campus esports tournaments and student engagement.',
     accent: '#dc2626',
-    icon: '🛡️',
+    iconType: 'shield',
     image: '/assets/events-and-logos/img_10_2026-11-05_at_10.30.14_AM__1_.jpeg'
   },
   {
@@ -157,7 +157,7 @@ export const PARTNERS = [
     category: 'Startup & Incubation Partner',
     desc: 'Section 8 Startup Incubator supporting entrepreneurial innovation and venture building in gaming.',
     accent: '#3b82f6',
-    icon: '🚀',
+    iconType: 'rocket',
     image: '/assets/events-and-logos/img_3_2026-11-05_at_10.30.09_AM.jpeg'
   }
 ];
@@ -365,10 +365,10 @@ export const TEAM_STRUCTURE = [
 ];
 
 export const AMBASSADOR_PERKS = [
-  { icon: '🎖️', title: 'Official Provincial Credentials', desc: 'Verified title and certificate from Nomad\'s Province leadership.' },
-  { icon: '🎟️', title: 'Tournament Priority Access', desc: 'Free entry and priority squad check-ins in our scrims and collegiate tournaments.' },
-  { icon: '🤝', title: 'Campus Event Backing', desc: 'Direct logistical, promotional, and operational backing to host gaming fests at your college.' },
-  { icon: '🚀', title: 'Internship & Career Pipeline', desc: 'Fast-track consideration for roles in esports operations, game dev, and community management.' },
-  { icon: '📦', title: 'Official Merch & Perks', desc: 'Exclusive community badges, apparel, and partner perks.' },
-  { icon: '🎙️', title: 'Industry & Creator Network', desc: 'Direct connection with GDAI developers, tournament casters, and community leaders.' },
+  { iconType: 'shield', title: 'Official Credentials', desc: 'Verified title and certificate from Nomad\'s Province leadership.' },
+  { iconType: 'trophy', title: 'Tournament Priority Access', desc: 'Free entry and priority squad check-ins in our scrims and collegiate tournaments.' },
+  { iconType: 'zap', title: 'Campus Event Backing', desc: 'Direct logistical, promotional, and operational backing to host gaming fests at your college.' },
+  { iconType: 'rocket', title: 'Career & Industry Pipeline', desc: 'Fast-track consideration for roles in esports operations, game dev, and community management.' },
+  { iconType: 'sparkles', title: 'Official Perks & Recognition', desc: 'Exclusive community badges, apparel, and partner perks.' },
+  { iconType: 'globe', title: 'Industry & Creator Network', desc: 'Direct connection with GDAI developers, tournament casters, and community leaders.' },
 ];

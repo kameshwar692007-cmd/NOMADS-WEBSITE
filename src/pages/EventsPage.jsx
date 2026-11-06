@@ -5,6 +5,7 @@ import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
 import { EVENTS, ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
+import { IconMapPin, IconEvents, IconWhatsApp } from '../game/components/Icons.jsx';
 
 export default function EventsPage() {
   const [filter, setFilter] = useState('ALL');
@@ -42,14 +43,18 @@ export default function EventsPage() {
 
         {/* Filter Pills */}
         <div className="event-filters-bar">
-          {['ALL', 'UPCOMING', 'PAST'].map((cat) => (
+          {[
+            { id: 'ALL', label: 'ALL EVENTS', glyph: '◈' },
+            { id: 'UPCOMING', label: 'UPCOMING EVENTS', glyph: '⚡' },
+            { id: 'PAST', label: 'PAST ARCHIVE', glyph: '✓' }
+          ].map((cat) => (
             <button
-              key={cat}
-              className={`filter-btn ${filter === cat ? 'active' : ''}`}
-              onClick={() => { sound.playSelect(); setFilter(cat); }}
+              key={cat.id}
+              className={`filter-btn ${filter === cat.id ? 'active' : ''}`}
+              onClick={() => { sound.playSelect(); setFilter(cat.id); }}
               onMouseEnter={() => sound.playBlip()}
             >
-              {cat === 'ALL' ? '🎪 ALL EVENTS' : cat === 'UPCOMING' ? '⚡ UPCOMING EVENTS' : '🏆 PAST ARCHIVE'}
+              <span className="filter-glyph">{cat.glyph}</span> {cat.label}
             </button>
           ))}
         </div>
@@ -74,12 +79,12 @@ export default function EventsPage() {
 
               <h4 className="event-card-title">{ev.title}</h4>
               <div className="event-venue-row">
-                <span className="venue-icon">📍</span>
+                <IconMapPin size={14} color="#38bdf8" />
                 <span className="venue-name">{ev.venue}</span>
               </div>
 
               <div className="event-date-row">
-                <span className="date-icon">🗓️</span>
+                <IconEvents size={14} color="#fdbe53" />
                 <span className="date-str">{ev.date}</span>
               </div>
 
@@ -98,7 +103,8 @@ export default function EventsPage() {
         </p>
         <div className="host-actions">
           <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="gamified-btn host-btn" onMouseEnter={() => sound.playBlip()}>
-            CO-HOST AN EVENT VIA WHATSAPP 💬
+            <IconWhatsApp size={16} />
+            <span>CO-HOST AN EVENT VIA WHATSAPP</span>
           </a>
         </div>
       </section>

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
 import { STUDIO_PROJECTS, ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
+import { IconCode, IconZap, IconSparkles, IconGlobe, IconRocket, IconCheck } from '../game/components/Icons.jsx';
 
 export default function StudioPage() {
   const [pitchSent, setPitchSent] = useState(false);
@@ -68,25 +69,33 @@ export default function StudioPage() {
         <h3 className="section-title">STUDIO CAPABILITIES & TECH STACK</h3>
         <div className="tech-tree-grid">
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
-            <div className="node-icon">👾</div>
+            <div className="node-icon-frame">
+              <IconCode size={22} color="#38bdf8" />
+            </div>
             <div className="node-title">WebGL & HTML5 Canvas</div>
             <div className="node-sub">Zero-install, browser-based interactive virtual worlds running at 60fps.</div>
           </div>
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
-            <div className="node-icon">⚙️</div>
+            <div className="node-icon-frame">
+              <IconZap size={22} color="#eab308" />
+            </div>
             <div className="node-title">Unity & Godot Engines</div>
             <div className="node-sub">Cross-platform 2D mechanics, physics scripting, and prototype development.</div>
           </div>
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
-            <div className="node-icon">🎨</div>
+            <div className="node-icon-frame">
+              <IconSparkles size={22} color="#a855f7" />
+            </div>
             <div className="node-title">Handcrafted 2D Pixel Art</div>
             <div className="node-sub">Custom tilemap design, character sprites, and retro game environments.</div>
           </div>
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
-            <div className="node-icon">🤝</div>
+            <div className="node-icon-frame">
+              <IconGlobe size={22} color="#10b981" />
+            </div>
             <div className="node-title">GDAI Industry Mentorship</div>
             <div className="node-sub">Guidance from veteran Indian game developers on mechanics, art, and publishing.</div>
           </div>
@@ -103,7 +112,7 @@ export default function StudioPage() {
 
         {pitchSent ? (
           <div className="pitch-success-msg">
-            <span className="success-icon">✓</span>
+            <span className="success-icon"><IconCheck size={18} /></span>
             <div>SUBMISSION RECEIVED: Our game development team will connect with you via email / WhatsApp!</div>
           </div>
         ) : (
@@ -137,7 +146,8 @@ export default function StudioPage() {
               onChange={(e) => setFormData({ ...formData, pitch: e.target.value })}
             />
             <button type="submit" className="gamified-btn pitch-submit-btn" onMouseEnter={() => sound.playBlip()}>
-              TRANSMIT COLLABORATION INQUIRY 🚀
+              <IconRocket size={16} />
+              <span>SUBMIT COLLABORATION INQUIRY</span>
             </button>
           </form>
         )}

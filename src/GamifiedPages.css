@@ -113,70 +113,9 @@
   transform: translateY(-1px);
 }
 
-.hud-btn-bracket {
-  opacity: 0.6;
-}
-
-.hud-player-stats {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-left: 12px;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.hud-avatar-box {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(232, 69, 55, 0.15);
-  border: 1px solid #e84537;
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-
-.hud-avatar-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 8px #22c55e;
-  animation: beacon-ping 1.5s infinite;
-}
-
-.hud-rank {
+.hud-btn-arrow {
+  margin-right: 4px;
   font-size: 11px;
-  font-weight: 800;
-  color: #e84537;
-  letter-spacing: 0.5px;
-}
-
-.hud-stat-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.hud-stat-label {
-  font-size: 9px;
-  font-weight: 700;
-  color: #94a3b8;
-  letter-spacing: 0.8px;
-}
-
-.hud-bar-track {
-  width: 90px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.hud-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  box-shadow: 0 0 8px currentColor;
-  transition: width 0.3s ease;
 }
 
 /* Warp Switcher Pills */
@@ -1976,4 +1915,181 @@
 
 .partner-bullet {
   font-size: 8px;
+}
+
+/* ==========================================================================
+   CYBER LOADING, SCROLL REVEAL & HOVER ANIMATION SUITE
+   ========================================================================== */
+
+/* 1. Cyber Loading Progress Bar */
+.cyber-loading-line {
+  position: sticky;
+  top: 52px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent-glow, #e84537) 50%, transparent 100%);
+  z-index: 99;
+  background-size: 200% 100%;
+  animation: cyber-scan-sweep 1.8s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--accent-glow, #e84537);
+}
+
+@keyframes cyber-scan-sweep {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Page entrance state */
+.shell-loading .shell-content-container {
+  opacity: 0.7;
+  filter: blur(2px);
+  transform: translateY(8px);
+}
+
+.shell-ready .shell-content-container {
+  opacity: 1;
+  filter: none;
+  transform: translateY(0);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out, filter 0.4s ease-out;
+}
+
+/* 2. Automated Scroll Reveal System */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delays for grid items */
+.grid-3-col .scroll-reveal:nth-child(2),
+.tournaments-grid .scroll-reveal:nth-child(2),
+.studio-projects-grid .scroll-reveal:nth-child(2),
+.ambassador-perks-grid .scroll-reveal:nth-child(2),
+.partners-grid .scroll-reveal:nth-child(2) {
+  transition-delay: 0.08s;
+}
+
+.grid-3-col .scroll-reveal:nth-child(3),
+.tournaments-grid .scroll-reveal:nth-child(3),
+.studio-projects-grid .scroll-reveal:nth-child(3),
+.ambassador-perks-grid .scroll-reveal:nth-child(3),
+.partners-grid .scroll-reveal:nth-child(3) {
+  transition-delay: 0.16s;
+}
+
+.grid-3-col .scroll-reveal:nth-child(4),
+.tournaments-grid .scroll-reveal:nth-child(4),
+.ambassador-perks-grid .scroll-reveal:nth-child(4),
+.partners-grid .scroll-reveal:nth-child(4) {
+  transition-delay: 0.24s;
+}
+
+/* 3. Interactive Hover Levitation & Glowing Borders */
+.gamified-card {
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1), border-color 0.3s ease;
+}
+
+.gamified-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.65), 0 0 20px rgba(56, 189, 248, 0.14);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.tournament-card:hover {
+  border-color: var(--tourney-accent, #ff4444);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 22px rgba(232, 69, 55, 0.25);
+}
+
+.project-card:hover {
+  border-color: var(--proj-accent, #38bdf8);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 22px rgba(56, 189, 248, 0.25);
+}
+
+.partner-card:hover {
+  border-color: var(--partner-accent, #38bdf8);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.event-card:hover {
+  border-color: var(--event-accent, #fdbe53);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 22px rgba(253, 190, 83, 0.25);
+}
+
+/* 4. Themed Vector Icon Frames */
+.pillar-icon-box,
+.node-icon-frame,
+.perk-icon-frame,
+.partner-icon-frame,
+.channel-icon-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(14, 25, 45, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.gamified-card:hover .pillar-icon-box,
+.gamified-card:hover .node-icon-frame,
+.gamified-card:hover .perk-icon-frame,
+.gamified-card:hover .partner-icon-frame,
+.gamified-card:hover .channel-icon-frame {
+  transform: scale(1.1) rotate(2deg);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.tab-glyph, .filter-glyph {
+  font-size: 11px;
+  color: #38bdf8;
+  margin-right: 5px;
+}
+
+/* Button Pulse & Light Shimmer on Hover */
+.gamified-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.gamified-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+}
+
+.gamified-btn:active {
+  transform: translateY(0);
+}
+
+.gamified-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: rotate(30deg) translateY(-100%);
+  transition: transform 0.55s ease;
+  pointer-events: none;
+}
+
+.gamified-btn:hover::after {
+  transform: rotate(30deg) translateY(100%);
 }
