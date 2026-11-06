@@ -1,76 +1,31 @@
-// Foreground objects traced from the user's red obstacle dots on the 1090×612 map.
-// Screen annotation coordinates are transformed to the native 1672×941 scene.
-const xx = x => (x-4)*1672/1090;
-const yy = y => (y-64)*941/612;
-const objects = [
- // label, screen center, canopy radius, ground-contact y, solid foot radii.
- ['pink tree',118,324,30,37,373,11,7],
- ['west sapling',174,407,18,27,434,9,7],
- ['left shrub',165,353,13,17,366,10,7],
- ['studio lawn shrub',300,357,17,19,373,9,7],
- ['studio entry tree',377,301,18,29,334,9,7],
- ['studio bench',421,324,25,12,337,19,6],
- ['headquarters west tree',378,297,17,27,327,9,7],
- ['hq lamp west',498,318,8,30,344,6,7],
- ['hq banner west',467,344,12,30,370,7,8],
- ['hq banner east',634,345,12,30,371,7,8],
- ['hq lamp east',607,319,8,30,344,6,7],
- ['arena west tree',718,296,20,30,327,9,7],
- ['arena lawn shrub',870,361,18,19,376,10,7],
- ['arena east shrub',1017,346,18,22,366,10,7],
- ['arena south bush',808,376,22,18,389,12,7],
- ['west courtyard tree',397,390,24,31,418,11,8],
- ['east courtyard tree',699,385,24,31,417,11,8],
- ['central garden shrub',705,400,19,20,411,9,7],
- ['central banner west',467,409,11,30,435,7,8],
- ['central banner east',635,407,11,30,436,7,8],
- ['courtyard west lamp',438,435,7,25,457,6,6],
- ['courtyard east lamp',665,432,7,25,456,6,6],
- ['west coast tree',110,433,28,33,467,11,8],
- ['west flower patch',129,475,20,12,485,11,6],
- ['community flower patch',194,557,23,13,567,10,6],
- ['southwest tree',241,550,33,39,584,12,8],
- ['southwest second tree',277,569,25,27,592,11,7],
- ['east south tree',779,545,30,39,579,12,8],
- ['east south flowers',827,552,20,14,565,10,6],
- ['contact flowers',927,550,23,14,563,10,6],
- ['contact coastal tree',1032,465,27,32,491,12,8],
- ['contact door shrub',838,479,18,15,492,8,6],
- ['upper right bushes',1007,304,16,18,319,9,6],
-];
-export const SCENE_OBJECTS=objects.map(([id,sx,sy,rx,ry,base,solidRx,solidRy])=>({
- id,x:xx(sx),y:yy(sy),rx:rx*1672/1090,ry:ry*941/612,
- baseY:yy(base),solidRx:solidRx*1672/1090,solidRy:solidRy*941/612
-}));
-
-// Solid contact points only. The tree canopy remains a visual foreground
-// rather than a giant rectangular collider that would block an entire pathway.
+// Ground-contact collisions and foreground crops traced against the ORIGINAL
+// 1672×941 campus painting. Never infer props from the 1090px UI screenshot.
+// A small solid footprint blocks feet; the 2px transparent alpha mask is
+// applied to foreground artwork separately, never used as a giant hitbox.
+const RAW=[["pink-tree",72,278,105,112,125,375,12,8],["studio-sapling",139,381,66,83,174,441,10,7],["studio-approach-tree",540,324,67,84,571,389,10,7],["arena-approach-tree",1055,327,72,85,1090,390,11,7],["arena-outer-tree",1462,301,70,68,1494,354,9,7],["arena-south-bush",1280,432,78,64,1318,485,17,8],["arena-side-flower",1172,448,83,54,1215,490,16,6],["west-courtyard-tree",543,452,98,113,595,555,13,8],["east-courtyard-tree",1014,447,102,119,1063,556,13,8],["community-coast-tree",113,518,98,117,168,622,12,8],["community-small-bush",193,574,60,78,220,642,10,7],["community-flower",161,613,80,51,204,648,17,7],["southwest-tree-west",310,716,93,110,358,809,13,8],["southwest-tree-east",379,722,96,112,426,811,13,8],["event-west-bush",506,732,74,116,548,838,13,8],["event-east-tree",1109,701,103,114,1165,802,13,8],["event-east-flowers",1201,729,90,61,1250,776,17,7],["contact-coast-flowers",1379,717,78,53,1417,759,18,7],["contact-shrub-one",1255,608,42,41,1276,641,11,6],["contact-shrub-two",1290,602,44,46,1310,642,11,6],["contact-east-flower",1424,608,79,53,1464,645,17,6],["contact-east-tree",1517,545,92,116,1570,643,14,9],["contact-garden-flower",1082,558,80,53,1122,604,15,7],["studio-garden-flower",415,420,72,50,452,467,15,7],["northwest-bench",610,391,62,48,641,421,22,6],["northeast-bench",991,390,66,49,1025,421,23,6],["northwest-flag",683,330,45,98,704,410,6,8],["northeast-flag",938,328,47,98,962,412,6,8],["plaza-west-flag",686,481,46,104,709,569,7,8],["plaza-east-flag",937,480,43,104,960,567,7,8],["northwest-lamp",722,316,46,77,744,380,7,6],["northeast-lamp",899,314,44,79,920,378,7,6],["southwest-lamp",641,526,41,69,660,585,7,6],["southeast-lamp",987,526,39,69,1006,583,7,6]];
+export const SCENE_OBJECTS=Object.freeze(RAW.map(([id,x,y,w,h,footX,baseY,solidRx,solidRy])=>
+ Object.freeze({id,x,y,w,h,footX,baseY,solidRx,solidRy})
+));
 export function hitsSceneObject(x,y,w,h){
  for(const o of SCENE_OBJECTS){
-  const cx=Math.max(x,Math.min(o.x,x+w)),cy=Math.max(y,Math.min(o.baseY,y+h));
-  if(((cx-o.x)/o.solidRx)**2+((cy-o.baseY)/o.solidRy)**2<1)return true;
+   // Edge-inclusive foot rectangle versus tiny solid foot ellipse.
+   const nearX=Math.max(x,Math.min(o.footX,x+w));
+   const nearY=Math.max(y,Math.min(o.baseY,y+h));
+   if(((nearX-o.footX)/o.solidRx)**2+((nearY-o.baseY)/o.solidRy)**2<1)return true;
  }
  return false;
 }
-
-// The campus is one flattened image, so restore each object from its original
-// world pixels only if the player's FEET are behind its ground contact.
-// When the player is in front, the player renders after the background normally.
-export function drawForegroundForPlayer(ctx,campus,footX,footY,playerWidth=32,playerHeight=48){
- if(!campus?.width)return;
+// The foreground image already has exact alpha per pixel. Do not apply a
+// second ellipse or copy an opaque rectangle of the background as before.
+export function drawForegroundForPlayer(ctx,foreground,footX,footY,playerWidth=32,playerHeight=48){
+ if(!foreground?.width)return;
+ const left=footX-playerWidth/2,top=footY-playerHeight;
  for(const o of SCENE_OBJECTS){
+  // Foot/base ordering: behind object when actor feet are north of its base.
   if(footY>=o.baseY-2)continue;
-  const withinX=Math.abs(footX-o.x)<o.rx+playerWidth/2;
-  const withinY=footY>o.y-o.ry-playerHeight&&footY<o.y+o.ry+playerHeight;
-  if(!withinX||!withinY)continue;
-  ctx.save();ctx.beginPath();
-  ctx.ellipse(o.x,o.y,o.rx,o.ry,0,0,Math.PI*2);
-  ctx.clip();
-  const left=Math.max(0,Math.floor(o.x-o.rx)-2);
-  const top=Math.max(0,Math.floor(o.y-o.ry)-2);
-  const right=Math.min(1672,Math.ceil(o.x+o.rx)+2);
-  const bottom=Math.min(941,Math.ceil(o.y+o.ry)+2);
-  ctx.drawImage(campus,left,top,right-left,bottom-top,left,top,right-left,bottom-top);
-  ctx.restore();
+  if(left>=o.x+o.w||left+playerWidth<=o.x||top>=o.y+o.h||footY<=o.y)continue;
+  // Alpha outside the actual contour is zero in 'foreground'; transparent
+  // pixels leave the hero untouched regardless of crop bounds.
+  ctx.drawImage(foreground,o.x,o.y,o.w,o.h,o.x,o.y,o.w,o.h);
  }
 }
