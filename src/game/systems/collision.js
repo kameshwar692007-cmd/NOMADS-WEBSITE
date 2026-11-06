@@ -29,3 +29,17 @@ export function resolveMovement(x,y,dx,dy){
   }
   return {x:px,y:py};
 }
+
+// Autopilot follows the planned cement corridor exactly. Unlike the generic
+// sliding resolver, it must never slide sideways into another obstacle/route.
+export function resolvePathMovement(x,y,dx,dy) {
+ const distance=Math.hypot(dx,dy);
+ const steps=Math.max(1,Math.ceil(distance/1.5));
+ let px=x,py=y;
+ for(let i=0;i<steps;i++){
+  const nx=px+dx/steps,ny=py+dy/steps;
+  if(checkCollision(nx,ny))return {x:px,y:py,blocked:true};
+  px=nx;py=ny;
+ }
+ return {x:px,y:py,blocked:false};
+}
