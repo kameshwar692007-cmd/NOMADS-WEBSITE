@@ -13,7 +13,7 @@
 .np-book-right strong{font-family:Georgia,serif;font-size:clamp(14px,2.3vw,26px);line-height:1.2;letter-spacing:.03em;}
 .np-book-caption{font-weight:800;letter-spacing:.14em;color:#893a50;margin:10px 0;font-size:clamp(8px,1vw,11px);}
 .np-book-right p{font-family:Georgia,serif;font-style:italic;font-size:clamp(10px,1.35vw,16px);line-height:1.4;max-width:240px;}
-.np-book-front{position:absolute;left:0;top:0;width:50%;height:100%;transform-origin:right center;backface-visibility:hidden;background:#1b2440 url('/assets/onboarding/nomads-book-cover.webp') center/cover;border:6px solid #9e6939;border-radius:13px 3px 3px 13px;box-shadow:inset 0 0 14px #0009,0 0 0 2px #2c1a20;animation:np-book-cover-open 1.8s .25s ease-in-out forwards;z-index:3;box-sizing:border-box;}
+.np-book-front{position:absolute;left:0;top:0;width:50%;height:100%;transform-origin:right center;backface-visibility:hidden;background:#1b2440 url('/assets/onboarding/nomads-book-cover.svg') center/cover;border:6px solid #9e6939;border-radius:13px 3px 3px 13px;box-shadow:inset 0 0 14px #0009,0 0 0 2px #2c1a20;animation:np-book-cover-open 1.8s .25s ease-in-out forwards;z-index:3;box-sizing:border-box;}
 .np-book-cta{text-align:center;opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s;pointer-events:none;margin-top:clamp(8px,3vh,26px);}
 .np-book-cta-ready{opacity:1;transform:none;pointer-events:auto;}
 .np-book-cta-kicker{font-size:12px;letter-spacing:.19em;font-weight:800;color:#d8bd93;margin-bottom:12px;}
