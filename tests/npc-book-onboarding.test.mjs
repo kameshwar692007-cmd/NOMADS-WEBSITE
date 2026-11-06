@@ -34,7 +34,7 @@ test('onboarding is skippable and first-session only with a short control tutori
  assert.ok(home.includes('sessionStorage.setItem('));
  assert.ok(home.includes('onNpcInteract={setNpcDialogue}'));
  assert.ok(home.includes('paused={Boolean(introOpen || npcDialogue'));
- assert.ok(book.includes('Skip intro'));
+ assert.match(book,/SKIP INTRO|Skip intro/);
  assert.ok(book.includes("e.key==='Escape'"));
  assert.ok(book.includes('prefers-reduced-motion'));
 });
@@ -59,7 +59,15 @@ test('checked-in portrait atlas and book cover have valid signatures',()=>{
  const cover=read('public/assets/onboarding/nomads-book-cover.svg');
  assert.ok(cover.includes('<svg')&&cover.includes("NOMAD'S"));
  const css=read('src/game/components/NpcDialogue.css');
- assert.ok(css.includes('npc-portraits-atlas.webp'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('npc-portraits-atlas.webp'));
+ assert.ok(css.includes('np-portrait-image'));
+ const sprites=readFileSync(new URL('../public/assets/onboarding/npc-complete-atlas.png',import.meta.url));
+ assert.equal(sprites.toString('ascii',1,4),'PNG');
+ assert.equal(sprites.readUInt32BE(16),192);
+ assert.equal(sprites.readUInt32BE(20),48);
  assert.ok(css.includes('@media(max-width:600px)'));
- assert.ok(read('src/game/components/BookIntro.css').includes('nomads-book-cover.svg'));
+ assert.ok(read('src/game/components/BookIntro.css').includes('np-book-hardcover'));
+ assert.ok(read('src/game/components/BookIntro.css').includes('perspective:1500px'));
+ assert.ok(read('src/game/components/BookIntro.jsx').includes('np-book-turn-page'));
+ assert.ok(read('src/game/components/BookIntro.jsx').includes('np-cinematic-progress'));
 });
