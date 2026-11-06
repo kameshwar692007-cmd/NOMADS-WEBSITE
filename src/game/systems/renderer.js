@@ -9,8 +9,8 @@ function drawArtwork(ctx, image) {
 // Stable timeline: frame advances only while feet actually travel.
 // Idle always uses the fixed first cell, no jump from global clock.
 const WALK_CYCLE = [1, 2, 3, 2];
-export const HERO_DRAW_WIDTH = 36;
-export const HERO_DRAW_HEIGHT = 52;
+export const HERO_DRAW_WIDTH = 32;
+export const HERO_DRAW_HEIGHT = 48;
 
 export function getHeroFrame(player) {
   const row = { down:0, left:1, right:2, up:3 }[player.direction] ?? 0;
