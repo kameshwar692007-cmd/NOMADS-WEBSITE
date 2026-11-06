@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
 import BlueprintAssembler from '../game/components/BlueprintAssembler.jsx';
-import { STUDIO_PROJECTS, ORG_INFO } from '../game/data/campusContent.js';
+import { STUDIO_PROJECTS } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
 import { IconCode, IconZap, IconSparkles, IconGlobe, IconRocket, IconCheck } from '../game/components/Icons.jsx';
 
@@ -15,7 +15,7 @@ export default function StudioPage() {
 
   const handlePitchSubmit = (e) => {
     e.preventDefault();
-    sound.playSelect();
+    sound.playArrival();
     setPitchSent(true);
     setTimeout(() => setPitchSent(false), 4000);
     setFormData({ name: '', role: 'Developer', pitch: '' });
@@ -28,8 +28,12 @@ export default function StudioPage() {
       accentColor="#38bdf8"
     >
       {/* 1. Studio Holo Header (Stitch Target) */}
-      <section className="gamified-card studio-hero-card stitch-target" data-stitch-label="Constructing Studio Alliance Hub...">
-        <div className="studio-alliance-badge">
+      <section
+        className="gamified-card studio-hero-card stitch-target"
+        data-stitch-label="Constructing Studio Alliance Hub..."
+        onMouseEnter={() => sound.playBlip()}
+      >
+        <div className="studio-alliance-badge" onMouseEnter={() => sound.playBlip()}>
           <span>PARTNERED WITH GDAI (GAME DEVELOPERS ASSOCIATION OF INDIA)</span>
         </div>
         <h2 className="studio-headline">Forging Original Games & Interactive Experiences</h2>
@@ -53,7 +57,13 @@ export default function StudioPage() {
         layout="grid"
       >
         {STUDIO_PROJECTS.map((proj) => (
-          <div key={proj.id} className="gamified-card project-card" style={{ '--proj-accent': proj.accent }} onMouseEnter={() => sound.playBlip()}>
+          <div
+            key={proj.id}
+            className="gamified-card project-card"
+            style={{ '--proj-accent': proj.accent, cursor: 'pointer' }}
+            onMouseEnter={() => sound.playBlip()}
+            onClick={() => sound.playSelect()}
+          >
             <div className="project-banner-wrap">
               <img src={proj.image} alt={proj.title} className="project-banner-img" />
               <div className="project-overlay">
@@ -140,6 +150,7 @@ export default function StudioPage() {
                   className="retro-input"
                   required
                   value={formData.name}
+                  onFocus={() => sound.playBlip()}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
@@ -149,6 +160,7 @@ export default function StudioPage() {
                 <select 
                   className="retro-input"
                   value={formData.role}
+                  onFocus={() => sound.playBlip()}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 >
                   <option value="Game Developer">Game Developer (Code / Engine)</option>
@@ -168,6 +180,7 @@ export default function StudioPage() {
                 required
                 rows={3}
                 value={formData.pitch}
+                onFocus={() => sound.playBlip()}
                 onChange={(e) => setFormData({ ...formData, pitch: e.target.value })}
               />
             </div>

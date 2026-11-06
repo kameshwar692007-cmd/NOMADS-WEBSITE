@@ -2,16 +2,28 @@
 // Lists all campus locations with click-to-travel
 
 import { LOCATIONS } from '../data/locationData.js';
+import { sound } from '../systems/soundFx.js';
 
 export default function Directory({ isOpen, onClose, onTravel }) {
   if (!isOpen) return null;
 
+  const handleTravelClick = (id) => {
+    sound.playWarp();
+    onTravel(id);
+    onClose();
+  };
+
+  const handleClose = () => {
+    sound.playCancel();
+    onClose();
+  };
+
   return (
-    <div className="directory-backdrop" onClick={onClose}>
+    <div className="directory-backdrop" onClick={handleClose}>
       <div className="directory-panel" onClick={e => e.stopPropagation()}>
         <div className="directory-header">
           <h2 className="directory-title">CAMPUS DIRECTORY</h2>
-          <button className="directory-close" onClick={onClose}>
+          <button className="directory-close" onClick={handleClose} onMouseEnter={() => sound.playBlip()}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
@@ -23,10 +35,8 @@ export default function Directory({ isOpen, onClose, onTravel }) {
             <button
               key={loc.id}
               className="directory-item"
-              onClick={() => {
-                onTravel(loc.id);
-                onClose();
-              }}
+              onClick={() => handleTravelClick(loc.id)}
+              onMouseEnter={() => sound.playBlip()}
             >
               <div className="directory-item-badge" style={{ backgroundColor: loc.accentColor }}>
                 <img 

@@ -1,20 +1,31 @@
 // Nomad's Province — Map Modal
 // Displays the campus layout with quick travel points
 
-import { LOCATIONS } from '../data/locationData.js';
+import { sound } from '../systems/soundFx.js';
 
 export default function MapModal({ isOpen, onClose, onTravel }) {
   if (!isOpen) return null;
 
+  const handleTravel = (id) => {
+    sound.playWarp();
+    onTravel(id);
+    onClose();
+  };
+
+  const handleClose = () => {
+    sound.playCancel();
+    onClose();
+  };
+
   return (
-    <div className="map-modal-backdrop" onClick={onClose}>
+    <div className="map-modal-backdrop" onClick={handleClose}>
       <div className="map-modal-card" onClick={e => e.stopPropagation()}>
         <div className="map-modal-header">
           <div className="map-title-row">
             <span className="map-crest">&#9670;</span>
             <h2 className="map-modal-title">CAMPUS OVERVIEW MAP</h2>
           </div>
-          <button className="map-modal-close" onClick={onClose}>
+          <button className="map-modal-close" onClick={handleClose} onMouseEnter={() => sound.playBlip()}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
@@ -26,7 +37,8 @@ export default function MapModal({ isOpen, onClose, onTravel }) {
             {/* Top row */}
             <button 
               className="map-node node-studio"
-              onClick={() => { onTravel('game-dev-studio'); onClose(); }}
+              onClick={() => handleTravel('game-dev-studio')}
+              onMouseEnter={() => sound.playBlip()}
             >
               <span className="node-badge" style={{ backgroundColor: '#38bdf8' }}>STUDIO</span>
               <span className="node-name">Game Dev Studio</span>
@@ -34,7 +46,8 @@ export default function MapModal({ isOpen, onClose, onTravel }) {
 
             <button 
               className="map-node node-hq"
-              onClick={() => { onTravel('main-headquarters'); onClose(); }}
+              onClick={() => handleTravel('main-headquarters')}
+              onMouseEnter={() => sound.playBlip()}
             >
               <span className="node-badge" style={{ backgroundColor: '#e84537' }}>HQ</span>
               <span className="node-name">Main Headquarters</span>
@@ -42,7 +55,8 @@ export default function MapModal({ isOpen, onClose, onTravel }) {
 
             <button 
               className="map-node node-arena"
-              onClick={() => { onTravel('esports-arena'); onClose(); }}
+              onClick={() => handleTravel('esports-arena')}
+              onMouseEnter={() => sound.playBlip()}
             >
               <span className="node-badge" style={{ backgroundColor: '#ff4444' }}>ARENA</span>
               <span className="node-name">Esports Arena</span>
@@ -59,7 +73,8 @@ export default function MapModal({ isOpen, onClose, onTravel }) {
             {/* Bottom row */}
             <button 
               className="map-node node-community"
-              onClick={() => { onTravel('community-hub'); onClose(); }}
+              onClick={() => handleTravel('community-hub')}
+              onMouseEnter={() => sound.playBlip()}
             >
               <span className="node-badge" style={{ backgroundColor: '#84c669' }}>HUB</span>
               <span className="node-name">Community Hub</span>
@@ -67,7 +82,8 @@ export default function MapModal({ isOpen, onClose, onTravel }) {
 
             <button 
               className="map-node node-events"
-              onClick={() => { onTravel('event-grounds'); onClose(); }}
+              onClick={() => handleTravel('event-grounds')}
+              onMouseEnter={() => sound.playBlip()}
             >
               <span className="node-badge" style={{ backgroundColor: '#fdbe53' }}>EVENTS</span>
               <span className="node-name">Event Grounds</span>
@@ -75,7 +91,8 @@ export default function MapModal({ isOpen, onClose, onTravel }) {
 
             <button 
               className="map-node node-contact"
-              onClick={() => { onTravel('contact-centre'); onClose(); }}
+              onClick={() => handleTravel('contact-centre')}
+              onMouseEnter={() => sound.playBlip()}
             >
               <span className="node-badge" style={{ backgroundColor: '#c0cbdc' }}>CONTACT</span>
               <span className="node-name">Contact Centre</span>

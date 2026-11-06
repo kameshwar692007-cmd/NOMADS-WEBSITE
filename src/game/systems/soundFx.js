@@ -11,6 +11,8 @@ class SoundManager {
       }
     } catch (_) {}
     this.muted = savedMute;
+    this.lastFootstepTime = 0;
+    this.lastChirpTime = 0;
   }
 
   init() {
@@ -128,6 +130,152 @@ class SoundManager {
       osc.stop(this.ctx.currentTime + 0.12);
     } catch {
       // Audio not permitted or suspended
+    }
+  }
+
+  // Retro footstep sound effect (self-throttled, subtle)
+  playFootstep(minIntervalMs = 260) {
+    if (this.muted) return;
+    const nowMs = Date.now();
+    if (nowMs - this.lastFootstepTime < minIntervalMs) return;
+    this.lastFootstepTime = nowMs;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'triangle';
+      const baseFreq = 95 + Math.random() * 25;
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(35, now + 0.04);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(260, now);
+
+      gain.gain.setValueAtTime(0.028, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch {
+      // Audio not permitted
+    }
+  }
+
+  // Interactive prompt chime (NPC, building, dialogue)
+  playInteract() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(659.25, now); // E5
+      osc.frequency.setValueAtTime(880.00, now + 0.07); // A5
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    } catch {
+      // Audio not permitted
+    }
+  }
+
+  // Destination reached fanfare
+  playArrival() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+      osc.frequency.setValueAtTime(1046.50, now + 0.16); // C6
+      gain.gain.setValueAtTime(0.065, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } catch {
+      // Audio not permitted
+    }
+  }
+
+  // Typewriter text tick for NPC dialogues
+  playDialogueChirp(minIntervalMs = 50) {
+    if (this.muted) return;
+    const nowMs = Date.now();
+    if (nowMs - this.lastChirpTime < minIntervalMs) return;
+    this.lastChirpTime = nowMs;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      const pitch = 380 + Math.random() * 40;
+      osc.frequency.setValueAtTime(pitch, now);
+      gain.gain.setValueAtTime(0.016, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.03);
+    } catch {
+      // Audio not permitted
+    }
+  }
+
+  // Door enter whoosh
+  playDoorEnter() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.22);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(400, now);
+      filter.frequency.exponentialRampToValueAtTime(1600, now + 0.22);
+
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.24);
+    } catch {
+      // Audio not permitted
     }
   }
 

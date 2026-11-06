@@ -8,6 +8,7 @@ import { CameraSystem } from '../systems/camera.js';
 import { resolveMovement, resolvePathMovement } from '../systems/collision.js';
 import { loadAllAssets } from '../systems/assetLoader.js';
 import { renderWorld, screenToWorld } from '../systems/renderer.js';
+import { sound } from '../systems/soundFx.js';
 import './GameControls.css';
 import {getNpcAtWorldPoint,getNearbyNpc} from '../data/npcDialogues.js';
 
@@ -65,15 +66,24 @@ export default function GameCanvas({
     setMessage('');
     if(Math.hypot(x-loc.entranceX,y-loc.entranceY)<=20){
       travelRef.current.cancel();setTraveling(false);
-      nearbyPromptedRef.current=id;interactRef.current(loc);return;
+      nearbyPromptedRef.current=id;
+      sound.playArrival();
+      interactRef.current(loc);
+      return;
     }
     const started=travelRef.current.startTravel(x,y,id,()=>{
       setTraveling(false);
       nearbyPromptedRef.current=id;
+      sound.playArrival();
       interactRef.current(loc);
     });
     setTraveling(started);
-    if(!started)setMessage('No safe route found. Move toward a path and try again.');
+    if(started){
+      sound.playBlip();
+    }else{
+      sound.playCancel();
+      setMessage('No safe route found. Move toward a path and try again.');
+    }
   },[]);
 
   useEffect(()=>{
@@ -87,7 +97,13 @@ export default function GameCanvas({
       if((e.key==='e'||e.key==='E')&&!e.repeat&&!pausedRef.current&&!isTypingTarget(e.target)){
         const player=playerRef.current;
         const nearby=getNearbyNpc(player.x+16,player.y+40,55);
-        if(nearby){e.preventDefault();travelRef.current.cancel();setTraveling(false);npcRef.current?.(nearby);}
+        if(nearby){
+          e.preventDefault();
+          travelRef.current.cancel();
+          setTraveling(false);
+          sound.playInteract();
+          npcRef.current?.(nearby);
+        }
         return;
       }
       const direction=KEY_TO_DIRECTION[e.key];
@@ -117,19 +133,35 @@ export default function GameCanvas({
       cameraRef.current,getZoom(rect,isMobile)*dpr,canvas.width,canvas.height
     );
     const npc=getNpcAtWorldPoint(point.x,point.y,39);
-    if(npc){travelRef.current.cancel();setTraveling(false);npcRef.current?.(npc);return;}
+    if(npc){
+      travelRef.current.cancel();
+      setTraveling(false);
+      sound.playInteract();
+      npcRef.current?.(npc);
+      return;
+    }
     const building=findClickedBuilding(point.x,point.y);
-    if(building){goToLocation(building.id);return;}
+    if(building){
+      sound.playSelect();
+      goToLocation(building.id);
+      return;
+    }
     const player=playerRef.current;
     const path=buildPathToPoint(player.x+16,player.y+40,point.x,point.y);
     const started=travelRef.current.startPath(path,()=>setTraveling(false));
     setTraveling(started);
+    if(started){
+      sound.playBlip();
+    }else{
+      sound.playCancel();
+    }
     setMessage(started?'':'That area is blocked. Click an open path or move with the controls.');
   },[isMobile,goToLocation]);
 
   const startTouchDirection=(e,direction)=>{
     if(pausedRef.current)return;
     e.preventDefault();
+    sound.playHapticClick();
     e.currentTarget.setPointerCapture?.(e.pointerId);
     touchRef.current=direction;
   };
@@ -179,19 +211,25 @@ export default function GameCanvas({
                 travelRef.current.startTravel(player.x+16,player.y+40,destination,()=>{
                   const loc=LOCATIONS.find(l=>l.id===destination);
                   setTraveling(false);
-                  if(loc){nearbyPromptedRef.current=loc.id;interactRef.current(loc);}
+                  if(loc){
+                    nearbyPromptedRef.current=loc.id;
+                    sound.playArrival();
+                    interactRef.current(loc);
+                  }
                 });
               }else{travelRef.current.cancel();setTraveling(false);}
             }
             if(blockedFrames>30){
               travelRef.current.cancel();setTraveling(false);
+              sound.playCancel();
               setMessage('Route blocked. Move toward the nearest open path.');
             }
           }else blockedFrames=0;
         }
       }else{blockedFrames=0;}
-      if(moved)player.walkCycleTime=((player.walkCycleTime??0)+dt*1000)%620;
+      if(moved) player.walkCycleTime=((player.walkCycleTime??0)+dt*1000)%620;
       else player.walkCycleTime=0;
+      if(moved) sound.playFootstep();
       player.moving=moved;
 
       if(!pausedRef.current&&!travelRef.current.isActive()){
@@ -201,6 +239,7 @@ export default function GameCanvas({
         if(!nearest){nearbyPromptedRef.current=null;}
         else if(moved&&nearbyPromptedRef.current!==nearest.id){
           nearbyPromptedRef.current=nearest.id;
+          sound.playArrival();
           interactRef.current(nearest);
         }
       }

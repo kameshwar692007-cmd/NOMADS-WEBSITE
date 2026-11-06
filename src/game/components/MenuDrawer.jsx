@@ -3,14 +3,26 @@
 
 import { useNavigate } from 'react-router-dom';
 import { LOCATIONS } from '../data/locationData.js';
+import { sound } from '../systems/soundFx.js';
 
 export default function MenuDrawer({ isOpen, onClose }) {
   const navigate = useNavigate();
 
   if (!isOpen) return null;
 
+  const handleNav = (route) => {
+    sound.playWarp();
+    onClose();
+    navigate(route);
+  };
+
+  const handleClose = () => {
+    sound.playCancel();
+    onClose();
+  };
+
   return (
-    <div className="menu-drawer-backdrop" onClick={onClose}>
+    <div className="menu-drawer-backdrop" onClick={handleClose}>
       <aside className="menu-drawer" onClick={e => e.stopPropagation()}>
         <div className="menu-drawer-header">
           <div className="menu-brand">
@@ -20,7 +32,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
               <span className="menu-subtitle">OFFICIAL DIRECTORY &amp; NAVIGATION</span>
             </div>
           </div>
-          <button className="menu-close-btn" onClick={onClose}>
+          <button className="menu-close-btn" onClick={handleClose} onMouseEnter={() => sound.playBlip()}>
             <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
@@ -34,10 +46,8 @@ export default function MenuDrawer({ isOpen, onClose }) {
               <button
                 key={loc.id}
                 className="menu-link-item"
-                onClick={() => {
-                  onClose();
-                  navigate(loc.route);
-                }}
+                onClick={() => handleNav(loc.route)}
+                onMouseEnter={() => sound.playBlip()}
               >
                 <span className="menu-link-dot" style={{ backgroundColor: loc.accentColor }} />
                 <div className="menu-link-text">
@@ -58,7 +68,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
         </div>
 
         <div className="menu-drawer-footer">
-          <button className="menu-return-btn" onClick={onClose}>
+          <button className="menu-return-btn" onClick={handleClose} onMouseEnter={() => sound.playBlip()}>
             &larr; Resume Campus Exploration
           </button>
         </div>
