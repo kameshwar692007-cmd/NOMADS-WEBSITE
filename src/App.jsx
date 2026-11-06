@@ -7,6 +7,7 @@ import StudioPage from './pages/StudioPage.jsx';
 import EventsPage from './pages/EventsPage.jsx';
 import CommunityPage from './pages/CommunityPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
 import './App.css';
 import './GamifiedPages.css';
 
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/events" element={<EventsPage />} />
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   );
