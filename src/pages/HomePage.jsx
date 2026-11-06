@@ -23,12 +23,12 @@ export default function HomePage() {
   // First visit of this tab only; returning from AGY's section pages must not
   // force visitors to replay the book or tutorial.
   const [introOpen, setIntroOpen] = useState(()=>{
-    try { return sessionStorage.getItem('np-campus-welcomed-v1')!=='yes'; }
+    try { return sessionStorage.getItem('np-campus-welcomed-v2')!=='yes'; }
     catch { return true; }
   });
   const [npcDialogue, setNpcDialogue] = useState(null);
   const completeIntro=useCallback(()=>{
-    try { sessionStorage.setItem('np-campus-welcomed-v1','yes'); } catch { /* private mode */ }
+    try { sessionStorage.setItem('np-campus-welcomed-v2','yes'); } catch { /* private mode */ }
     setIntroOpen(false);
     setNpcDialogue(HERO_GUIDE);
   },[]);
