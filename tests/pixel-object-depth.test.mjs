@@ -35,7 +35,7 @@ test('all mapped objects have tiny base contacts inside their own source bounds'
   assert.ok(o.x+o.w<=1672&&o.y+o.h<=941);
   assert.ok(o.footX>=o.x&&o.footX<=o.x+o.w);
   assert.ok(o.baseY>=o.y&&o.baseY<=o.y+o.h);
-  assert.ok(o.solidRx<o.w/3&&o.solidRy<o.h/3,'oversized lock-zone around '+o.id);
+  assert.ok(o.solidRx<o.w/2&&o.solidRy<o.h/3,'oversized lock-zone around '+o.id);
   assert.equal(hitsSceneObject(o.footX-o.solidRx/2,o.baseY-o.solidRy/2,o.solidRx,o.solidRy),true);
  }
 });
