@@ -61,7 +61,7 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   const plazaPatch = assets['world/plaza-patch'];
   if (plazaPatch?.width) ctx.drawImage(plazaPatch, 788, 511);
   drawPlayer(ctx, assets, player);
-  drawForegroundForPlayer(ctx,campus,player.x+16,player.y+40,HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
+  drawForegroundForPlayer(ctx,assets['world/foreground-pixels'],player.x+16,player.y+40,HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
   ctx.restore();
 }
 
