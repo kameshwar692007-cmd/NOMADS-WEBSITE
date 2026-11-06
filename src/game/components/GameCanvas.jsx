@@ -5,7 +5,7 @@ import { getSpawnPoint, buildPathToPoint } from '../data/travelPaths.js';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../data/mapData.js';
 import { AutoTravelSystem } from '../systems/autoTravel.js';
 import { CameraSystem } from '../systems/camera.js';
-import { resolveMovement } from '../systems/collision.js';
+import { resolvePathMovement } from '../systems/collision.js';
 import { loadAllAssets } from '../systems/assetLoader.js';
 import { renderWorld, screenToWorld } from '../systems/renderer.js';
 
@@ -102,7 +102,7 @@ export default function GameCanvas({
         const p=travelRef.current.update(player.x+16,player.y+40,dt);
         if(p&&!p.arrived){
           player.direction=p.direction;
-          const next=resolveMovement(player.x,player.y,p.dx,p.dy);
+          const next=resolvePathMovement(player.x,player.y,p.dx,p.dy);
           const distance=Math.hypot(next.x-player.x,next.y-player.y);
           player.x=next.x;player.y=next.y;
           moved=distance>0.08;

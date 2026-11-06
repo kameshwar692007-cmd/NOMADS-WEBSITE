@@ -3,24 +3,24 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { getHeroFrame, HERO_DRAW_WIDTH, HERO_DRAW_HEIGHT } from '../src/game/systems/renderer.js';
 
-const sprite=readFileSync(new URL('../public/assets/game/characters/player/nomad-goggles-v3.png',import.meta.url));
+const sprite=readFileSync(new URL('../public/assets/game/characters/player/nomad-goggles-v4.png',import.meta.url));
 const loader=readFileSync(new URL('../src/game/systems/assetLoader.js',import.meta.url),'utf8');
 const game=readFileSync(new URL('../src/game/components/GameCanvas.jsx',import.meta.url),'utf8');
 test('provided 4×4 character atlas is valid transparent PNG and loaded by the game',()=>{
  assert.equal(sprite.toString('ascii',1,4),'PNG');
- assert.equal(sprite.readUInt32BE(16),128);
- assert.equal(sprite.readUInt32BE(20),192);
- assert.ok(loader.includes('nomad-goggles-v3.png'));
+ assert.equal(sprite.readUInt32BE(16),96);
+ assert.equal(sprite.readUInt32BE(20),144);
+ assert.ok(loader.includes('nomad-goggles-v4.png'));
  assert.ok(!loader.includes('nomad-hero-v2.svg'));
 });
 import { PNG } from 'pngjs';
 test('every one of the 16 extracted hero frames contains visible pixels',()=>{
  const decoded=PNG.sync.read(sprite);
- assert.equal(decoded.width,128);
- assert.equal(decoded.height,192);
+ assert.equal(decoded.width,96);
+ assert.equal(decoded.height,144);
  for(let row=0;row<4;row++)for(let col=0;col<4;col++){
   let visible=0;
-  for(let y=row*48;y<(row+1)*48;y++)for(let x=col*32;x<(col+1)*32;x++){
+  for(let y=row*36;y<(row+1)*36;y++)for(let x=col*24;x<(col+1)*24;x++){
    if(decoded.data[(y*decoded.width+x)*4+3]>16)visible++;
   }
   assert.ok(visible>400,`invisible sprite frame ${row}:${col} (${visible} opaque pixels)`);

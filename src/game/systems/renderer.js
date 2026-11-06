@@ -20,8 +20,7 @@ export function getHeroFrame(player) {
 }
 
 function drawPlayer(ctx, assets, player) {
-  const hero = assets['player/nomad-goggles-v3'];
-  if (!hero?.complete || hero.naturalWidth!==128 || hero.naturalHeight!==192) return;
+  const hero = assets['player/nomad-goggles-v4'];
   const { x, y } = player;
   // World collision coordinates stay at (x+16,y+40), independent of sprite size.
   const footX = Math.round(x + 16), footY = Math.round(y + 40);
@@ -31,10 +30,12 @@ function drawPlayer(ctx, assets, player) {
   ctx.beginPath();
   ctx.ellipse(footX,footY+1,11,3.1,0,0,Math.PI*2);
   ctx.fill();
-  const {row,col} = getHeroFrame(player);
-  const fw=hero.naturalWidth/4,fh=hero.naturalHeight/4;
-  ctx.drawImage(hero,col*fw,row*fh,fw,fh,
-    Math.round(drawX),Math.round(drawY),HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
+  if (hero && (hero.naturalWidth || hero.width) > 0 && (hero.naturalHeight || hero.height) > 0) {
+    const {row,col} = getHeroFrame(player);
+    const fw=(hero.naturalWidth||hero.width)/4,fh=(hero.naturalHeight||hero.height)/4;
+    ctx.drawImage(hero,col*fw,row*fh,fw,fh,
+      Math.round(drawX),Math.round(drawY),HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
+  }
 }
 
 export function renderWorld(ctx, assets, camera, player, zoom, width, height, elapsed) {
