@@ -10,11 +10,11 @@ function loadImage(url){
 export async function loadAllAssets(){
  const [campus,hero,plazaPatch,headerLeft,headerRight]=await Promise.all([
   loadImage('/assets/game/campus-world.png'),
-  loadImage('/assets/game/characters/player/nomad-goggles-v3.png'),
+  loadImage('/assets/game/characters/player/nomad-goggles-v4.png'),
   loadImage('/assets/game/plaza-clean-patch.png'),
   loadImage('/assets/game/header-clean-left.webp'),
   loadImage('/assets/game/header-clean-right.webp')
  ]);
- return {'world/campus':campus,'player/nomad-goggles-v3':hero,'world/plaza-patch':plazaPatch,
+ return {'world/campus':campus,'player/nomad-goggles-v4':hero,'world/plaza-patch':plazaPatch,
    'world/header-left':headerLeft,'world/header-right':headerRight};
 }
