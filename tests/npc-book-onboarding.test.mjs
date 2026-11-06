@@ -59,9 +59,9 @@ test('checked-in portrait atlas and book cover have valid signatures',()=>{
  const cover=read('public/assets/onboarding/nomads-book-cover.svg');
  assert.ok(cover.includes('<svg')&&cover.includes("NOMAD'S"));
  const css=read('src/game/components/NpcDialogue.css');
- assert.ok(read('src/game/components/NpcDialogue.jsx').includes('npc-portraits-atlas.webp'));
- assert.ok(css.includes('np-portrait-sheet'));
- assert.ok(read('src/game/components/NpcDialogue.jsx').includes('src={ATLAS}'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('/assets/onboarding/portraits/'));
+ assert.ok(css.includes('np-portrait-image'));
+ assert.ok(read('src/game/components/NpcDialogue.jsx').includes('src={PORTRAITS[index]}'));
  assert.ok(!read('src/game/components/NpcDialogue.jsx').includes('canvas.toDataURL'));
  const sprites=readFileSync(new URL('../public/assets/onboarding/npc-complete-atlas.png',import.meta.url));
  assert.equal(sprites.toString('ascii',1,4),'PNG');
@@ -101,4 +101,18 @@ test('character-free reference tile atlas is valid and replaces all obsolete smu
  assert.ok(loader.includes('npc-complete-atlas.png'));
  assert.ok(!loader.includes('npc-clean-patch-atlas.png'));
  assert.ok(!renderer.includes("assets['world/plaza-patch']"));
+});
+
+test('seven distinct portraits and accessible help are wired into campus',()=>{
+ for(const name of ['guide','ezra','rex','kai','nova','ari','aiden']) {
+  assert.ok(read('public/assets/onboarding/portraits/'+name+'.svg').includes('<svg'),name);
+ }
+ const home=read('src/pages/HomePage.jsx');
+ const header=read('src/game/components/Header.jsx');
+ const help=read('src/game/components/HelpModal.jsx');
+ assert.ok(home.includes('|| helpOpen'));
+ assert.ok(home.includes('<HelpModal'));
+ assert.ok(header.includes('onHelpOpen'));
+ assert.ok(help.includes('aria-modal="true"'));
+ assert.ok(help.includes("event.key === 'Escape'"));
 });

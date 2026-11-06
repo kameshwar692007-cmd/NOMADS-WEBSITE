@@ -12,6 +12,7 @@ import MenuDrawer from '../game/components/MenuDrawer.jsx';
 import ControlHints from '../game/components/ControlHints.jsx';
 import NpcDialogue from '../game/components/NpcDialogue.jsx';
 import BookIntro from '../game/components/BookIntro.jsx';
+import HelpModal from '../game/components/HelpModal.jsx';
 import { HERO_GUIDE } from '../game/data/npcDialogues.js';
 
 export default function HomePage() {
@@ -20,6 +21,7 @@ export default function HomePage() {
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [travelTarget, setTravelTarget] = useState(null);
   // First visit of this tab only; returning from section pages must not
@@ -53,7 +55,8 @@ export default function HomePage() {
         !e.target.closest('.location-panel') &&
         !e.target.closest('.map-modal-card') &&
         !e.target.closest('.menu-drawer') &&
-        !e.target.closest('.campus-fixed-header')
+        !e.target.closest('.campus-fixed-header') &&
+        !e.target.closest('.campus-help-overlay')
       ) {
         e.preventDefault();
       }
@@ -86,6 +89,7 @@ export default function HomePage() {
         onDirectoryOpen={() => navigate('/contact')}
         onMapOpen={() => setMapOpen(true)}
         onMenuOpen={() => setMenuOpen(true)}
+        onHelpOpen={() => setHelpOpen(true)}
       />
       {/* 2. Interactive Explorable Canvas World */}
       <main className="game-viewport">
@@ -93,7 +97,7 @@ export default function HomePage() {
           onLocationInteract={handleLocationInteract}
           onNpcInteract={setNpcDialogue}
           isMobile={isMobile}
-          paused={Boolean(introOpen || npcDialogue || activeLocation || directoryOpen || mapOpen || menuOpen)}
+          paused={Boolean(introOpen || npcDialogue || activeLocation || directoryOpen || mapOpen || menuOpen || helpOpen)}
           directoryTravelTarget={travelTarget}
           onDirectoryTravelConsumed={handleTravelConsumed}
         />
@@ -128,6 +132,7 @@ export default function HomePage() {
       {/* Cinematic onboarding and reusable NPC dialogue only cover the campus. */}
       {introOpen && <BookIntro onComplete={completeIntro} />}
       <NpcDialogue npc={npcDialogue} onClose={() => setNpcDialogue(null)} />
+      <HelpModal isOpen={helpOpen} isMobile={isMobile} onClose={() => setHelpOpen(false)} />
 
       {/* 7. Desktop Unobtrusive Bottom Control Hints */}
       <ControlHints isMobile={isMobile} />

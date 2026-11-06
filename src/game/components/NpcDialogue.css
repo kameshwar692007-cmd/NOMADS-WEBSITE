@@ -4,7 +4,7 @@
 .np-dialogue-main{display:flex;align-items:flex-start;gap:clamp(16px,2.6vw,28px);}
 .np-portrait-frame{width:clamp(132px,19vw,170px);aspect-ratio:1/1;height:auto;flex:none;position:relative;border:2px solid #bdc9e9;border-radius:13px;background:radial-gradient(circle at 50% 26%,#3e5c83,#131b30 76%);box-shadow:0 0 0 4px #0b152b,0 8px 18px #0008;overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .np-portrait-sheet{position:absolute;display:block;top:0;left:0;width:400%;height:200%;max-width:none;object-fit:fill;image-rendering:auto;}
-.np-portrait-image{width:100%;height:100%;display:block;object-fit:contain;object-position:center;image-rendering:auto;filter:drop-shadow(0 4px 4px #0004);}
+.np-portrait-image{width:100%;height:100%;display:block;object-fit:cover;object-position:center;image-rendering:auto;filter:drop-shadow(0 4px 4px #0004);}
 .np-portrait-loading{font-size:40px;color:#d7bb88;}
 .np-dialogue-copy{min-width:0;padding-top:3px;flex:1;}
 .np-dialogue-role{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;color:#ff7184;}

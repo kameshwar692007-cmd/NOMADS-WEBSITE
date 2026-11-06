@@ -60,10 +60,10 @@ test('player is appropriately enlarged visually but keeps collision feet at fixe
  assert.match(renderer,/footX\s*=\s*Math\.round\(x\s*\+\s*16\)/);
  assert.match(renderer,/footY\s*=\s*Math\.round\(y\s*\+\s*40\)/);
 });
-test('NPC dialogue uses the original high-resolution atlas without blank canvas conversion',()=>{
+test('NPC dialogue uses separate portraits without blank canvas conversion',()=>{
  const portrait=read('src/game/components/NpcDialogue.jsx');
- assert.ok(portrait.includes('np-portrait-sheet'));
- assert.ok(portrait.includes('src={ATLAS}'));
+ assert.ok(portrait.includes('np-portrait-image'));
+ assert.ok(portrait.includes('src={PORTRAITS[index]}'));
  assert.ok(!portrait.includes('toDataURL('));
  const hq=CAMPUS_NPCS.find(n=>n.id==='receptionist');
  assert.equal(hq.portraitIndex,6);

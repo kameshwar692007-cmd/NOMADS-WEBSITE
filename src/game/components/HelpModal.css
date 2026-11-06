@@ -1,0 +1,17 @@
+.campus-help-overlay{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:20px;background:#040b1bdc;backdrop-filter:blur(6px);overflow-y:auto;touch-action:pan-y}
+.campus-help-panel{width:min(600px,100%);max-height:calc(100dvh - 40px);overflow-y:auto;box-sizing:border-box;padding:clamp(20px,4vw,32px);border:2px solid #93b5da;border-radius:18px;background:linear-gradient(155deg,#1a3150,#0c172b 75%);color:#edf5ff;box-shadow:0 24px 65px #000b,0 0 0 5px #0c1a32}
+.campus-help-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.campus-help-eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;color:#ff8298}
+.campus-help-heading h2{font-size:clamp(21px,4vw,29px);line-height:1.2;margin:8px 0 12px;color:white}
+.campus-help-panel>p{color:#c6d7ec;line-height:1.55;margin:0 0 20px}
+.campus-help-close{flex:none;width:39px;height:39px;border-radius:9px;background:#233954;color:#fff;border:1px solid #859dbe;font-size:27px;cursor:pointer}
+.campus-help-steps{display:grid;gap:10px}
+.campus-help-step{display:flex;align-items:flex-start;gap:14px;padding:14px;border:1px solid #728ca54a;border-radius:11px;background:#22395767}
+.campus-help-step-icon{flex:none;display:grid;place-items:center;width:39px;height:39px;border:1px solid #9dbadd66;border-radius:9px;background:#142841;color:#ff91a5;font-size:23px}
+.campus-help-step strong{display:block;font-size:15px;color:#fff;margin:1px 0 5px}
+.campus-help-step p{font-size:13px;line-height:1.5;color:#c3d5ed;margin:0}
+.campus-help-footnote{font-size:12px;line-height:1.5;color:#9fb7d3;margin:17px 0}
+.campus-help-done{width:100%;padding:13px 20px;border:1px solid #ff9bad;border-radius:9px;background:linear-gradient(110deg,#e74664,#b52346);color:white;font-weight:800;cursor:pointer}
+.campus-help-done:hover{filter:brightness(1.13)}
+.campus-help-panel :focus-visible{outline:3px solid #ffdb8f;outline-offset:3px}
+@media(max-width:600px){.campus-help-overlay{padding:10px}.campus-help-panel{max-height:calc(100dvh - 20px)}}

@@ -3,22 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { sound } from '../systems/soundFx.js';
 import './NpcDialogue.css';
 
-// Render the original high-quality 512×256 portrait atlas directly. The
-// previous canvas conversion flow could fail and leave portrait boxes blank.
-// A clipped <img> avoids canvas conversion and aligns all seven 128px portraits.
-const ATLAS = '/assets/onboarding/npc-portraits-atlas.webp';
+// One isolated image per NPC: avoids atlas crop bleed and scales cleanly in the dialogue.
+const PORTRAITS = [
+  '/assets/onboarding/portraits/guide.svg',
+  '/assets/onboarding/portraits/ezra.svg',
+  '/assets/onboarding/portraits/rex.svg',
+  '/assets/onboarding/portraits/kai.svg',
+  '/assets/onboarding/portraits/nova.svg',
+  '/assets/onboarding/portraits/ari.svg',
+  '/assets/onboarding/portraits/aiden.svg',
+];
 export function NpcPortrait({ portraitIndex = 0, name = 'Character', className = '' }) {
-  const index = Number.isInteger(portraitIndex) && portraitIndex >= 0 && portraitIndex < 7 ? portraitIndex : 0;
-  const col = index % 4, row = Math.floor(index / 4);
+  const index = Number.isInteger(portraitIndex) && portraitIndex >= 0 && portraitIndex < PORTRAITS.length ? portraitIndex : 0;
   return (
-    <div className={'np-portrait-frame ' + className} role="img" aria-label={name}>
-      <img
-        className="np-portrait-sheet"
-        src={ATLAS}
-        alt=""
-        draggable="false"
-        style={{ left: (-col * 100) + '%', top: (-row * 100) + '%' }}
-      />
+    <div className={'np-portrait-frame ' + className}>
+      <img className="np-portrait-image" src={PORTRAITS[index]}
+        alt={name + ' portrait'} draggable="false" width="512" height="512" />
     </div>
   );
 }
