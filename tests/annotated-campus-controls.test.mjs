@@ -75,7 +75,7 @@ test('WASD, arrow keys, mobile D-pad, and automatic arrival popup are wired',()=
  assert.ok(canvas.includes('interactRef.current(nearest)'));
  assert.ok(canvas.includes('travelRef.current.cancel()'));
  assert.ok(css.includes('touch-action:none'));
- assert.match(read('src/pages/HomePage.jsx'),/paused=\\{Boolean\\([^)]*activeLocation/);
+ assert.ok(read('src/pages/HomePage.jsx').includes('paused={Boolean(introOpen || npcDialogue || activeLocation'));
 });
 
 test('central plaza honors all six colored guide corridors, elsewhere takes direct A*',()=>{
