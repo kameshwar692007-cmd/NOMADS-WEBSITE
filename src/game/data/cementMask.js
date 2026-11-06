@@ -15,6 +15,10 @@ for (let y=0; y<ROWS; y++) {
     for(let x=left; x<=right; x++) grid[y*COLS+x]=1;
   }
 }
+// Restore a 3-cell-wide join on the original stone paving northwest of
+// the fountain. The texture's dark edge obscures this tiny connection;
+// without it HQ is isolated from the plaza for cardinal navigation.
+for(let y=49;y<=51;y++)for(let x=93;x<=95;x++)grid[y*COLS+x]=1;
 export function isCementPixel(x,y) {
   if(!Number.isFinite(x)||!Number.isFinite(y)||x<0||y<0)return false;
   const cx=Math.floor(x/CELL),cy=Math.floor(y/CELL);
