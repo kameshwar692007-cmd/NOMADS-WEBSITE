@@ -357,6 +357,95 @@ export const eventService = {
   },
 
   /**
+   * Fetch a single published event by slug (or id)
+   */
+  async getEventBySlug(slug) {
+    if (!slug) return null;
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .or(`slug.eq.${slug},id.eq.${slug}`)
+          .single();
+
+        if (!error && data) {
+          const mapped = {
+            id: data.id,
+            slug: data.slug,
+            title: data.title,
+            category: data.category,
+            venue: data.venue,
+            startDate: data.start_date,
+            endDate: data.end_date,
+            registrationDeadline: data.registration_deadline,
+            statusMode: data.status_mode,
+            manualStatus: data.manual_status,
+            isDraft: data.is_draft,
+            posterUrl: data.poster_url,
+            registrationUrl: data.registration_url,
+            partner: data.partner,
+            description: data.description,
+            results: data.results || {},
+            createdBy: data.created_by,
+            createdAt: data.created_at,
+            updatedAt: data.updated_at
+          };
+          return {
+            ...mapped,
+            computedStatus: computeEventStatus(mapped)
+          };
+        }
+      } catch (err) {
+        console.warn('Supabase slug fetch error, trying local fallback:', err);
+      }
+    }
+
+    const local = getLocalEvents();
+    const found = local.find((e) => e.slug === slug || e.id === slug);
+    if (!found) return null;
+
+    return {
+      ...found,
+      computedStatus: computeEventStatus(found)
+    };
+  },
+
+  /**
+   * Track external registration link clicks (Zero-cost telemetry)
+   */
+  trackRegistrationClick(eventId, eventTitle) {
+    try {
+      const KEY = 'nomads_analytics_clicks_v1';
+      const raw = storageGet(KEY);
+      const data = raw ? JSON.parse(raw) : {};
+      const current = data[eventId] || { clicks: 0, title: eventTitle || 'Event' };
+      data[eventId] = {
+        clicks: current.clicks + 1,
+        title: eventTitle || current.title,
+        lastClicked: new Date().toISOString()
+      };
+      storageSet(KEY, JSON.stringify(data));
+    } catch (e) {
+      // Ignore
+    }
+  },
+
+  /**
+   * Retrieve click telemetry summary for Admin Dashboard
+   */
+  getAnalyticsSummary() {
+    try {
+      const KEY = 'nomads_analytics_clicks_v1';
+      const raw = storageGet(KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  },
+
+  /**
    * Fetch all events including drafts for administrative operations
    * Protected by RLS on Supabase (only staff can view drafts)
    */

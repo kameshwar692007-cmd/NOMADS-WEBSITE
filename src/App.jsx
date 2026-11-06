@@ -10,6 +10,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
 const EsportsPage = lazy(() => import('./pages/EsportsPage.jsx'));
 const StudioPage = lazy(() => import('./pages/StudioPage.jsx'));
 const EventsPage = lazy(() => import('./pages/EventsPage.jsx'));
+const EventDetailPage = lazy(() => import('./pages/EventDetailPage.jsx'));
 const CommunityPage = lazy(() => import('./pages/CommunityPage.jsx'));
 const ContactPage = lazy(() => import('./pages/ContactPage.jsx'));
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx'));
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/esports" element={<EsportsPage />} />
           <Route path="/studio" element={<StudioPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/events/:slug" element={<EventDetailPage />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/admin" element={<AdminPage />} />

@@ -1,5 +1,6 @@
 // Nomad's Province — Contact Centre (/contact)
 // Multi-category communication console with direct routing and FAQ terminal
+// Delivers enquiries to official WhatsApp / Email at ₹0 cost without exposed keys
 
 import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
@@ -33,6 +34,7 @@ const FAQS = [
 export default function ContactPage() {
   const [activeFaq, setActiveFaq] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [dispatchMethod, setDispatchMethod] = useState('whatsapp'); // 'whatsapp' | 'email'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -43,6 +45,18 @@ export default function ContactPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     sound.playSelect();
+
+    if (dispatchMethod === 'whatsapp') {
+      const text = `*New Nomad's Province Enquiry*%0A%0A*Sender:* ${encodeURIComponent(formData.name)}%0A*Email:* ${encodeURIComponent(formData.email)}%0A*Category:* ${encodeURIComponent(formData.category)}%0A%0A*Message:*%0A${encodeURIComponent(formData.message)}`;
+      const waUrl = `https://api.whatsapp.com/send?text=${text}`;
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      const subject = `[${formData.category}] Enquiry from ${formData.name}`;
+      const body = `Sender: ${formData.name}\nEmail: ${formData.email}\nCategory: ${formData.category}\n\nMessage:\n${formData.message}`;
+      const mailtoUrl = `mailto:${ORG_INFO.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
+    }
+
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 5000);
     setFormData({ name: '', email: '', category: 'Brand Sponsorship', message: '' });
@@ -77,7 +91,7 @@ export default function ContactPage() {
           {submitted ? (
             <div className="pitch-success-msg" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>
               <span className="success-icon"><IconCheck size={18} /></span>
-              <div>MESSAGE SENT: Our team will respond to your inquiry via email / WhatsApp!</div>
+              <div>INQUIRY TRANSMITTED: Opening your message channel to connect with Nomad's Province leadership!</div>
             </div>
           ) : (
             <form className="contact-form" onSubmit={handleSubmit}>
@@ -133,9 +147,32 @@ export default function ContactPage() {
                 />
               </div>
 
+              {/* Delivery Channel Selector */}
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="retro-label">DISPATCH CHANNEL</label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    type="button"
+                    className={`filter-btn ${dispatchMethod === 'whatsapp' ? 'active' : ''}`}
+                    onClick={() => { sound.playSelect(); setDispatchMethod('whatsapp'); }}
+                    style={{ flex: 1, padding: '8px 12px', fontSize: '12px' }}
+                  >
+                    <span>💬 WHATSAPP DIRECT</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`filter-btn ${dispatchMethod === 'email' ? 'active' : ''}`}
+                    onClick={() => { sound.playSelect(); setDispatchMethod('email'); }}
+                    style={{ flex: 1, padding: '8px 12px', fontSize: '12px' }}
+                  >
+                    <span>✉️ EMAIL (MAILTO)</span>
+                  </button>
+                </div>
+              </div>
+
               <button type="submit" className="gamified-btn submit-dispatch-btn" onMouseEnter={() => sound.playBlip()}>
                 <IconRocket size={16} />
-                <span>SEND INQUIRY</span>
+                <span>{dispatchMethod === 'whatsapp' ? 'TRANSMIT VIA WHATSAPP →' : 'TRANSMIT VIA EMAIL →'}</span>
               </button>
             </form>
           )}

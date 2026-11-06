@@ -29,6 +29,7 @@ export default function AdminPage() {
     isSuperAdmin: true,
     isSimulated: true
   });
+  const [analyticsData, setAnalyticsData] = useState({});
   const [statusFilter, setStatusFilter] = useState('ALL');
   
   // Modal states
@@ -77,6 +78,7 @@ export default function AdminPage() {
       ]);
       setEvents(eventsData);
       setUserRoleState(roleData);
+      setAnalyticsData(eventService.getAnalyticsSummary());
     } catch (err) {
       console.error('Failed to load admin telemetry:', err);
     } finally {
@@ -294,11 +296,12 @@ export default function AdminPage() {
   const upcomingCount = events.filter((e) => e.computedStatus === 'UPCOMING' && !e.isDraft).length;
   const endedCount = events.filter((e) => e.computedStatus === 'ENDED' && !e.isDraft).length;
   const draftCount = events.filter((e) => e.isDraft).length;
+  const totalClicks = Object.values(analyticsData).reduce((sum, item) => sum + (item.clicks || 0), 0);
 
   return (
     <GameShell
       title="ADMIN COMMAND CENTER"
-      subtitle="Event Operations, RBAC Governance, Live Overrides, Tournament Results & Media"
+      subtitle="Super Admin Operations, Event Lifecycles, Status Overrides, Tournament Results & Media"
       accentColor="#ef4444"
     >
       {/* 1. Admin Top Control & Telemetry Bar */}
@@ -311,39 +314,30 @@ export default function AdminPage() {
                 {eventService.isCloudConnected() ? 'CONNECTED: SUPABASE POSTGRESQL' : 'STORAGE: RESILIENT LOCAL FALLBACK'}
               </span>
               <span className="telemetry-env">VERCEL FREE TIER COMPATIBLE</span>
-              {userRoleState.isSimulated && (
-                <span className="telemetry-env" style={{ background: '#3b82f6', color: '#fff' }}>
-                  DEV ROLE SIMULATION
-                </span>
-              )}
+              <span className="telemetry-env" style={{ background: '#ffd700', color: '#090d16', fontWeight: 'bold' }}>
+                SINGLE SUPER ADMIN
+              </span>
             </div>
             <h2 className="telemetry-heading">Nomad's Province Event Governance</h2>
             <p className="telemetry-desc">
               Manage tournament brackets, collegiate hackathons, live game days, and active sports activations. 
-              Changes sync in real-time to the public <strong>Event Grounds (/events)</strong>.
+              Changes sync in real-time to the public <strong>Event Grounds (/events)</strong> and dedicated pages.
             </p>
           </div>
 
-          {/* Role Access Indicator & Simulator */}
+          {/* Super Admin Single-Owner Access Badge */}
           <div className="telemetry-role-box">
-            <span className="role-box-label">
-              AUTHENTICATED ROLE: <strong style={{ color: '#38bdf8' }}>{userRoleState.role}</strong>
-            </span>
-            <div className="role-selector-pills">
-              {[
-                { id: 'SUPER_ADMIN', label: 'Super Admin', icon: '👑' },
-                { id: 'ADMIN', label: 'Admin', icon: '⚡' },
-                { id: 'EDITOR', label: 'Editor', icon: '✏️' }
-              ].map((role) => (
-                <button
-                  key={role.id}
-                  className={`role-pill-btn ${userRoleState.role === role.id ? 'active' : ''}`}
-                  onClick={() => handleSimulateRoleSwitch(role.id)}
-                  title={`Simulate ${role.label} permissions (DB RLS enforced in production)`}
-                >
-                  <span>{role.icon}</span> {role.label}
-                </button>
-              ))}
+            <span className="role-box-label">GOVERNANCE LEVEL</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px' }}>
+              <span style={{ fontSize: '24px' }}>👑</span>
+              <div>
+                <div style={{ fontWeight: 'bold', color: '#ffd700', fontSize: '14px', fontFamily: 'monospace' }}>
+                  SUPER ADMIN (OWNER)
+                </div>
+                <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                  Complete CRUD, Media & Results Authority
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -369,6 +363,10 @@ export default function AdminPage() {
           <div className="admin-metric-card draft" onClick={() => setStatusFilter('DRAFTS')}>
             <span className="metric-val">{draftCount}</span>
             <span className="metric-lbl">DRAFTS (HIDDEN)</span>
+          </div>
+          <div className="admin-metric-card" style={{ borderColor: '#38bdf8' }}>
+            <span className="metric-val" style={{ color: '#38bdf8' }}>{totalClicks}</span>
+            <span className="metric-lbl">REGISTRATION CLICKS</span>
           </div>
         </div>
       </section>

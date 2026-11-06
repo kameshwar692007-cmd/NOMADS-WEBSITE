@@ -19,8 +19,6 @@ test('1. Anonymous/Public event retrieval strictly excludes draft events', async
 test('2. Staff/Admin view retrieves all events including drafts', async () => {
   const allEvents = await eventService.getAllEventsForAdmin();
   assert.ok(Array.isArray(allEvents), 'Expected array of events');
-  const hasDrafts = allEvents.some(e => e.isDraft === true);
-  // Both draft and published events should be retrievable by staff
   assert.ok(allEvents.length >= 1, 'Should have events loaded in admin view');
 });
 
@@ -133,4 +131,30 @@ test('8. Poster upload validation rejects invalid types and oversized files', as
     () => eventService.uploadPoster({ type: 'image/png', size: 6 * 1024 * 1024 }),
     /exceeds 5mb size limit/i
   );
+});
+
+test('9. getEventBySlug resolves dedicated event page by slug or id', async () => {
+  const publicEvents = await eventService.getPublicEvents();
+  assert.ok(publicEvents.length > 0);
+  const target = publicEvents[0];
+
+  const fetched = await eventService.getEventBySlug(target.slug);
+  assert.ok(fetched, 'Must locate event by slug');
+  assert.equal(fetched.id, target.id);
+  assert.equal(fetched.title, target.title);
+  assert.ok(fetched.computedStatus);
+
+  // Non-existent slug returns null
+  const missing = await eventService.getEventBySlug('non-existent-event-slug-12345');
+  assert.equal(missing, null);
+});
+
+test('10. trackRegistrationClick records telemetry for external registration links', async () => {
+  eventService.trackRegistrationClick('test-event-id-101', 'Test Tournament League');
+  eventService.trackRegistrationClick('test-event-id-101', 'Test Tournament League');
+
+  const summary = eventService.getAnalyticsSummary();
+  assert.ok(summary['test-event-id-101']);
+  assert.ok(summary['test-event-id-101'].clicks >= 2);
+  assert.equal(summary['test-event-id-101'].title, 'Test Tournament League');
 });

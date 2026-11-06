@@ -140,10 +140,18 @@ export default function EventsPage() {
                   </div>
                 )}
 
-                <div className="event-card-action">
-                  <button className="view-details-btn">
-                    <span>VIEW DETAILS & REGISTRATION →</span>
+                <div className="event-card-action" style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+                  <button className="view-details-btn" onClick={(e) => { e.stopPropagation(); handleCardClick(ev); }}>
+                    <span>QUICK VIEW</span>
                   </button>
+                  <Link
+                    to={`/events/${ev.slug || ev.id}`}
+                    className="view-details-btn"
+                    style={{ textDecoration: 'none', background: '#38bdf8', color: '#090d16', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <span>PAGE ↗</span>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -228,16 +236,25 @@ export default function EventsPage() {
 
                 {/* Registration Action */}
                 {selectedEvent.registrationUrl && selectedEvent.computedStatus !== 'ENDED' && (
-                  <div className="detail-cta-wrap">
+                  <div className="detail-cta-wrap" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     <a
                       href={selectedEvent.registrationUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="gamified-btn modal-reg-btn"
+                      onClick={() => eventService.trackRegistrationClick(selectedEvent.id, selectedEvent.title)}
                     >
                       <IconRocket size={18} />
                       <span>OFFICIAL REGISTRATION LINK</span>
                     </a>
+                    <Link
+                      to={`/events/${selectedEvent.slug || selectedEvent.id}`}
+                      className="gamified-btn"
+                      style={{ background: '#1e293b', border: '1px solid #334155' }}
+                      onClick={() => sound.playSelect()}
+                    >
+                      OPEN STANDALONE PAGE ↗
+                    </Link>
                   </div>
                 )}
               </div>
