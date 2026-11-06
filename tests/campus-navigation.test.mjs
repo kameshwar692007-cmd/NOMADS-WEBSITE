@@ -60,8 +60,8 @@ test('autotravel movement is time-based and never announces arrival before reach
 
 test('decorations, forest, coastline, and event objects block player feet',()=>{
   const blocked=[
-    ['ocean',20,750],['north cliff',830,110],['tree trunk',590,535],
-    ['bush',534,761],['north bench',630,415],['south lamp',650,555],
+    ['ocean',20,750],['north cliff',830,110],['tree trunk',595,555],
+    ['bush',548,838],['north bench',630,415],['south lamp',660,585],
     ['fountain',835,475],['event stage',830,725],['event tent',655,790],
     ['dock water',80,780]
   ];
