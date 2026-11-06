@@ -298,7 +298,7 @@ create policy "Admins and Super Admins can view audit logs"
 -- Direct client tampering, modification, or deletion of audit logs is completely blocked.
 
 -- 6. Storage Bucket Setup & Hardened Storage RLS
-insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+insert into storage.buckets (id, name, "public", file_size_limit, allowed_mime_types)
 values (
   'event-posters',
   'event-posters',
@@ -307,7 +307,7 @@ values (
   array['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 )
 on conflict (id) do update set
-  public = true,
+  "public" = true,
   file_size_limit = 5242880,
   allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
