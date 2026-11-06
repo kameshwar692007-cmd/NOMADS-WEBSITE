@@ -104,7 +104,9 @@ function eventPath(start,end){
 export function buildTravelPath(fromX,fromY,destinationId){
  const destination=LOCATION_MAP[destinationId];if(!destination)return [];
  const start={x:fromX,y:fromY},end={x:destination.entranceX,y:destination.entranceY};
- return destinationId==='event-grounds'?eventPath(start,end):shortestPath(start,end);
+ // The dedicated west-side paving is the only accessible Event Grounds route.
+ // Let A* select the nearest path from the CURRENT position, without a forced detour.
+ return shortestPath(start,end);
 }
 export function getSpawnPoint(){return {...PLAZA_CENTER};}
 
