@@ -29,10 +29,26 @@ export default function AboutPage() {
               Our primary focus moving forward is expanding our dedicated <strong>Game Development Studio</strong> and organizing structured <strong>Esports competitions</strong>.
             </p>
             <div className="citadel-stats-row">
-              {ORG_INFO.stats.map((s, idx) => (
-                <div key={idx} className="hud-metric-box">
-                  <div className="metric-number">{s.value}</div>
-                  <div className="metric-label">{s.label}</div>
+              {[
+                { label: "Core Pillars", value: "Esports & Game Dev", icon: "trophy", accent: "#ff4444" },
+                { label: "Base Operations", value: "Chennai, India", icon: "pin", accent: "#38bdf8" },
+                { label: "Partner Network", value: "12+ Colleges & Brands", icon: "graduation", accent: "#fdbe53" },
+                { label: "Active Sectors", value: "Sports • Esports • Studio", icon: "rocket", accent: "#10b981" },
+              ].map((s, idx) => (
+                <div
+                  key={idx}
+                  className="hud-metric-box"
+                  style={{ '--metric-accent': s.accent }}
+                  onMouseEnter={() => sound.playBlip()}
+                >
+                  <div className="metric-icon-wrap" style={{ color: s.accent, borderColor: `${s.accent}55`, backgroundColor: `${s.accent}15` }}>
+                    <ThemedIcon name={s.icon} size={18} color={s.accent} />
+                  </div>
+                  <div className="metric-content">
+                    <span className="metric-label">{s.label}</span>
+                    <strong className="metric-number">{s.value}</strong>
+                  </div>
+                  <span className="metric-corner-bracket">┘</span>
                 </div>
               ))}
             </div>
