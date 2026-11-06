@@ -36,7 +36,7 @@ export default function HomePage() {
         !e.target.closest('.location-panel') &&
         !e.target.closest('.map-modal-card') &&
         !e.target.closest('.menu-drawer') &&
-        !e.target.closest('.game-header')
+        !e.target.closest('.campus-fixed-header')
       ) {
         e.preventDefault();
       }
@@ -63,20 +63,16 @@ export default function HomePage() {
 
   return (
     <div className="homepage-frame">
-      {/* On narrow screens the world-image corner buttons are offscreen.
-          Keep accessible fixed controls on mobile only. */}
-      {isMobile && <Header
+      {/* Fixed header stays above the camera on desktop and mobile. */}
+      <Header
         onDirectoryOpen={() => setDirectoryOpen(true)}
         onMapOpen={() => setMapOpen(true)}
         onMenuOpen={() => setMenuOpen(true)}
-      />}
+      />
       {/* 2. Interactive Explorable Canvas World */}
       <main className="game-viewport">
         <GameCanvas 
           onLocationInteract={handleLocationInteract}
-          onDirectoryOpen={() => setDirectoryOpen(true)}
-          onMapOpen={() => setMapOpen(true)}
-          onMenuOpen={() => setMenuOpen(true)}
           isMobile={isMobile}
           directoryTravelTarget={travelTarget}
           onDirectoryTravelConsumed={handleTravelConsumed}

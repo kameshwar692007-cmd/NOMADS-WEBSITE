@@ -28,23 +28,6 @@ function drawPlayer(ctx, assets, player, elapsed) {
   }
 }
 
-function drawWorldDirectory(ctx) {
-  // Match the permanent, authored Menu and Map plaques on the top right.
-  const x = 1203, y = 10, w = 167, h = 65;
-  ctx.save();
-  ctx.fillStyle = '#0d1b33';
-  ctx.strokeStyle = '#e4e5ec';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, 13);
-  ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 18px Arial';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('DIRECTORY', x + w / 2, y + h / 2);
-  ctx.restore();
-}
-
 export function renderWorld(ctx, assets, camera, player, zoom, width, height, elapsed) {
   ctx.save();
   ctx.imageSmoothingEnabled = false;
@@ -55,11 +38,17 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   ctx.translate(-Math.round(camera.x), -Math.round(camera.y));
   const campus = assets['world/campus'];
   if (campus?.width) drawArtwork(ctx, campus);
+  // Restore unbranded scenery using the matching clean reference artwork.
+  // These are WORLD-space pixels and therefore move with the map, while
+  // the real banner, Map and Menu live in the fixed React overlay.
+  const cleanLeft=assets['world/header-left'];
+  if(cleanLeft?.width) ctx.drawImage(cleanLeft,0,0,420,110);
+  const cleanRight=assets['world/header-right'];
+  if(cleanRight?.width) ctx.drawImage(cleanRight,1380,0,292,100);
   // Correct the permanently baked character/smudge using the matching
   // clean reference pavement, before drawing the moving player.
   const plazaPatch = assets['world/plaza-patch'];
   if (plazaPatch?.width) ctx.drawImage(plazaPatch, 788, 511);
-  drawWorldDirectory(ctx);
   drawPlayer(ctx, assets, player, elapsed);
   ctx.restore();
 }

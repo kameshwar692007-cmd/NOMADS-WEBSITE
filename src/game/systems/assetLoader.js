@@ -8,10 +8,13 @@ function loadImage(url){
  });
 }
 export async function loadAllAssets(){
- const [campus,hero,plazaPatch]=await Promise.all([
+ const [campus,hero,plazaPatch,headerLeft,headerRight]=await Promise.all([
   loadImage('/assets/game/campus-world.png'),
   loadImage('/assets/game/characters/player/uploaded-hero.png'),
-  loadImage('/assets/game/plaza-clean-patch.png')
+  loadImage('/assets/game/plaza-clean-patch.png'),
+  loadImage('/assets/game/header-clean-left.webp'),
+  loadImage('/assets/game/header-clean-right.webp')
  ]);
- return {'world/campus':campus,'player/uploaded-hero':hero,'world/plaza-patch':plazaPatch};
+ return {'world/campus':campus,'player/uploaded-hero':hero,'world/plaza-patch':plazaPatch,
+   'world/header-left':headerLeft,'world/header-right':headerRight};
 }

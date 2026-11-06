@@ -1,26 +1,23 @@
-// Nomad's Province — Header Bar
-// Minimal header: brand left, navigation right
-
+// Fixed website chrome; independent of the game's scrolling camera.
 export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen }) {
   return (
-    <header className="game-header">
-      <div className="header-brand">
-        <span className="header-crest">&#9670;</span>
-        <div className="header-brand-text">
-          <span className="header-brand-name">NOMAD'S PROVINCE</span>
-          <span className="header-brand-sub">HEADQUARTERS</span>
-        </div>
-      </div>
-
-      <nav className="header-nav">
-        <button className="header-nav-btn" onClick={onDirectoryOpen}>
-          DIRECTORY
+    <header className="campus-fixed-header" aria-label="Nomad's Province navigation">
+      <a className="campus-fixed-brand" href="/" aria-label="Nomad's Province — Home">
+        <img
+          src="/assets/game/headquarters-banner.webp"
+          alt="Nomad's Province Headquarters"
+          draggable="false"
+        />
+      </a>
+      <nav className="campus-fixed-nav" aria-label="Campus controls">
+        <button type="button" className="campus-fixed-button campus-directory-button" onClick={onDirectoryOpen} aria-label="Open campus directory">
+          <span aria-hidden="true">☷</span> <span>Directory</span>
         </button>
-        <button className="header-nav-btn" onClick={onMapOpen}>
-          MAP
+        <button type="button" className="campus-fixed-button" onClick={onMapOpen} aria-label="Open campus map">
+          <span aria-hidden="true">⌖</span> <span>Map</span>
         </button>
-        <button className="header-nav-btn" onClick={onMenuOpen}>
-          MENU
+        <button type="button" className="campus-fixed-button" onClick={onMenuOpen} aria-label="Open website menu">
+          <span aria-hidden="true">☰</span> <span>Menu</span>
         </button>
       </nav>
     </header>
