@@ -1,9 +1,9 @@
 // Nomad's Province — Main Headquarters (/about)
-// Rich gamified layout with interactive stats, guild lore, and partner networks
+// Clean, verified information aligned with official organization profile & partner network
 
 import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
-import { ORG_INFO, PARTNERS } from '../game/data/campusContent.js';
+import { ORG_INFO, PARTNERS, TEAM_STRUCTURE } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
 
 export default function AboutPage() {
@@ -12,7 +12,7 @@ export default function AboutPage() {
   return (
     <GameShell
       title="MAIN HEADQUARTERS"
-      subtitle="Vision, Operational Governance & Provincial Heritage"
+      subtitle="Vision, Ecosystem Governance & Core Provincial Guild"
       accentColor="#e84537"
     >
       {/* 1. Core Mission Hologram Card */}
@@ -20,16 +20,17 @@ export default function AboutPage() {
         <div className="card-glitch-border" />
         <div className="citadel-grid">
           <div className="citadel-text">
-            <span className="quest-code">QUEST OBJECTIVE: ECOSYSTEM EXPANSION</span>
-            <h2 className="citadel-heading">Building India's Premier Gaming & Esports Bastion</h2>
+            <span className="quest-code">ORGANIZATION PROFILE // CHENNAI, INDIA</span>
+            <h2 className="citadel-heading">Building a Unified Esports & Game Development Ecosystem</h2>
             <p className="citadel-desc">
-              Nomad's Province is an integrated ecosystem operating across <strong>Competitive Esports, Collegiate Tournaments, and Indie Game Development</strong>. 
-              We connect passionate players, student creators, indie game developers, and visionary brands under one unified platform.
+              <strong>Nomad's Province</strong> is an organization working across <strong>Sports, Esports, and Game Development</strong>. 
+              We organize competitive tournaments, gaming events, college festivals, grassroots initiatives, community programs, and industry collaborations. 
+              Our primary focus moving forward is expanding our dedicated <strong>Game Development Studio</strong> and organizing structured <strong>Esports competitions</strong>.
             </p>
             <div className="citadel-stats-row">
               {ORG_INFO.stats.map((s, idx) => (
                 <div key={idx} className="hud-metric-box">
-                  <div className="metric-number">{s.value}{s.suffix}</div>
+                  <div className="metric-number">{s.value}</div>
                   <div className="metric-label">{s.label}</div>
                 </div>
               ))}
@@ -37,10 +38,17 @@ export default function AboutPage() {
           </div>
           <div className="citadel-badge-col">
             <div className="hologram-emblem">
-              <img src="/assets/events-and-logos/img_14_2026-11-05_at_10.30.15_AM__2_.jpeg" alt="Nomad's Province Emblem" className="emblem-img" />
+              {/* Gamified Nomad's Province Cyber Shield */}
+              <svg viewBox="0 0 120 120" className="emblem-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="60,10 108,35 108,85 60,110 12,85 12,35" stroke="#e84537" strokeWidth="4" fill="rgba(232, 69, 55, 0.12)" />
+                <polygon points="60,22 96,42 96,80 60,98 24,80 24,42" stroke="#38bdf8" strokeWidth="2" strokeDasharray="4 2" fill="none" />
+                <path d="M42 45 L60 35 L78 45 L78 72 L60 85 L42 72 Z" fill="#e84537" opacity="0.8" />
+                <text x="60" y="66" textAnchor="middle" fill="#ffffff" fontSize="16" fontWeight="bold" fontFamily="monospace">NP</text>
+                <circle cx="60" cy="60" r="38" stroke="#ffffff" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+              </svg>
               <div className="hologram-ring" />
             </div>
-            <div className="emblem-caption">NOMAD'S PROVINCE CORE CITADEL</div>
+            <div className="emblem-caption">NOMAD'S PROVINCE OFFICIAL CITADEL</div>
           </div>
         </div>
       </section>
@@ -52,106 +60,122 @@ export default function AboutPage() {
           onClick={() => { sound.playSelect(); setActiveTab('lore'); }}
           onMouseEnter={() => sound.playBlip()}
         >
-          📜 CHRONICLES & PILLARS
+          📜 MISSION & PILLARS
         </button>
         <button
-          className={`tab-btn ${activeTab === 'matrix' ? 'active' : ''}`}
-          onClick={() => { sound.playSelect(); setActiveTab('matrix'); }}
+          className={`tab-btn ${activeTab === 'team' ? 'active' : ''}`}
+          onClick={() => { sound.playSelect(); setActiveTab('team'); }}
           onMouseEnter={() => sound.playBlip()}
         >
-          ⚔️ PROVINCE STANDARD
+          👥 CORE TEAM & ROLES
         </button>
         <button
           className={`tab-btn ${activeTab === 'allies' ? 'active' : ''}`}
           onClick={() => { sound.playSelect(); setActiveTab('allies'); }}
           onMouseEnter={() => sound.playBlip()}
         >
-          🛡️ STRATEGIC ALLIES ({PARTNERS.length})
+          🛡️ STRATEGIC PARTNERS ({PARTNERS.length})
         </button>
       </div>
 
-      {/* Tab 1: Chronicles & Pillars */}
+      {/* Tab 1: Mission & 4 Pillars */}
       {activeTab === 'lore' && (
         <div className="tab-pane fade-in">
           <div className="grid-3-col">
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
               <div className="pillar-icon">🏆</div>
-              <h3 className="pillar-title">Competitive Esports</h3>
+              <h3 className="pillar-title">Esports & Tournaments</h3>
               <p className="pillar-text">
-                Hosting tiered scrims, collegiate showdowns, and live-streamed tournament circuits across Free Fire Max, CODM, Indus, and BGMI.
+                Orchestrating competitive tournament circuits, collegiate scrims, and live-streamed matches across Free Fire Max, CODM, Indus, and BGMI.
               </p>
-              <div className="pillar-tag">10+ TOURNAMENTS HOSTED</div>
+              <div className="pillar-tag">COMPETITIVE CIRCUITS</div>
             </div>
 
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-              <div className="pillar-icon">🎮</div>
+              <div className="pillar-icon">💻</div>
               <h3 className="pillar-title">Game Development Studio</h3>
               <p className="pillar-text">
-                Expanding into original indie titles, technical game jam prototypes, and interactive WebGL experiences in partnership with GDAI.
+                Creating original indie games, interactive WebGL experiences, and hosting 24-hr game dev hackathons in partnership with GDAI.
               </p>
-              <div className="pillar-tag">ORIGINAL IP DEVELOPMENT</div>
+              <div className="pillar-tag">GDAI ALLIANCE</div>
+            </div>
+
+            <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
+              <div className="pillar-icon">⚡</div>
+              <h3 className="pillar-title">Sports & Active Gaming</h3>
+              <p className="pillar-text">
+                Combining physical turf sports activations and digital gaming tournaments in partnership with Decathlon and Playo.
+              </p>
+              <div className="pillar-tag">DECATHLON & PLAYO</div>
             </div>
 
             <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
               <div className="pillar-icon">🎓</div>
               <h3 className="pillar-title">Collegiate Network</h3>
               <p className="pillar-text">
-                Empowering student leaders through our Campus Ambassador Program across BITS Pilani, SRMIST, Crescent, and universities across India.
+                Partnering with institutions like SRMIST, Easwari Engineering, VIT-AP, Crescent, and St. Lourdes to nurture campus talent.
               </p>
-              <div className="pillar-tag">30+ PARTNER INSTITUTIONS</div>
+              <div className="pillar-tag">COLLEGE CHAPTERS</div>
+            </div>
+
+            <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
+              <div className="pillar-icon">✨</div>
+              <h3 className="pillar-title">Pop-Culture Communities</h3>
+              <p className="pillar-text">
+                Collaborating with regional cultural groups like Chennai Anime Club and Otaku Nadu for anime screenings, cosplay, and gaming fests.
+              </p>
+              <div className="pillar-tag">CULTURE CROSSOVERS</div>
+            </div>
+
+            <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
+              <div className="pillar-icon">🚀</div>
+              <h3 className="pillar-title">Startup & Innovation</h3>
+              <p className="pillar-text">
+                Supported by Huddle Global (KSUM) and Easwari Startup Incubator to connect gaming creators with industry and venture opportunities.
+              </p>
+              <div className="pillar-tag">HUDDLE GLOBAL & KSUM</div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Tab 2: Comparison Matrix */}
-      {activeTab === 'matrix' && (
+      {/* Tab 2: Core Team Showcase */}
+      {activeTab === 'team' && (
         <div className="tab-pane fade-in">
-          <div className="gamified-card matrix-card">
-            <h3 className="section-title">WHY PLAYERS & COMMUNITIES CHOOSE US</h3>
-            <div className="comparison-table-wrapper">
-              <table className="comparison-table">
-                <thead>
-                  <tr>
-                    <th>Ecosystem Feature</th>
-                    <th>Typical Casual Communities</th>
-                    <th className="highlight-col">Nomad's Province Standard</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Tournament Schedules</td>
-                    <td className="status-bad">Inconsistent, frequent cancellations</td>
-                    <td className="status-good">Structured monthly leagues & guaranteed weekend scrims</td>
-                  </tr>
-                  <tr>
-                    <td>Career & Talent Pathway</td>
-                    <td className="status-bad">Dead-end brackets with no progression</td>
-                    <td className="status-good">Campus-to-Pro progression & verified certificates</td>
-                  </tr>
-                  <tr>
-                    <td>Live Broadcast Production</td>
-                    <td className="status-bad">Unstructured matches, zero casting</td>
-                    <td className="status-good">Multi-cam spectator streams, casters & highlight reels</td>
-                  </tr>
-                  <tr>
-                    <td>Industry Backing</td>
-                    <td className="status-bad">Isolated with no brand partnerships</td>
-                    <td className="status-good">Backed by Decathlon, Playo, GDAI, and premier universities</td>
-                  </tr>
-                  <tr>
-                    <td>Game Development Integration</td>
-                    <td className="status-bad">Zero game creation capabilities</td>
-                    <td className="status-good">In-house studio crafting original games and prototypes</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div className="grid-2-col">
+            {TEAM_STRUCTURE.map((group, idx) => (
+              <div key={idx} className="gamified-card team-group-card" onMouseEnter={() => sound.playBlip()}>
+                <div className="team-group-header">
+                  <span className="role-chip">{group.roleCategory}</span>
+                  <h3 className="group-title">{group.title}</h3>
+                </div>
+                <p className="group-desc">{group.desc}</p>
+                <div className="members-subgrid">
+                  {group.members.map((m, mIdx) => (
+                    <div key={mIdx} className="member-role-row">
+                      <div className="role-bullet">▸</div>
+                      <div className="member-info">
+                        <strong className="member-role-title">{m.role}</strong>
+                        <div className="member-area">{m.area}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="gamified-card join-team-callout">
+            <h4>JOIN THE NOMAD'S PROVINCE GUILD</h4>
+            <p>We are always expanding our team with student developers, tournament referees, casters, and collegiate ambassadors.</p>
+            <a href="https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f" target="_blank" rel="noreferrer" className="gamified-btn" onMouseEnter={() => sound.playBlip()}>
+              CONNECT WITH OUR TEAM ON WHATSAPP 💬
+            </a>
           </div>
         </div>
       )}
 
-      {/* Tab 3: Strategic Allies Showcase */}
+      {/* Tab 3: Strategic Partners Showcase (14 Verified Partners) */}
       {activeTab === 'allies' && (
         <div className="tab-pane fade-in">
           <div className="partners-grid">

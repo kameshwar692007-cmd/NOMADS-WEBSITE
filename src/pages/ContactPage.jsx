@@ -8,24 +8,24 @@ import { sound } from '../game/systems/soundFx.js';
 
 const FAQS = [
   {
-    q: "How can I join tournaments hosted by Nomad's Province?",
-    a: "You can register for any upcoming tournament through our dedicated registration forms announced on our website, WhatsApp community channel, and Instagram (@nomadsprovince)."
+    q: "How can I join tournaments organized by Nomad's Province?",
+    a: "You can register for any active tournament through our registration links announced on our website, WhatsApp community channel, and official Instagram (@nomadsprovince)."
   },
   {
     q: "What games do you organize tournaments for?",
-    a: "We actively organize scrims and championships for Free Fire Max, Call of Duty: Mobile (CODM), Indus Battle Royale, Battlegrounds Mobile India (BGMI), and collegiate PC titles."
+    a: "We organize competitive tournaments and scrims across Free Fire Max, Call of Duty: Mobile (CODM), Indus Battle Royale, Battlegrounds Mobile India (BGMI), and collegiate PC titles."
   },
   {
     q: "Can colleges or gaming communities collaborate with Nomad's Province?",
-    a: "Yes! We actively co-host college festivals, LAN tournaments, and 24-hr game jams with partners like SRMIST, BITS Pilani, Decathlon, Playo, and GDAI."
+    a: "Yes! We actively co-host collegiate gaming festivals, esports tournaments, and 24-hr game jams with educational institutions and partners including SRMIST, Easwari Engineering, VIT-AP, Crescent, Decathlon, Playo, and GDAI."
   },
   {
     q: "Are tournaments streamed live?",
-    a: "Yes, featured tournament brackets and grand finals are broadcast live with match casting, spectator cams, and highlight reels."
+    a: "Yes, featured tournament brackets and grand finals are broadcast live with match casting, spectator views, and highlight coverage."
   },
   {
-    q: "How can I become a Campus Ambassador?",
-    a: "Any college student can apply via our Community Hub. Ambassadors receive verified certificates, free tournament access, and direct internship consideration."
+    q: "How can I apply for the Campus Ambassador Program?",
+    a: "College students can apply directly through our Community Hub page or via WhatsApp. Ambassadors receive official certificates, priority tournament slots, and direct internship opportunities."
   }
 ];
 
@@ -68,20 +68,20 @@ export default function ContactPage() {
             <span className="terminal-title">TRANSMISSION TERMINAL // DIRECT DISPATCH</span>
           </div>
 
-          <h3 className="section-title">LET'S BUILD THE NEXT BIG EVENT</h3>
+          <h3 className="section-title">CONNECT WITH NOMAD'S PROVINCE</h3>
           <p className="contact-intro">
-            Connect with Nomad's Province for esports championships, game dev collaborations, collegiate fest partnerships, or brand sponsorships.
+            Connect with our core team for esports tournaments, game development collaborations, collegiate fest partnerships, or brand sponsorships.
           </p>
 
           {submitted ? (
             <div className="pitch-success-msg" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>
               <span className="success-icon">✓</span>
-              <div>TRANSMISSION DISPATCHED: Our coordination team will respond within 24 hours!</div>
+              <div>TRANSMISSION DISPATCHED: Our team will respond to your inquiry via email / WhatsApp!</div>
             </div>
           ) : (
             <form className="contact-form" onSubmit={handleSubmit}>
               <div className="form-group">
-                <label className="retro-label">OPERATIVE / SENDER NAME</label>
+                <label className="retro-label">SENDER NAME / CONTACT PERSON</label>
                 <input 
                   type="text" 
                   placeholder="Your Full Name" 
@@ -105,23 +105,23 @@ export default function ContactPage() {
               </div>
 
               <div className="form-group">
-                <label className="retro-label">MISSION CATEGORY</label>
+                <label className="retro-label">INQUIRY CATEGORY</label>
                 <select 
                   className="retro-input"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 >
                   <option value="Brand Sponsorship">Brand Sponsorship (Decathlon / Playo / Corporate)</option>
-                  <option value="College Festival">College Festival (SRMIST / BITS / University)</option>
-                  <option value="Game Dev Studio">Game Dev Partnership (GDAI / Indie Dev)</option>
-                  <option value="Community Alliance">Community Alliance (Anime Club / Otaku Nadu / Free Fire)</option>
-                  <option value="Campus Ambassador">Campus Ambassador / Internship</option>
-                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="College Festival">Collegiate Festival & Event (SRM / VIT-AP / Crescent / University)</option>
+                  <option value="Game Dev Studio">Game Dev Partnership (GDAI / Indie Studio / Hackathon)</option>
+                  <option value="Community Alliance">Community & Pop-Culture (Anime Club / Otaku Nadu / Free Fire)</option>
+                  <option value="Campus Ambassador">Campus Ambassador & Internship Program</option>
+                  <option value="General Inquiry">General Inquiries</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label className="retro-label">TRANSMISSION BRIEF</label>
+                <label className="retro-label">MESSAGE / PROPOSAL BRIEF</label>
                 <textarea 
                   placeholder="Describe your collaboration, event dates, or inquiry..." 
                   className="retro-input textarea"
@@ -142,12 +142,12 @@ export default function ContactPage() {
         {/* Right Column: Direct Channels & Operational Comms */}
         <div className="contact-sidebar">
           <div className="gamified-card comms-channels-card">
-            <h4 className="sidebar-title">DIRECT CHANNELS</h4>
+            <h4 className="sidebar-title">VERIFIED DIRECT CHANNELS</h4>
 
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
               <span className="channel-icon">💬</span>
               <div>
-                <div className="channel-label">Official WhatsApp Community</div>
+                <div className="channel-label">Official WhatsApp Channel</div>
                 <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="channel-link">
                   Join WhatsApp Channel →
                 </a>
@@ -157,7 +157,7 @@ export default function ContactPage() {
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
               <span className="channel-icon">📸</span>
               <div>
-                <div className="channel-label">Instagram (@nomadsprovince)</div>
+                <div className="channel-label">Official Instagram (@nomadsprovince)</div>
                 <a href={ORG_INFO.instagram} target="_blank" rel="noreferrer" className="channel-link">
                   Follow on Instagram →
                 </a>
@@ -167,7 +167,7 @@ export default function ContactPage() {
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
               <span className="channel-icon">✉️</span>
               <div>
-                <div className="channel-label">Official Email</div>
+                <div className="channel-label">Official Contact Email</div>
                 <a href={`mailto:${ORG_INFO.email}`} className="channel-link">
                   {ORG_INFO.email}
                 </a>

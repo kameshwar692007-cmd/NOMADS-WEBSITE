@@ -1,5 +1,5 @@
 // Nomad's Province — Esports Arena (/esports)
-// High-energy competitive tournament dashboard with brackets, registration, and game specs
+// High-energy competitive tournament dashboard with verified titles & authentic registration
 
 import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
@@ -19,7 +19,7 @@ export default function EsportsPage() {
   return (
     <GameShell
       title="ESPORTS ARENA"
-      subtitle="Competitive Tournament Circuits, Monthly Scrims & Live Broadcasts"
+      subtitle="Competitive Tournament Circuits, Collegiate Scrims & Community Showdowns"
       accentColor="#ff4444"
     >
       {/* 1. Arena Live Radar Banner */}
@@ -27,24 +27,24 @@ export default function EsportsPage() {
         <div className="arena-pulse-header">
           <div className="arena-status-pill">
             <span className="live-radar-dot" />
-            <span>COLLEGIATE & PRO CIRCUITS ACTIVE</span>
+            <span>COLLEGIATE & COMMUNITY CIRCUITS ACTIVE</span>
           </div>
-          <div className="arena-scrim-alert">MONTHLY CASH POOLS & VERIFIED TROPHIES</div>
+          <div className="arena-scrim-alert">OFFICIAL SQUAD REGISTRATIONS OPEN</div>
         </div>
 
         <div className="arena-headline-wrap">
-          <h2 className="arena-headline">Where Champions Are Forged on the Virtual Battlefield</h2>
+          <h2 className="arena-headline">Where Competitors Battle Across Premier Mobile & PC Titles</h2>
           <p className="arena-sub">
-            Nomad's Province orchestrates structured multi-regional tournaments, tactical squad showdowns, 
-            and collegiate invitationals across India's most competitive mobile and PC titles.
+            Nomad's Province organizes structured esports tournaments, collegiate scrims, and community showdowns 
+            across India's top competitive titles including Free Fire Max, Call of Duty: Mobile, Indus Battle Royale, and BGMI.
           </p>
         </div>
       </section>
 
       {/* 2. Active Tournaments Battle Grid */}
       <div className="section-title-wrap">
-        <h3 className="section-title">ACTIVE & UPCOMING TOURNAMENT CIRCUITS</h3>
-        <span className="section-badge">OFFICIAL NOMAD'S BRACKETS</span>
+        <h3 className="section-title">FEATURED TOURNAMENT CIRCUITS</h3>
+        <span className="section-badge">NOMAD'S PROVINCE BRACKETS</span>
       </div>
 
       <div className="tournaments-grid">
@@ -55,25 +55,27 @@ export default function EsportsPage() {
             style={{ '--tourney-accent': t.accent }}
             onMouseEnter={() => sound.playBlip()}
           >
-            <div className="tourney-banner-wrap">
-              <img src={t.image} alt={t.title} className="tourney-banner-img" />
-              <div className="tourney-status-overlay">
-                <span className="tourney-status-chip" style={{ backgroundColor: t.accent }}>{t.status}</span>
-                <span className="tourney-game-badge">{t.game}</span>
-              </div>
+            <div className="tourney-header-chip-wrap">
+              <span className="tourney-status-chip" style={{ backgroundColor: t.accent }}>{t.status}</span>
+              <span className="tourney-game-badge">{t.game}</span>
             </div>
 
             <div className="tourney-body">
+              <div className="tourney-badge-sub" style={{ color: t.accent }}>{t.badge}</div>
               <h4 className="tourney-title">{t.title}</h4>
               <p className="tourney-desc">{t.desc}</p>
 
+              <div className="tourney-partner-tag">
+                <span className="partner-bullet">●</span> {t.partnerInfo}
+              </div>
+
               <div className="tourney-specs-grid">
                 <div className="spec-box">
-                  <span className="spec-label">PRIZE POOL</span>
+                  <span className="spec-label">AWARDS & RECOGNITION</span>
                   <span className="spec-val" style={{ color: t.accent }}>{t.prizePool}</span>
                 </div>
                 <div className="spec-box">
-                  <span className="spec-label">FORMAT</span>
+                  <span className="spec-label">MATCH FORMAT</span>
                   <span className="spec-val">{t.format}</span>
                 </div>
               </div>
@@ -84,7 +86,7 @@ export default function EsportsPage() {
                 onClick={() => handleRegisterClick(t)}
                 onMouseEnter={() => sound.playBlip()}
               >
-                <span>⚔️ REGISTER SQUAD</span>
+                <span>⚔️ REGISTER FOR TOURNAMENT</span>
               </button>
             </div>
           </div>
@@ -97,23 +99,23 @@ export default function EsportsPage() {
         <div className="pipeline-steps-grid">
           <div className="pipeline-step" onMouseEnter={() => sound.playBlip()}>
             <div className="step-num">01</div>
-            <h4 className="step-title">Open Scrims</h4>
-            <p className="step-desc">Weekly open lobby rotations to sharpen recoil, callouts, and squad chemistry under match conditions.</p>
+            <h4 className="step-title">Community Scrims</h4>
+            <p className="step-desc">Regular practice rooms and custom lobbies for squads to build team chemistry and match discipline.</p>
           </div>
           <div className="pipeline-step" onMouseEnter={() => sound.playBlip()}>
             <div className="step-num">02</div>
             <h4 className="step-title">Collegiate Cups</h4>
-            <p className="step-desc">Double-elimination intercollegiate championships featuring verified team check-ins and cash prizes.</p>
+            <p className="step-desc">Bracketed tournaments across partner colleges with verified team rosters and certificate recognition.</p>
           </div>
           <div className="pipeline-step" onMouseEnter={() => sound.playBlip()}>
             <div className="step-num">03</div>
-            <h4 className="step-title">Broadcast Finals</h4>
-            <p className="step-desc">Streamed grand finals with live caster commentary, spectator overlays, and MVP highlights.</p>
+            <h4 className="step-title">Broadcasted Finals</h4>
+            <p className="step-desc">Live-streamed showdowns featuring caster commentary, spectator replays, and MVP highlights.</p>
           </div>
         </div>
       </section>
 
-      {/* 4. Registration Modal */}
+      {/* 4. Registration Modal with Official Free Channels */}
       {modalOpen && (
         <div className="retro-modal-backdrop" onClick={() => { sound.playCancel(); setModalOpen(false); }}>
           <div className="retro-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -122,7 +124,7 @@ export default function EsportsPage() {
               <button className="modal-close-btn" onClick={() => { sound.playCancel(); setModalOpen(false); }}>✕</button>
             </div>
             <div className="modal-body">
-              <p>Squad registration is coordinated through our official channels. Connect with tournament marshals below:</p>
+              <p>Squad check-ins and external registration forms are coordinated via our official channels:</p>
               <div className="modal-links">
                 <a 
                   href={ORG_INFO.whatsapp} 
@@ -140,7 +142,7 @@ export default function EsportsPage() {
                   className="modal-action-btn insta-btn"
                   onClick={() => sound.playSelect()}
                 >
-                  📸 Check Guidelines on Instagram (@nomadsprovince)
+                  📸 Check Updates on Instagram (@nomadsprovince)
                 </a>
               </div>
             </div>

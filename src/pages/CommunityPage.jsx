@@ -27,12 +27,12 @@ export default function CommunityPage() {
       {/* 1. Guild Welcome Hero */}
       <section className="gamified-card community-hero-card">
         <div className="guild-beacon">
-          <span>CHENNAI ANIME CLUB • OTAKU NADU • FREE FIRE COMMUNITY</span>
+          <span>CHENNAI ANIME CLUB • OTAKU NADU • FREE FIRE COMMUNITY • DRUSHYA (DAG)</span>
         </div>
-        <h2 className="community-headline">The Gathering Place for Gamers, Creators & Guild Leaders</h2>
+        <h2 className="community-headline">Connecting Gamers, Creators & Collegiate Leaders</h2>
         <p className="community-desc">
-          Nomad's Province is more than an organization — it is a thriving social fabric connecting 250+ competitive players, 
-          anime and pop-culture enthusiasts, and collegiate leaders across southern India and beyond.
+          Nomad's Province is built on a strong grassroots ecosystem connecting passionate esports competitors, 
+          indie game developers, anime & pop-culture fans, and student leaders across educational institutions.
         </p>
 
         <div className="community-links-row">
@@ -40,7 +40,7 @@ export default function CommunityPage() {
             JOIN WHATSAPP GUILD 💬
           </a>
           <a href={ORG_INFO.instagram} target="_blank" rel="noreferrer" className="gamified-btn comm-btn insta-comm" onMouseEnter={() => sound.playBlip()}>
-            FOLLOW INSTAGRAM (@nomadsprovince) 📸
+            FOLLOW ON INSTAGRAM (@nomadsprovince) 📸
           </a>
         </div>
       </section>
@@ -65,14 +65,14 @@ export default function CommunityPage() {
       <section className="gamified-card ambassador-apply-card">
         <h3 className="section-title">ENLIST AS A CAMPUS AMBASSADOR</h3>
         <p className="apply-intro">
-          Any college student passionate about esports, community organization, or game development can apply. 
+          Any college student passionate about esports, gaming community organization, or game development can apply. 
           No prior esports experience is required!
         </p>
 
         {applied ? (
           <div className="pitch-success-msg" style={{ borderColor: '#84c669', color: '#84c669' }}>
             <span className="success-icon">✓</span>
-            <div>ENLISTMENT RECORDED: Our ambassador coordinators will reach out via WhatsApp / Email!</div>
+            <div>APPLICATION SUBMITTED: Our campus coordinators will reach out via WhatsApp / Email!</div>
           </div>
         ) : (
           <form className="ambassador-form" onSubmit={handleAmbassadorSubmit}>
@@ -129,12 +129,13 @@ export default function CommunityPage() {
       <section className="gamified-card culture-card">
         <h3 className="section-title">COMMUNITY & POP-CULTURE ALLIANCES</h3>
         <p className="culture-desc">
-          We collaborate closely with regional fan groups like <strong>Chennai Anime Club</strong> and <strong>Otaku Nadu</strong> to merge anime conventions, cosplay showcases, and esports into unified youth celebrations.
+          We collaborate closely with regional cultural groups like <strong>Chennai Anime Club</strong> and <strong>Otaku Nadu</strong> to merge anime conventions, cosplay showcases, and gaming into unified youth celebrations.
         </p>
         <div className="culture-badges-row">
           <div className="culture-badge-box">🎌 OTAKU NADU ALLIANCE</div>
           <div className="culture-badge-box">✨ CHENNAI ANIME CLUB</div>
           <div className="culture-badge-box">🔥 FREE FIRE COMMUNITY</div>
+          <div className="culture-badge-box">🎮 GAME COM</div>
         </div>
       </section>
     </GameShell>

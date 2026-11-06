@@ -21,7 +21,7 @@ export default function StudioPage() {
   return (
     <GameShell
       title="GAME DEVELOPMENT STUDIO"
-      subtitle="Original Games, Interactive Experiments & Tech Prototypes"
+      subtitle="Original Games, Interactive Experiences & Tech Prototypes"
       accentColor="#38bdf8"
     >
       {/* 1. Studio Holo Header */}
@@ -29,17 +29,18 @@ export default function StudioPage() {
         <div className="studio-alliance-badge">
           <span>PARTNERED WITH GDAI (GAME DEVELOPERS ASSOCIATION OF INDIA)</span>
         </div>
-        <h2 className="studio-headline">Forging Original Worlds from Code & Pixels</h2>
+        <h2 className="studio-headline">Forging Original Games & Interactive Experiences</h2>
         <p className="studio-desc">
-          Nomad's Studio expands our gaming ecosystem from competitive play into original game design. 
-          We craft retro-inspired indie games, WebGL interactive experiences, and 24-hour game jam experiments.
+          Nomad's Province is expanding into our own dedicated Game Development Studio. 
+          We focus on creating original indie games, interactive WebGL experiences, and gaming-related products 
+          while mentoring student creators through 24-hour game development hackathons with GDAI.
         </p>
       </section>
 
       {/* 2. Featured Projects Grid */}
       <div className="section-title-wrap">
-        <h3 className="section-title">ORIGINAL TITLES & ACTIVE PRODUCTION</h3>
-        <span className="section-badge" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>STUDIO PORTFOLIO</span>
+        <h3 className="section-title">ORIGINAL CREATIONS & STUDIO PORTFOLIO</h3>
+        <span className="section-badge" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>STUDIO SHOWCASE</span>
       </div>
 
       <div className="studio-projects-grid">
@@ -62,54 +63,55 @@ export default function StudioPage() {
         ))}
       </div>
 
-      {/* 3. Studio Tech Tree / Engine Matrix */}
+      {/* 3. Studio Capabilities & Pipeline */}
       <section className="gamified-card tech-tree-card">
-        <h3 className="section-title">ENGINE & PRODUCTION PIPELINE</h3>
+        <h3 className="section-title">STUDIO CAPABILITIES & TECH STACK</h3>
         <div className="tech-tree-grid">
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
             <div className="node-icon">👾</div>
-            <div className="node-title">WebGL & Canvas</div>
-            <div className="node-sub">Zero-lag, 60fps browser rendering, nearest-neighbor scaling.</div>
+            <div className="node-title">WebGL & HTML5 Canvas</div>
+            <div className="node-sub">Zero-install, browser-based interactive virtual worlds running at 60fps.</div>
           </div>
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
             <div className="node-icon">⚙️</div>
-            <div className="node-title">Godot & Unity</div>
-            <div className="node-sub">Multi-platform indie pipeline for 2D top-down & 3D mechanics.</div>
+            <div className="node-title">Unity & Godot Engines</div>
+            <div className="node-sub">Cross-platform 2D mechanics, physics scripting, and prototype development.</div>
           </div>
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
             <div className="node-icon">🎨</div>
-            <div className="node-title">Handcrafted Pixel Art</div>
-            <div className="node-sub">Authored tilemaps, multi-directional sprites & fluid frame cycles.</div>
+            <div className="node-title">Handcrafted 2D Pixel Art</div>
+            <div className="node-sub">Custom tilemap design, character sprites, and retro game environments.</div>
           </div>
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
-            <div className="node-icon">🎵</div>
-            <div className="node-title">Chiptune & Adaptive Audio</div>
-            <div className="node-sub">Dynamic synthesizers and retro ambient audio programming.</div>
+            <div className="node-icon">🤝</div>
+            <div className="node-title">GDAI Industry Mentorship</div>
+            <div className="node-sub">Guidance from veteran Indian game developers on mechanics, art, and publishing.</div>
           </div>
         </div>
       </section>
 
       {/* 4. Pitch Your Game / Collab Terminal */}
       <section className="gamified-card pitch-card">
-        <h3 className="section-title">PITCH A PROTOTYPE / JOIN THE STUDIO</h3>
+        <h3 className="section-title">COLLABORATE WITH NOMAD'S STUDIO</h3>
         <p className="pitch-intro">
-          Are you a pixel artist, gameplay programmer, or sound designer? Connect with Nomad's Studio to collaborate on upcoming game jam entries and commercial titles.
+          Are you a student game developer, pixel artist, programmer, or audio composer? 
+          Collaborate with our studio on game jam hackathons and indie prototypes.
         </p>
 
         {pitchSent ? (
           <div className="pitch-success-msg">
             <span className="success-icon">✓</span>
-            <div>TRANSMISSION RECEIVED: We will review your prototype via email / WhatsApp!</div>
+            <div>SUBMISSION RECEIVED: Our game development team will connect with you via email / WhatsApp!</div>
           </div>
         ) : (
           <form className="pitch-form" onSubmit={handlePitchSubmit}>
             <div className="form-row">
               <input 
                 type="text" 
-                placeholder="Your Name / Handle" 
+                placeholder="Your Name / Developer Handle" 
                 className="retro-input"
                 required
                 value={formData.name}
@@ -121,13 +123,13 @@ export default function StudioPage() {
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               >
                 <option value="Developer">Game Developer / Programmer</option>
-                <option value="Pixel Artist">Pixel Artist / Animator</option>
+                <option value="Pixel Artist">Pixel Artist / 2D Animator</option>
                 <option value="Sound Designer">Sound Designer / Composer</option>
-                <option value="Game Designer">Game Designer / Writer</option>
+                <option value="Game Designer">Game Designer / Level Designer</option>
               </select>
             </div>
             <textarea 
-              placeholder="Tell us about your prototype, game engine, or links to your portfolio..." 
+              placeholder="Tell us about your game idea, engine experience, or link to your portfolio/itch.io..." 
               className="retro-input textarea"
               required
               rows={3}
@@ -135,7 +137,7 @@ export default function StudioPage() {
               onChange={(e) => setFormData({ ...formData, pitch: e.target.value })}
             />
             <button type="submit" className="gamified-btn pitch-submit-btn" onMouseEnter={() => sound.playBlip()}>
-              TRANSMIT COLLABORATION PITCH 🚀
+              TRANSMIT COLLABORATION INQUIRY 🚀
             </button>
           </form>
         )}
