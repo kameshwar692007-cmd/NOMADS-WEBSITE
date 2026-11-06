@@ -1,5 +1,6 @@
 // Feet-based collision coordinates for the 32x48 player avatar.
 import { LOCATIONS } from '../data/locationData.js';
+import { CAMPUS_NPCS } from '../data/npcDialogues.js';
 import { isWorldCollision } from '../data/mapData.js';
 export const PLAYER_COLLISION_W=14;
 export const PLAYER_COLLISION_H=10;
@@ -9,6 +10,14 @@ export const PLAYER_COLLISION_OFFSET_Y=35;
 export function checkFootCollision(footX, footY) {
   const x=footX-PLAYER_COLLISION_W/2,y=footY-PLAYER_COLLISION_H/2;
   if(isWorldCollision(x,y,PLAYER_COLLISION_W,PLAYER_COLLISION_H))return true;
+  // NPC bodies occupy actual ground; prevent walking through their feet.
+  // Only collide near the shoes, not through their head or dialogue marker.
+  for (const npc of CAMPUS_NPCS) {
+    const nearestX=Math.max(x,Math.min(npc.x,x+PLAYER_COLLISION_W));
+    const dx=(nearestX-npc.x)/13;
+    const dy=(Math.max(y,Math.min(npc.y,y+PLAYER_COLLISION_H))-npc.y)/8;
+    if(dx*dx+dy*dy<1)return true;
+  }
   for(const loc of LOCATIONS){
     const box=loc.collisionBox;
     const bx=loc.worldX+box.x,by=loc.worldY+box.y;
