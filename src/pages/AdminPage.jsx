@@ -948,7 +948,7 @@ export default function AdminPage() {
               <button className="modal-close-btn" onClick={() => setAuditModalOpen(false)}>✕</button>
             </div>
 
-            <div style={{ padding: '16px', maxHeight: '450px', overflowY: 'auto' }}>
+            <div className="modal-body-form" style={{ maxHeight: 'min(60vh, 480px)', padding: '16px 20px' }}>
               <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>
                 All mutations on the <code>events</code> table trigger immutable server-side logging. Direct client modifications or deletions of audit entries are permanently forbidden by database RLS.
               </p>
@@ -991,7 +991,7 @@ export default function AdminPage() {
               )}
             </div>
 
-            <div className="modal-footer-actions">
+            <div className="modal-footer-actions" style={{ padding: '12px 20px', marginTop: 0 }}>
               <button type="button" className="gamified-btn save-btn" onClick={() => setAuditModalOpen(false)}>
                 CLOSE
               </button>
