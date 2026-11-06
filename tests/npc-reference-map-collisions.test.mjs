@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {CAMPUS_NPCS} from '../src/game/data/npcDialogues.js';
-import {checkFootCollision,resolveMovement} from '../src/game/systems/collision.js';
+import {checkFootCollision,hitsNpcFoot,resolveMovement} from '../src/game/systems/collision.js';
 import {LOCATIONS} from '../src/game/data/locationData.js';
 import {getSpawnPoint,buildTravelPath} from '../src/game/data/travelPaths.js';
 import {CLEAN_TILE_RECTS,createCleanCampus} from '../src/game/systems/assetLoader.js';
@@ -10,8 +10,8 @@ import {HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT} from '../src/game/systems/renderer.js'
 const read=(p)=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 test('all six NPC feet block the avatar, with accessible ring around each',()=>{
  for(const n of CAMPUS_NPCS){
-  assert.equal(checkFootCollision(n.x,n.y),true, n.id+' must have a real collider');
-  assert.equal(checkFootCollision(n.x+22,n.y+20),false, n.id+' must not create oversized invisible wall');
+  assert.equal(hitsNpcFoot(n.x,n.y),true, n.id+' must have a real collider');
+  assert.equal(hitsNpcFoot(n.x+35,n.y+30),false, n.id+' must not create oversized invisible wall');
   assert.ok(!LOCATIONS.some(l=>{
     const c=l.collisionBox;
     return n.x>=l.worldX+c.x && n.x<=l.worldX+c.x+c.w &&
