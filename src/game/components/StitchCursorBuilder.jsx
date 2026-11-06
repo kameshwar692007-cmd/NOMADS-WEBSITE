@@ -1,29 +1,51 @@
 // Nomad's Province — Stitch AI Cursor Page Builder
-// Re-creates the iconic AI prompt-to-UI assembly effect (as seen in Google Stitch & AI UI builders)
-// An AI cursor traverses specific divs & buttons, constructing their wireframes into solid UI.
-// Triggers ONCE when the user refreshes/reloads the page, then parks cleanly.
+// Dynamic scroll-triggered AI UI assembly effect with authentic SFX & zero auto-scroll
+// Re-creates the Google Stitch experience: sleek laser pointer without text clutter.
+// Constructs elements dynamically as the user scrolls through the page.
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { sound } from '../systems/soundFx.js';
 
 export default function StitchCursorBuilder({ accentColor = '#38bdf8' }) {
-  const [active, setActive] = useState(false);
+  const [cursorVisible, setCursorVisible] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-  const [cursorLabel, setCursorLabel] = useState('✨ Stitch AI: Synthesizing Prompt...');
   const [isClicking, setIsClicking] = useState(false);
   const [activeBox, setActiveBox] = useState(null);
-  const cancelledRef = useRef(false);
+
+  const builtSetRef = useRef(new Set());
+  const queueRef = useRef([]);
+  const isProcessingRef = useRef(false);
+  const activeElementRef = useRef(null);
+  const isDestroyedRef = useRef(false);
+
+  // Sync coordinates dynamically in real time while user is scrolling during assembly
+  const syncPositionWithScroll = useCallback(() => {
+    if (!activeElementRef.current) return;
+    const el = activeElementRef.current;
+    const rect = el.getBoundingClientRect();
+    const isButton = el.tagName === 'BUTTON' || el.tagName === 'A' || el.classList.contains('gamified-btn') || el.classList.contains('view-details-btn') || el.classList.contains('tab-btn');
+
+    const targetX = rect.left + (isButton ? rect.width / 2 : Math.min(80, rect.width * 0.45));
+    const targetY = rect.top + (isButton ? rect.height / 2 : Math.min(45, rect.height * 0.35));
+
+    setCursorPos({ x: targetX, y: targetY });
+    setActiveBox({
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+      isButton
+    });
+  }, []);
 
   useEffect(() => {
-    // Determine if this is a genuine page reload / refresh
+    // Only trigger on genuine reload or fresh session entry
     const navEntry = window.performance?.getEntriesByType?.('navigation')?.[0];
     const isReload = navEntry?.type === 'reload';
     const reloadToken = (window.performance?.timeOrigin || Date.now()).toString();
     const tokenKey = 'stitch_reload_' + window.location.pathname;
     const previousToken = sessionStorage.getItem(tokenKey);
 
-    // Trigger only if it's a reload (or fresh initial session load if reload token not stored)
-    // and hasn't already executed for this reload instance
     if (previousToken === reloadToken && !isReload) {
       document.querySelectorAll('.stitch-target').forEach(el => {
         el.classList.add('stitch-built');
@@ -32,129 +54,143 @@ export default function StitchCursorBuilder({ accentColor = '#38bdf8' }) {
     }
 
     sessionStorage.setItem(tokenKey, reloadToken);
+    isDestroyedRef.current = false;
 
-    let startTimer;
-    let finishTimer;
+    // Gather all tagged targets on the current page
+    const allTargets = Array.from(document.querySelectorAll('.stitch-target'));
+    if (allTargets.length === 0) return;
 
-    // Small delay to allow DOM nodes and game shell to mount cleanly
-    startTimer = setTimeout(() => {
-      const targets = Array.from(document.querySelectorAll('.stitch-target'));
-      if (targets.length === 0) return;
+    // Initialize unbuilt targets in blueprint wireframe mode
+    allTargets.forEach(el => {
+      el.classList.add('stitch-pending');
+      el.classList.remove('stitch-built');
+    });
 
-      // Initially mark targets as pending wireframe
-      targets.forEach(el => {
-        el.classList.add('stitch-pending');
-        el.classList.remove('stitch-built');
-      });
+    // Worker queue processing elements that enter viewport
+    async function processQueue() {
+      if (isProcessingRef.current || queueRef.current.length === 0 || isDestroyedRef.current) return;
+      isProcessingRef.current = true;
 
-      setActive(true);
-      cancelledRef.current = false;
+      while (queueRef.current.length > 0 && !isDestroyedRef.current) {
+        const el = queueRef.current.shift();
+        if (!el || builtSetRef.current.has(el)) continue;
 
-      // Start cursor in the top-right quadrant
-      const startX = Math.min(window.innerWidth - 120, Math.max(80, window.innerWidth * 0.65));
-      const startY = 90;
-      setCursorPos({ x: startX, y: startY });
-      setCursorLabel('✨ Stitch AI: Synthesizing Layout...');
+        activeElementRef.current = el;
+        const isButton = el.tagName === 'BUTTON' || el.tagName === 'A' || el.classList.contains('gamified-btn') || el.classList.contains('view-details-btn') || el.classList.contains('tab-btn');
 
-      async function runSequence() {
-        // Pause to let user perceive initial blueprint state
-        await new Promise(r => setTimeout(r, 400));
-        if (cancelledRef.current) return;
+        // Viewport coordinates without auto-scrolling
+        const rect = el.getBoundingClientRect();
+        const targetX = rect.left + (isButton ? rect.width / 2 : Math.min(80, rect.width * 0.45));
+        const targetY = rect.top + (isButton ? rect.height / 2 : Math.min(45, rect.height * 0.35));
 
-        for (let i = 0; i < targets.length; i++) {
-          const el = targets[i];
-          if (!el || cancelledRef.current) break;
+        // 1. Cursor swoops to element with SFX
+        setCursorVisible(true);
+        setCursorPos({ x: targetX, y: targetY });
+        try { sound.playLaserSwoop(); } catch (_) {}
 
-          const isButton = el.tagName === 'BUTTON' || el.tagName === 'A' || el.classList.contains('gamified-btn') || el.classList.contains('view-details-btn') || el.classList.contains('tab-btn');
-          const customLabel = el.getAttribute('data-stitch-label') || (isButton ? '🎯 Compiling Action Button...' : `⚡ Assembling Blueprint Div 0${i + 1}...`);
+        // Flight transition time
+        await new Promise(r => setTimeout(r, 260));
+        if (isDestroyedRef.current) break;
 
-          // Bring element into view if necessary
-          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          await new Promise(r => setTimeout(r, 160));
-          if (cancelledRef.current) break;
+        // 2. Laser bounding box locks on with scan SFX
+        const currentRect = el.getBoundingClientRect();
+        setActiveBox({
+          top: currentRect.top,
+          left: currentRect.left,
+          width: currentRect.width,
+          height: currentRect.height,
+          isButton
+        });
+        try { sound.playLaserScan(); } catch (_) {}
 
-          const rect = el.getBoundingClientRect();
-          const targetX = rect.left + Math.min(60, rect.width * 0.5);
-          const targetY = rect.top + Math.min(30, rect.height * 0.5);
+        // Transition element into active construction
+        el.classList.remove('stitch-pending');
+        el.classList.add('stitch-constructing');
 
-          // Move cursor to target
-          setCursorPos({ x: targetX, y: targetY });
-          setCursorLabel(customLabel);
-          setActiveBox({
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height,
-            isButton
-          });
+        await new Promise(r => setTimeout(r, isButton ? 260 : 320));
+        if (isDestroyedRef.current) break;
 
-          try { sound.playBlip(); } catch (_) {}
+        // 3. If button, perform physical click with mechanical SFX
+        if (isButton) {
+          setIsClicking(true);
+          try { sound.playHapticClick(); } catch (_) {}
+          el.classList.add('stitch-clicked');
 
-          // Trace & construct element
-          el.classList.remove('stitch-pending');
-          el.classList.add('stitch-constructing');
-
-          // Dwell time on element
-          await new Promise(r => setTimeout(r, isButton ? 440 : 360));
-          if (cancelledRef.current) break;
-
-          // If button, perform physical click animation with sound
-          if (isButton) {
-            setIsClicking(true);
-            try { sound.playSelect(); } catch (_) {}
-            el.classList.add('stitch-clicked');
-
-            await new Promise(r => setTimeout(r, 220));
-            setIsClicking(false);
-            el.classList.remove('stitch-clicked');
-          }
-
-          // Solidify element
-          el.classList.remove('stitch-constructing');
-          el.classList.add('stitch-built');
-          setActiveBox(null);
-
-          await new Promise(r => setTimeout(r, 140));
+          await new Promise(r => setTimeout(r, 180));
+          setIsClicking(false);
+          try { sound.playSelect(); } catch (_) {}
+          el.classList.remove('stitch-clicked');
         }
 
-        // Completion & graceful parking
-        if (!cancelledRef.current) {
-          setCursorLabel('✓ Stitch AI: Complete');
-          setCursorPos(prev => ({ x: prev.x + 60, y: Math.max(30, prev.y - 40) }));
+        // 4. Solidify component
+        el.classList.remove('stitch-constructing');
+        el.classList.add('stitch-built');
+        builtSetRef.current.add(el);
+        setActiveBox(null);
+        activeElementRef.current = null;
 
-          finishTimer = setTimeout(() => {
-            setActive(false);
-            targets.forEach(el => el.classList.add('stitch-built'));
-          }, 600);
-        }
+        await new Promise(r => setTimeout(r, 90));
       }
 
-      runSequence();
+      isProcessingRef.current = false;
+
+      // If no more visible targets in queue, fade cursor cleanly
+      if (queueRef.current.length === 0) {
+        setTimeout(() => {
+          if (!isProcessingRef.current && queueRef.current.length === 0) {
+            setCursorVisible(false);
+          }
+        }, 320);
+      }
+    }
+
+    // Scroll trigger handler: checks elements entering viewport as user scrolls
+    const handleScrollOrResize = () => {
+      // Keep active bounding box & cursor synchronized with scroll position in real time
+      if (activeElementRef.current) {
+        syncPositionWithScroll();
+      }
+
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const targets = document.querySelectorAll('.stitch-target');
+
+      targets.forEach(el => {
+        if (builtSetRef.current.has(el) || queueRef.current.includes(el) || activeElementRef.current === el) {
+          return;
+        }
+
+        const rect = el.getBoundingClientRect();
+        // Element is visible in the active viewport
+        if (rect.top < viewportHeight * 0.90 && rect.bottom > 40) {
+          queueRef.current.push(el);
+        }
+      });
+
+      if (queueRef.current.length > 0 && !isProcessingRef.current) {
+        processQueue();
+      }
+    };
+
+    // Initial check for elements already visible above the fold on initial load
+    const initialTimer = setTimeout(() => {
+      handleScrollOrResize();
     }, 120);
 
-    // Instant cancel if user scrolls or types to ensure non-blocking UX
-    const handleCancel = () => {
-      cancelledRef.current = true;
-      setActive(false);
+    // Dynamic scroll listeners without any forced auto-scroll
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+
+    return () => {
+      isDestroyedRef.current = true;
+      clearTimeout(initialTimer);
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
       document.querySelectorAll('.stitch-target').forEach(el => {
         el.classList.remove('stitch-pending', 'stitch-constructing', 'stitch-clicked');
         el.classList.add('stitch-built');
       });
     };
-
-    window.addEventListener('keydown', handleCancel, { once: true });
-    window.addEventListener('wheel', handleCancel, { once: true, passive: true });
-
-    return () => {
-      cancelledRef.current = true;
-      clearTimeout(startTimer);
-      clearTimeout(finishTimer);
-      window.removeEventListener('keydown', handleCancel);
-      window.removeEventListener('wheel', handleCancel);
-    };
-  }, []);
-
-  if (!active) return null;
+  }, [syncPositionWithScroll]);
 
   return (
     <div className="stitch-builder-overlay" style={{ pointerEvents: 'none' }}>
@@ -174,13 +210,12 @@ export default function StitchCursorBuilder({ accentColor = '#38bdf8' }) {
           <span className="corner-tag tr" />
           <span className="corner-tag bl" />
           <span className="corner-tag br" />
-          <span className="wireframe-status-tag">{cursorLabel}</span>
         </div>
       )}
 
-      {/* 2. Floating AI Cursor Pointer */}
+      {/* 2. Floating AI Laser Cursor Pointer (Clean laser arrow without text) */}
       <div
-        className="stitch-ai-cursor"
+        className={`stitch-ai-cursor ${cursorVisible ? 'visible' : 'hidden'}`}
         style={{
           transform: `translate3d(${cursorPos.x}px, ${cursorPos.y}px, 0)`,
           '--cursor-accent': accentColor
@@ -188,24 +223,18 @@ export default function StitchCursorBuilder({ accentColor = '#38bdf8' }) {
       >
         <div className={`cursor-body ${isClicking ? 'clicking' : ''}`}>
           {/* Futuristic Laser Arrow Pointer */}
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="cursor-arrow-svg">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="cursor-arrow-svg">
             <path
               d="M3 3L10.07 19.97L12.58 12.58L19.97 10.07L3 3Z"
               fill={accentColor}
               stroke="#090d16"
-              strokeWidth="1.5"
+              strokeWidth="1.6"
               strokeLinejoin="round"
             />
           </svg>
 
           {/* Pulsing Spark at Cursor Tip */}
           <div className="cursor-spark-ring" />
-
-          {/* Floating AI Status Pill */}
-          <div className="cursor-pill-badge">
-            <span className="badge-radar-dot" />
-            <span className="badge-text">{cursorLabel}</span>
-          </div>
         </div>
       </div>
     </div>
