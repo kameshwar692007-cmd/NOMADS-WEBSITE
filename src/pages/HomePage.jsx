@@ -36,7 +36,7 @@ export default function HomePage() {
         !e.target.closest('.location-panel') &&
         !e.target.closest('.map-modal-card') &&
         !e.target.closest('.menu-drawer') &&
-        !e.target.closest('.game-header')
+        !e.target.closest('.campus-fixed-header')
       ) {
         e.preventDefault();
       }
@@ -73,9 +73,6 @@ export default function HomePage() {
       <main className="game-viewport">
         <GameCanvas 
           onLocationInteract={handleLocationInteract}
-          onDirectoryOpen={() => setDirectoryOpen(true)}
-          onMapOpen={() => setMapOpen(true)}
-          onMenuOpen={() => setMenuOpen(true)}
           isMobile={isMobile}
           directoryTravelTarget={travelTarget}
           onDirectoryTravelConsumed={handleTravelConsumed}
