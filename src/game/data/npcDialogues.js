@@ -21,7 +21,7 @@ export const CAMPUS_NPCS=Object.freeze([
   npc('event-coordinator','Nova','Event Coordinator',4,3,745,808,
     'Something exciting is always happening! Discover upcoming events and our best moments.',
     'View Events','/events'),
-  npc('community-manager','Ari','Community Manager',5,4,542,689,
+  npc('community-manager','Ari','Community Manager',5,4,535,625,
     'This is where gamers, creators, colleges and collaborators become a community.',
     'Explore Community','/community'),
   npc('partnership-rep','Ezra','Partnership Representative',1,0,1170,706,
