@@ -31,7 +31,7 @@ test('all destinations use cement-constrained paths without long diagonal grass 
 });
 test('blocked objects reject travel but the marked red-outline lawns remain explorable',()=>{
  const spawn=getSpawnPoint();
- for(const [x,y] of [[20,750],[830,110],[590,535],[534,761],[835,475],[830,725]]){
+ for(const [x,y] of [[20,750],[830,110],[595,555],[548,838],[835,475],[830,725]]){
   assert.equal(checkFootCollision(x,y),true);
   assert.deepEqual(buildPathToPoint(spawn.x,spawn.y,x,y),[]);
  }
