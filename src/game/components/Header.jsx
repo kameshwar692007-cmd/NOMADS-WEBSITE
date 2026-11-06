@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { sound } from '../systems/soundFx.js';
 
-export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen }) {
+export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpOpen }) {
   const [muted, setMuted] = useState(() => sound.isMuted());
 
   useEffect(() => {
@@ -41,6 +41,11 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen }) {
           aria-label="Open campus map"
         >
           <span aria-hidden="true">⌖</span> <span>Map</span>
+        </button>
+        <button type="button" className="campus-fixed-button campus-help-button"
+          onClick={onHelpOpen} onMouseEnter={() => sound.playBlip()}
+          aria-label="How to play" title="How to play">
+          <span aria-hidden="true">?</span> <span>Help</span>
         </button>
         <button
           type="button"
