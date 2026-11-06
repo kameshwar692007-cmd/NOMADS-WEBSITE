@@ -33,7 +33,7 @@ export default function GameCanvas({
   useEffect(()=>{
     let mounted=true;
     const spawn=getSpawnPoint();
-    playerRef.current={x:spawn.x-16,y:spawn.y-40,direction:'down',moving:false};
+    playerRef.current={x:spawn.x-16,y:spawn.y-40,direction:'down',moving:false,walkCycleTime:0};
     cameraRef.current.snapTo(spawn.x,spawn.y);
     loadAllAssets().then(assets=>{if(mounted){assetsRef.current=assets;setLoaded(true);}});
     return ()=>{mounted=false;travelRef.current.cancel();};
@@ -126,6 +126,10 @@ export default function GameCanvas({
           }else blockedFrames=0;
         }
       }
+      // Advance a stable walk clock only if actual collision-resolved travel occurred.
+      // Idle resets to a true stationary frame instead of an arbitrary global-time pose.
+      if (moved) player.walkCycleTime = ((player.walkCycleTime ?? 0) + dt*1000) % 620;
+      else player.walkCycleTime = 0;
       player.moving=moved;
       cameraRef.current.update(player.x+16,player.y+40,width,height,zoom*dpr);
       renderWorld(ctx,assetsRef.current,cameraRef.current,player,zoom*dpr,width,height,now);
