@@ -1,8 +1,10 @@
 // Nomad's Province — Game Development Studio (/studio)
 // Showcasing original games, prototypes, and GDAI partnerships
+// Progressive blueprint assembly animation on featured studio creations
 
 import { useState } from 'react';
 import GameShell from '../game/components/GameShell.jsx';
+import BlueprintAssembler from '../game/components/BlueprintAssembler.jsx';
 import { STUDIO_PROJECTS, ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
 import { IconCode, IconZap, IconSparkles, IconGlobe, IconRocket, IconCheck } from '../game/components/Icons.jsx';
@@ -38,13 +40,18 @@ export default function StudioPage() {
         </p>
       </section>
 
-      {/* 2. Featured Projects Grid */}
+      {/* 2. Featured Projects Blueprint Assembly Showcase */}
       <div className="section-title-wrap">
         <h3 className="section-title">ORIGINAL CREATIONS & STUDIO PORTFOLIO</h3>
-        <span className="section-badge" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>STUDIO SHOWCASE</span>
+        <span className="section-badge" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>BLUEPRINT ASSEMBLY</span>
       </div>
 
-      <div className="studio-projects-grid">
+      <BlueprintAssembler
+        promptText="Construct Nomad's Province original creations, WebGL game engines, and hackathon prototypes..."
+        moduleTag="studio_engine.sh"
+        accentColor="#38bdf8"
+        layout="grid"
+      >
         {STUDIO_PROJECTS.map((proj) => (
           <div key={proj.id} className="gamified-card project-card" style={{ '--proj-accent': proj.accent }} onMouseEnter={() => sound.playBlip()}>
             <div className="project-banner-wrap">
@@ -62,7 +69,7 @@ export default function StudioPage() {
             </div>
           </div>
         ))}
-      </div>
+      </BlueprintAssembler>
 
       {/* 3. Studio Capabilities & Pipeline */}
       <section className="gamified-card tech-tree-card">
@@ -78,76 +85,96 @@ export default function StudioPage() {
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
             <div className="node-icon-frame">
-              <IconZap size={22} color="#eab308" />
+              <IconZap size={22} color="#e84537" />
             </div>
-            <div className="node-title">Unity & Godot Engines</div>
-            <div className="node-sub">Cross-platform 2D mechanics, physics scripting, and prototype development.</div>
+            <div className="node-title">Unity & Godot Engine</div>
+            <div className="node-sub">Multi-platform game development targeting mobile, desktop, and interactive installations.</div>
           </div>
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
             <div className="node-icon-frame">
-              <IconSparkles size={22} color="#a855f7" />
+              <IconSparkles size={22} color="#f59e0b" />
             </div>
-            <div className="node-title">Handcrafted 2D Pixel Art</div>
-            <div className="node-sub">Custom tilemap design, character sprites, and retro game environments.</div>
+            <div className="node-title">24-Hour Game Jams</div>
+            <div className="node-sub">Rapid prototyping hackathons organized with collegiate partners and GDAI mentors.</div>
           </div>
 
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
             <div className="node-icon-frame">
               <IconGlobe size={22} color="#10b981" />
             </div>
-            <div className="node-title">GDAI Industry Mentorship</div>
-            <div className="node-sub">Guidance from veteran Indian game developers on mechanics, art, and publishing.</div>
+            <div className="node-title">Indie Game Incubation</div>
+            <div className="node-sub">Mentorship, production support, and industry pathways for aspiring student game developers.</div>
           </div>
         </div>
       </section>
 
-      {/* 4. Pitch Your Game / Collab Terminal */}
+      {/* 4. Pitch & Collaborate Terminal */}
       <section className="gamified-card pitch-card">
-        <h3 className="section-title">COLLABORATE WITH NOMAD'S STUDIO</h3>
-        <p className="pitch-intro">
-          Are you a student game developer, pixel artist, programmer, or audio composer? 
-          Collaborate with our studio on game jam hackathons and indie prototypes.
+        <div className="terminal-header">
+          <span className="terminal-dot red" />
+          <span className="terminal-dot yellow" />
+          <span className="terminal-dot green" />
+          <span className="terminal-title">CREATOR SUBMISSION CONSOLE</span>
+        </div>
+
+        <h3 className="section-title">HAVE A GAME CONCEPT OR TECH PROTOTYPE?</h3>
+        <p className="pitch-desc">
+          Nomad's Province Studio collaborates with student creators, indie devs, and university clubs. 
+          Pitch your project to gain development mentorship, showcase opportunities at GameJam X, and technical collaboration.
         </p>
 
         {pitchSent ? (
           <div className="pitch-success-msg">
             <span className="success-icon"><IconCheck size={18} /></span>
-            <div>SUBMISSION RECEIVED: Our game development team will connect with you via email / WhatsApp!</div>
+            <div>TRANSMISSION LOGGED: Our studio leads will review your concept and reach out via official channels!</div>
           </div>
         ) : (
           <form className="pitch-form" onSubmit={handlePitchSubmit}>
             <div className="form-row">
-              <input 
-                type="text" 
-                placeholder="Your Name / Developer Handle" 
-                className="retro-input"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-              <select 
-                className="retro-input"
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              >
-                <option value="Developer">Game Developer / Programmer</option>
-                <option value="Pixel Artist">Pixel Artist / 2D Animator</option>
-                <option value="Sound Designer">Sound Designer / Composer</option>
-                <option value="Game Designer">Game Designer / Level Designer</option>
-              </select>
+              <div className="form-group">
+                <label className="retro-label">CREATOR / TEAM NAME</label>
+                <input 
+                  type="text" 
+                  placeholder="Your Name or Studio Squad" 
+                  className="retro-input"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="retro-label">PRIMARY ROLE</label>
+                <select 
+                  className="retro-input"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                >
+                  <option value="Game Developer">Game Developer (Code / Engine)</option>
+                  <option value="Game Designer">Game Designer (Mechanics / Lore)</option>
+                  <option value="Pixel / 3D Artist">Artist (Pixel Art, 3D, UI/UX)</option>
+                  <option value="Audio Composer">Audio Composer / Sound Designer</option>
+                  <option value="College Club">Collegiate Game Dev Club</option>
+                </select>
+              </div>
             </div>
-            <textarea 
-              placeholder="Tell us about your game idea, engine experience, or link to your portfolio/itch.io..." 
-              className="retro-input textarea"
-              required
-              rows={3}
-              value={formData.pitch}
-              onChange={(e) => setFormData({ ...formData, pitch: e.target.value })}
-            />
-            <button type="submit" className="gamified-btn pitch-submit-btn" onMouseEnter={() => sound.playBlip()}>
+
+            <div className="form-group">
+              <label className="retro-label">GAME CONCEPT / PROTOTYPE BRIEF</label>
+              <textarea 
+                placeholder="Describe your game mechanics, genre, engine, or collaboration proposal..." 
+                className="retro-input textarea"
+                required
+                rows={3}
+                value={formData.pitch}
+                onChange={(e) => setFormData({ ...formData, pitch: e.target.value })}
+              />
+            </div>
+
+            <button type="submit" className="gamified-btn submit-pitch-btn" onMouseEnter={() => sound.playBlip()}>
               <IconRocket size={16} />
-              <span>SUBMIT COLLABORATION INQUIRY</span>
+              <span>TRANSMIT STUDIO PITCH</span>
             </button>
           </form>
         )}
