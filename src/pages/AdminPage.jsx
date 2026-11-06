@@ -68,6 +68,39 @@ export default function AdminPage() {
   const [formSuccess, setFormSuccess] = useState('');
   const [uploadingPoster, setUploadingPoster] = useState(false);
 
+  // Authentication states
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loggingIn, setLoggingIn] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    setLoggingIn(true);
+    sound.playSelect();
+    try {
+      await eventService.login(loginEmail, loginPassword);
+      sound.playArrival();
+      await loadEventsAndRole();
+    } catch (err) {
+      sound.playCancel();
+      setLoginError(err.message || 'Authentication failed. Please verify credentials.');
+    } finally {
+      setLoggingIn(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    sound.playCancel();
+    try {
+      await eventService.logout();
+      await loadEventsAndRole();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  };
+
   // Load events and user role
   const loadEventsAndRole = async () => {
     setLoading(true);
@@ -298,6 +331,70 @@ export default function AdminPage() {
   const draftCount = events.filter((e) => e.isDraft).length;
   const totalClicks = Object.values(analyticsData).reduce((sum, item) => sum + (item.clicks || 0), 0);
 
+  // If not authenticated as staff in cloud-connected production mode
+  if (!userRoleState.isStaff) {
+    return (
+      <GameShell
+        title="ADMIN COMMAND CENTER"
+        subtitle="Internal Staff Authentication Gateway"
+        accentColor="#ef4444"
+      >
+        <section className="gamified-card admin-telemetry-card" style={{ maxWidth: '480px', margin: '40px auto 60px', padding: '32px' }}>
+          <div className="terminal-header" style={{ marginBottom: '20px' }}>
+            <span className="terminal-dot red" />
+            <span className="terminal-dot yellow" />
+            <span className="terminal-dot green" />
+            <span className="terminal-title">STAFF AUTHENTICATION GATEWAY</span>
+          </div>
+
+          <h3 className="section-title" style={{ color: '#f8fafc', marginBottom: '8px' }}>INTERNAL ACCESS ONLY</h3>
+          <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: '1.5', marginBottom: '24px' }}>
+            Sign in with your authorized Nomad's Province Super Admin credentials to access event management, tournament brackets, and telemetry.
+          </p>
+
+          {loginError && (
+            <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#fca5a5', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', marginBottom: '18px' }}>
+              {loginError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="form-group">
+              <label className="retro-label">ADMIN EMAIL</label>
+              <input
+                type="email"
+                required
+                className="retro-input"
+                placeholder="owner@nomadsprovince.com"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label className="retro-label">PASSWORD</label>
+              <input
+                type="password"
+                required
+                className="retro-input"
+                placeholder="••••••••••••"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loggingIn}
+              className="gamified-btn"
+              style={{ width: '100%', marginTop: '8px', background: '#e84537', color: '#fff', padding: '12px', fontWeight: 'bold' }}
+            >
+              {loggingIn ? 'VERIFYING CREDENTIALS...' : 'ACCESS COMMAND CENTER →'}
+            </button>
+          </form>
+        </section>
+      </GameShell>
+    );
+  }
+
   return (
     <GameShell
       title="ADMIN COMMAND CENTER"
@@ -328,16 +425,37 @@ export default function AdminPage() {
           {/* Super Admin Single-Owner Access Badge */}
           <div className="telemetry-role-box">
             <span className="role-box-label">GOVERNANCE LEVEL</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px' }}>
-              <span style={{ fontSize: '24px' }}>👑</span>
-              <div>
-                <div style={{ fontWeight: 'bold', color: '#ffd700', fontSize: '14px', fontFamily: 'monospace' }}>
-                  SUPER ADMIN (OWNER)
-                </div>
-                <div style={{ fontSize: '11px', color: '#94a3b8' }}>
-                  Complete CRUD, Media & Results Authority
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginTop: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '24px' }}>👑</span>
+                <div>
+                  <div style={{ fontWeight: 'bold', color: '#ffd700', fontSize: '14px', fontFamily: 'monospace' }}>
+                    SUPER ADMIN (OWNER)
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                    {userRoleState.email || 'Complete CRUD & Media Authority'}
+                  </div>
                 </div>
               </div>
+              {!userRoleState.isSimulated && (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    color: '#f87171',
+                    fontSize: '11px',
+                    padding: '4px 10px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    marginLeft: '8px'
+                  }}
+                >
+                  LOGOUT
+                </button>
+              )}
             </div>
           </div>
         </div>

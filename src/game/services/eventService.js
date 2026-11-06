@@ -303,6 +303,29 @@ export const eventService = {
   },
 
   /**
+   * Authenticate Super Admin / Staff via Supabase Auth
+   */
+  async login(email, password) {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      return this.getCurrentUserRole();
+    }
+    return this.getCurrentUserRole();
+  },
+
+  /**
+   * Log out from active session
+   */
+  async logout() {
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    }
+    return { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false };
+  },
+
+  /**
    * Fetch all publicly viewable events (Excludes drafts strictly)
    */
   async getPublicEvents() {
