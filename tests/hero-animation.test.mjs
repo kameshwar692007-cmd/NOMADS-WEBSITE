@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { getHeroFrame, HERO_DRAW_WIDTH, HERO_DRAW_HEIGHT } from '../src/game/systems/renderer.js';
 
-const sprite=readFileSync(new URL('../public/assets/game/characters/player/nomad-goggles-v3.png',import.meta.url));
+const sprite=readFileSync(new URL('../public/assets/game/characters/player/nomad-goggles-v4.png',import.meta.url));
 const loader=readFileSync(new URL('../src/game/systems/assetLoader.js',import.meta.url),'utf8');
 const game=readFileSync(new URL('../src/game/components/GameCanvas.jsx',import.meta.url),'utf8');
 test('provided 4×4 character atlas is valid transparent PNG and loaded by the game',()=>{
  assert.equal(sprite.toString('ascii',1,4),'PNG');
  assert.equal(sprite.readUInt32BE(16),128);
  assert.equal(sprite.readUInt32BE(20),192);
- assert.ok(loader.includes('nomad-goggles-v3.png'));
+ assert.ok(loader.includes('nomad-goggles-v4.png'));
  assert.ok(!loader.includes('nomad-hero-v2.svg'));
 });
 import { PNG } from 'pngjs';
