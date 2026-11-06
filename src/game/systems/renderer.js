@@ -1,6 +1,7 @@
 // Approved campus art with repaired UI and plaza overlays.
 // All coordinates are in world pixels; gameplay remains on a separate moving layer.
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../data/mapData.js';
+import { drawForegroundForPlayer } from '../data/sceneObjects.js';
 
 function drawArtwork(ctx, image) {
   ctx.drawImage(image, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -60,6 +61,7 @@ export function renderWorld(ctx, assets, camera, player, zoom, width, height, el
   const plazaPatch = assets['world/plaza-patch'];
   if (plazaPatch?.width) ctx.drawImage(plazaPatch, 788, 511);
   drawPlayer(ctx, assets, player);
+  drawForegroundForPlayer(ctx,campus,player.x+16,player.y+40,HERO_DRAW_WIDTH,HERO_DRAW_HEIGHT);
   ctx.restore();
 }
 
