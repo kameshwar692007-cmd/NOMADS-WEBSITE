@@ -44,7 +44,7 @@ function drawPlayer(ctx, assets, player) {
 // dialogue portraits. Foot-based painter ordering prevents cut-off heads.
 function drawNpcInteractions(ctx,assets,player,elapsed=0){
  const spriteAtlas=assets['npc/complete-sprites'];
- if(!spriteAtlas?.width)return;
+ if(!spriteAtlas?.width){drawPlayer(ctx,assets,player);return;}
  const sorted=[...CAMPUS_NPCS.map(n=>({type:'npc',y:n.y,n})),{type:'hero',y:player.y+40}].sort((a,b)=>a.y-b.y);
  for(const item of sorted){
   if(item.type==='hero'){drawPlayer(ctx,assets,player);continue;}
