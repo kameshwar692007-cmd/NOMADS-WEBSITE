@@ -1,48 +1,72 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import './NpcDialogue.css';
 
-const INDEX={ 'hero-guide':0, receptionist:1,'arena-host':2, developer:3,
- 'event-coordinator':4,'community-manager':5,'partnership-rep':6 };
-export function NpcPortrait({portrait='hero-guide',className=''}) {
- const i=INDEX[portrait]??0;
- return <div className={'np-portrait '+className}
-   role="img" aria-label={portrait.replaceAll('-',' ')}
-   style={{'--np-portrait-x':`${i%4*100/3}%`,'--np-portrait-y':`${Math.floor(i/4)*100}%`}}/>;
+// Convert the existing 4x2 portrait sheet into a separate image for each NPC.
+// Each portrait is independently cropped at its native 128x128 resolution;
+// no CSS offsets, atlas bleed or accidentally mixed characters.
+const portraitCache=new Map();
+const ATLAS='/assets/onboarding/npc-portraits-atlas.webp';
+function usePortrait(index){
+ const [src,setSrc]=useState(()=>portraitCache.get(index)||null);
+ useEffect(()=>{
+  let alive=true;
+  if(portraitCache.has(index)){setSrc(portraitCache.get(index));return;}
+  const img=new Image();
+  img.onload=()=>{
+   if(!alive)return;
+   const canvas=document.createElement('canvas');
+   canvas.width=128;canvas.height=128;
+   const ctx=canvas.getContext('2d');
+   ctx?.drawImage(img,(index%4)*128,Math.floor(index/4)*128,128,128,0,0,128,128);
+   const url=canvas.toDataURL('image/png');
+   portraitCache.set(index,url);setSrc(url);
+  };
+  img.src=ATLAS;
+  return ()=>{alive=false;};
+ },[index]);
+ return src;
 }
-
+export function NpcPortrait({portraitIndex=0,name='Character',className=''}) {
+ const src=usePortrait(portraitIndex);
+ return <div className={'np-portrait-frame '+className}>
+  {src?<img className="np-portrait-image" src={src} alt={name} draggable="false"/>:
+    <span className="np-portrait-loading" aria-hidden="true">✦</span>}
+ </div>;
+}
 export default function NpcDialogue({npc,onClose}) {
  const navigate=useNavigate();
  const message=npc?.message||'';
  const [shown,setShown]=useState(0);
  useEffect(()=>{
   if(!npc)return;
-  setShown(0);
-  if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){setShown(message.length);return;}
-  let count=0;
-  const timer=window.setInterval(()=>{count=Math.min(message.length,count+2);setShown(count);if(count>=message.length)window.clearInterval(timer);},24);
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  setShown(reduced?message.length:0);
+  if(reduced)return;
+  let amount=0;
+  const timer=window.setInterval(()=>{amount=Math.min(message.length,amount+2);setShown(amount);if(amount>=message.length)window.clearInterval(timer);},22);
   return ()=>window.clearInterval(timer);
  },[npc?.id,message]);
  useEffect(()=>{
   if(!npc)return;
-  const key=e=>{
-   if(e.key==='Escape'){onClose();return;}
+  const onKey=e=>{
+   if(e.key==='Escape'){e.stopPropagation();onClose();}
    if(e.key==='Enter'&&shown<message.length){setShown(message.length);}
   };
-  window.addEventListener('keydown',key);
-  return ()=>window.removeEventListener('keydown',key);
+  window.addEventListener('keydown',onKey);
+  return ()=>window.removeEventListener('keydown',onKey);
  },[npc,onClose,shown,message.length]);
  if(!npc)return null;
- const handleContinue=()=>{
+ const continueToPage=()=>{
   if(shown<message.length){setShown(message.length);return;}
-  if(npc.route){onClose();navigate(npc.route);}
-  else onClose();
+  onClose();
+  if(npc.route)navigate(npc.route);
  };
- return <div className="np-dialogue-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)onClose();}}>
+ return <div className="np-dialogue-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)onClose();}}>
   <section className="np-dialogue" role="dialog" aria-modal="true" aria-label={npc.name+' dialogue'}>
    <button type="button" className="np-dialogue-close" onClick={onClose} aria-label="Close dialogue">×</button>
    <div className="np-dialogue-main">
-    <NpcPortrait portrait={npc.portrait}/>
+    <NpcPortrait portraitIndex={npc.portraitIndex} name={npc.name}/>
     <div className="np-dialogue-copy">
      <div className="np-dialogue-role">{npc.title}</div>
      <h2>{npc.name}</h2>
@@ -52,8 +76,8 @@ export default function NpcDialogue({npc,onClose}) {
    </div>
    <div className="np-dialogue-actions">
     <button type="button" className="np-dialogue-later" onClick={onClose}>Not now</button>
-    <button type="button" className="np-dialogue-enter" onClick={handleContinue}>
-      {shown<message.length?'Continue':npc.actionLabel||'Explore'} <span aria-hidden="true">➜</span>
+    <button type="button" className="np-dialogue-enter" onClick={continueToPage}>
+     {shown<message.length?'Skip text':npc.actionLabel||'Explore'} <span aria-hidden="true">➜</span>
     </button>
    </div>
   </section>
