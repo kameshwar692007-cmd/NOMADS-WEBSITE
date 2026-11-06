@@ -33,7 +33,8 @@ export const HERO_GUIDE = Object.freeze({
 
 export function getNpcAtWorldPoint(x,y,radius=31){
   if(!Number.isFinite(x)||!Number.isFinite(y))return null;
-  return CAMPUS_NPCS.find(npc=>Math.hypot(npc.x-x,npc.y-y)<=radius)||null;
+  return CAMPUS_NPCS.find(npc=>Math.hypot(npc.x-x,npc.y-y)<=radius ||
+    Math.hypot(npc.x-x,npc.y-48-y)<=Math.min(radius,20))||null;
 }
 export function getNearbyNpc(x,y,radius=54){
   return getNpcAtWorldPoint(x,y,radius);
