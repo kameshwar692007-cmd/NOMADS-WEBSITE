@@ -3,23 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import { sound } from '../systems/soundFx.js';
 import './NpcDialogue.css';
 
-// Read the checked-in WebP directly. SVGs with embedded image data can
-// render blank in browsers when loaded through an <img> element.
+// High-resolution, individually illustrated NPC portraits.
+// The legacy atlas remains a safe fallback until every HD asset is deployed.
 const PORTRAIT_ATLAS = '/assets/onboarding/npc-portraits-atlas.webp';
+const PORTRAIT_NAMES = ['guide', 'ezra', 'rex', 'kai', 'nova', 'ari', 'aiden'];
+
 export function NpcPortrait({ portraitIndex = 0, name = 'Character', className = '' }) {
-  const index = Number.isInteger(portraitIndex) && portraitIndex >= 0 && portraitIndex < 7 ? portraitIndex : 0;
-  const col = index % 4;
-  const row = Math.floor(index / 4);
+  const index = Number.isInteger(portraitIndex) && portraitIndex >= 0 && portraitIndex < PORTRAIT_NAMES.length
+    ? portraitIndex : 0;
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [index]);
+  const col = index % 4, row = Math.floor(index / 4);
+
   return (
     <div className={'np-portrait-frame ' + className} role="img" aria-label={name + ' portrait'}>
-      <img
-        className="np-portrait-sheet"
-        src={PORTRAIT_ATLAS}
-        alt=""
-        aria-hidden="true"
-        draggable="false"
-        style={{ left: (-col * 100) + '%', top: (-row * 100) + '%' }}
-      />
+      {failed ? (
+        <img className="np-portrait-sheet" src={PORTRAIT_ATLAS} alt="" aria-hidden="true"
+          draggable="false" style={{ left: (-col * 100) + '%', top: (-row * 100) + '%' }} />
+      ) : (
+        <img className="np-portrait-image"
+          src={`/assets/onboarding/portraits-hd/${PORTRAIT_NAMES[index]}.webp`}
+          alt="" aria-hidden="true" draggable="false" width="512" height="512"
+          onError={() => setFailed(true)} />
+      )}
     </div>
   );
 }
