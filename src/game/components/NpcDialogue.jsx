@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import './NpcDialogue.css';
 
 // Render the original high-quality 512×256 portrait atlas directly. The
-// previous canvas.toDataURL flow could fail and leave portrait boxes blank.
+// previous canvas conversion flow could fail and leave portrait boxes blank.
 // A clipped <img> avoids canvas conversion and aligns all seven 128px portraits.
 const ATLAS='/assets/onboarding/npc-portraits-atlas.webp';
 export function NpcPortrait({portraitIndex=0,name='Character',className=''}) {
