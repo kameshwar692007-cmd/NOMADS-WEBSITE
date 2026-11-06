@@ -9,7 +9,7 @@ const npc=(id,name,title,portraitIndex,spriteIndex,x,y,message,actionLabel,route
     portraitAtlas:PORTRAIT_ATLAS});
 
 export const CAMPUS_NPCS=Object.freeze([
-  npc('receptionist','Mira','Headquarters Receptionist',1,0,785,398,
+  npc('receptionist','Aiden','Headquarters Receptionist',6,5,785,398,
     "Welcome to Nomad's Province! Meet our team and discover the world we're building together.",
     'Discover Our Story','/about'),
   npc('arena-host','Rex','Esports Arena Host',2,2,1494,415,
@@ -24,7 +24,7 @@ export const CAMPUS_NPCS=Object.freeze([
   npc('community-manager','Ari','Community Manager',5,4,485,655,
     'This is where gamers, creators, colleges and collaborators become a community.',
     'Explore Community','/community'),
-  npc('partnership-rep','Ezra','Partnership Representative',6,5,1212,670,
+  npc('partnership-rep','Ezra','Partnership Representative',1,0,1250,640,
     'Interested in partnering, sponsoring or collaborating? Get in touch with our team.',
     'Contact Us','/contact')
 ]);
