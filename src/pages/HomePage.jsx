@@ -63,13 +63,12 @@ export default function HomePage() {
 
   return (
     <div className="homepage-frame">
-      {/* On narrow screens the world-image corner buttons are offscreen.
-          Keep accessible fixed controls on mobile only. */}
-      {isMobile && <Header
+      {/* Fixed header stays above the camera on desktop and mobile. */}
+      <Header
         onDirectoryOpen={() => setDirectoryOpen(true)}
         onMapOpen={() => setMapOpen(true)}
         onMenuOpen={() => setMenuOpen(true)}
-      />}
+      />
       {/* 2. Interactive Explorable Canvas World */}
       <main className="game-viewport">
         <GameCanvas 
