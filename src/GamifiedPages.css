@@ -4243,3 +4243,16 @@ body.stitch-scroll-locked {
     font-size: 14px !important;
   }
 }
+
+/* One-shot scroll motion; never conceal content when reduced motion is requested. */
+.province-explore-intro.scroll-reveal {
+  transition-duration: .55s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal, .scroll-reveal.revealed {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+}
