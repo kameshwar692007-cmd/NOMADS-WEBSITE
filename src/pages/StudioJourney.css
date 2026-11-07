@@ -1,0 +1,28 @@
+/* Dedicated studio additions; shared campus and existing studio components remain intact. */
+.studio-journey-intro,.studio-pathway{background:linear-gradient(125deg,#102841,#121c34);border:1px solid #497f9e;padding:clamp(20px,3vw,32px)}
+.studio-journey-overline{font-size:11px;color:#75d8ff;letter-spacing:.16em;font-weight:900}
+.studio-journey-intro h2{font-size:clamp(24px,3.2vw,36px);line-height:1.2;color:#fff;margin:8px 0 12px}
+.studio-journey-intro p,.studio-pathway-head p{max-width:780px;font-size:15px;line-height:1.65;color:#c3d5e8;margin:0}
+.studio-journey-navigation{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.studio-journey-navigation a{display:inline-flex;align-items:center;justify-content:space-between;gap:14px;color:#fff;text-decoration:none;padding:12px 16px;border:1px solid #8ea5bd;background:#1e3a54;border-radius:9px;min-height:44px;box-sizing:border-box;font-size:13px;font-weight:800}
+.studio-journey-navigation a:hover{border-color:#7fe6ff;background:#2b5272}
+.studio-anchor{scroll-margin-top:90px}
+.studio-project-expand{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #6398b8;background:#14364e;border-radius:8px;color:#f4faff;font-size:13px;font-weight:900;padding:11px 15px;min-height:44px;width:100%;cursor:pointer;margin-top:15px}
+.studio-project-expand:hover{background:#275476}
+.studio-project-expand span{font-size:20px;color:#7ae0ff}
+.studio-project-detail{display:grid;gap:10px;border-top:1px solid #5d7f9955;padding-top:16px;margin-top:12px}
+.studio-project-detail div{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;font-size:12px;color:#9cb9d1}
+.studio-project-detail div span{font-size:10px;font-weight:900;letter-spacing:.06em}
+.studio-project-detail strong{color:#edf8ff;text-align:right;max-width:68%;font-size:12px}
+.studio-project-detail a{color:#7cdcff;text-decoration:underline;text-underline-offset:3px;font-size:12px;font-weight:800;margin-top:6px}
+.studio-pathway-head h3{font-size:clamp(23px,3vw,32px);color:#fff;margin:8px 0 12px}
+.studio-pathway-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;list-style:none;padding:0;margin:25px 0 18px}
+.studio-pathway-steps li{border:1px solid #51778d;background:#1a324d;border-radius:11px;padding:20px;min-width:0}
+.studio-pathway-steps li>span{display:block;font-size:12px;font-weight:900;color:#7edfff;letter-spacing:.12em;margin-bottom:14px}
+.studio-pathway-steps strong{font-size:17px;color:#fff}
+.studio-pathway-steps p{font-size:13px;color:#bfd2e4;line-height:1.6;margin:10px 0 0}
+.studio-pathway-note{color:#9fbad1;font-size:12px;line-height:1.6;margin:0}
+.studio-journey-intro a:focus-visible,.studio-project-expand:focus-visible,.studio-project-detail a:focus-visible{outline:3px solid #ffdf91;outline-offset:3px}
+@media(max-width:900px){.studio-pathway-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.studio-pathway-steps{grid-template-columns:1fr}.studio-journey-navigation{flex-direction:column}.studio-journey-navigation a{width:100%}.studio-project-detail div{flex-direction:column;gap:5px}.studio-project-detail strong{text-align:left;max-width:100%}}
+@media(prefers-reduced-motion:reduce){.studio-journey-navigation a,.studio-project-expand{transition:none}}
