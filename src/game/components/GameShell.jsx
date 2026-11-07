@@ -8,6 +8,7 @@ import { sound } from '../systems/soundFx.js';
 import StitchCursorBuilder from './StitchCursorBuilder.jsx';
 import { LOCATIONS } from '../data/locationData.js';
 import './CampusContinuity.css';
+import './DestinationDiscovery.css';
 import {
   IconHQ,
   IconEsports,
@@ -20,6 +21,14 @@ import {
   IconMenu,
   IconClose
 } from './Icons.jsx';
+
+const NEXT_DESTINATION = {
+  '/esports': '/events',
+  '/studio': '/community',
+  '/events': '/esports',
+  '/community': '/studio',
+  '/contact': '/about',
+};
 
 const DESTINATIONS = [
   { path: '/about', label: 'Main HQ', Icon: IconHQ, color: '#e84537' },
@@ -35,6 +44,7 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
   const location = useLocation();
   const campusLocation = LOCATIONS.find((item) => item.route === location.pathname);
   const chapterNumber = campusLocation ? String(LOCATIONS.indexOf(campusLocation) + 1).padStart(2, '0') : null;
+  const nextLocation = LOCATIONS.find(item => item.route === NEXT_DESTINATION[location.pathname]);
   const [muted, setMuted] = useState(() => sound.isMuted());
 
   // Keep muted state synchronized across route transitions
@@ -332,6 +342,31 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
       <main className="shell-main-content">
         {children}
       </main>
+
+      {/* The same explorable destinations, expanded as useful page-specific information. */}
+      {campusLocation && campusLocation.route !== '/about' && campusLocation.sectionDetails && (
+        <aside className="campus-discover" aria-labelledby="campus-discover-title">
+          <div className="campus-discover-heading">
+            <span className="campus-discover-eyebrow">DESTINATION FIELD NOTES</span>
+            <h2 id="campus-discover-title">What you can explore here</h2>
+            <p>Discover the different ways to get involved with {campusLocation.displayName}.</p>
+          </div>
+          <ul className="campus-discover-list">
+            {campusLocation.sectionDetails.highlights.map(highlight => (
+              <li key={highlight}><span aria-hidden="true">✦</span> {highlight}</li>
+            ))}
+          </ul>
+          {nextLocation && (
+            <div className="campus-discover-next">
+              <img src={nextLocation.badgeAsset} alt="" loading="lazy" />
+              <div><span>CONTINUE YOUR JOURNEY</span><strong>{nextLocation.displayName}</strong></div>
+              <button type="button" onClick={() => handleNav(nextLocation.route)} onMouseEnter={() => sound.playBlip()}>
+                View More <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          )}
+        </aside>
+      )}
 
       {/* 5. Cyber Footer */}
       <footer className="shell-footer">
