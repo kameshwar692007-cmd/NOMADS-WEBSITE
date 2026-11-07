@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Pinned Split-Screen Showcase Prototype</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #060b14;
+      color: #f1f5f9;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 40px 20px;
+    }
+    .spacer { height: 60vh; display: flex; align-items: center; justify-content: center; color: #475569; }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* Section Header */
+    .showcase-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(232, 69, 55, 0.12);
+      border: 1px solid rgba(232, 69, 55, 0.35);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #e84537;
+      letter-spacing: 1.2px;
+      margin-bottom: 12px;
+    }
+    .showcase-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .showcase-desc {
+      font-size: 15px;
+      color: #94a3b8;
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Pinned Showcase Track */
+    .showcase-pinned-track {
+      position: relative;
+      min-height: 280vh;
+    }
+
+    /* Pinned Split-Screen Card */
+    .split-card {
+      position: sticky;
+      top: 100px;
+      background: #0a1120;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 36px 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 35px var(--card-glow, rgba(56, 189, 248, 0.12));
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 48px;
+      align-items: center;
+      min-height: 500px;
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Left: 1:1 Logo Stage with Mask Reveal */
+    .stage-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+    }
+    .stage-box {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--accent-color, #ff4d4d);
+      background: var(--bg-color, #080808);
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px var(--card-glow, rgba(255, 77, 77, 0.25));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stage-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+      animation: maskReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes maskReveal {
+      0% {
+        clip-path: inset(40% 40% 40% 40% round 8px);
+        opacity: 0;
+        transform: scale(0.92);
+      }
+      100% {
+        clip-path: inset(0% 0% 0% 0% round 0px);
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .stage-corner {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-color: var(--accent-color, #ff4d4d);
+      border-style: solid;
+      pointer-events: none;
+      transition: border-color 0.3s ease;
+    }
+    .stage-corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+    .stage-corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+    .stage-corner.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+    .stage-corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+    /* Right: Details Side */
+    .details-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 8px;
+      animation: detailSlideIn 0.35s ease forwards;
+    }
+
+    @keyframes detailSlideIn {
+      0% {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .cat-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent-color, #ff4d4d);
+      border: 1px solid var(--accent-color, #ff4d4d);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 12px;
+      border-radius: 4px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    .partner-index {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 800;
+      color: #64748b;
+      letter-spacing: 1px;
+    }
+    .partner-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    .partner-fullname {
+      font-size: 14px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+    .accent-bar {
+      width: 60px;
+      height: 3px;
+      background: var(--accent-color, #ff4d4d);
+      border-radius: 2px;
+      margin-bottom: 18px;
+      transition: background-color 0.3s ease;
+    }
+    .partner-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #cbd5e1;
+      margin-bottom: 28px;
+      max-width: 580px;
+    }
+    
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .dots-group {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0;
+    }
+    .dot.active {
+      background: var(--accent-color, #ff4d4d);
+      border-color: var(--accent-color, #ff4d4d);
+      transform: scale(1.3);
+      box-shadow: 0 0 10px var(--accent-color, #ff4d4d);
+    }
+    .arrows-group {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .arrow-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #f1f5f9;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+    }
+    .arrow-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--accent-color, #ff4d4d);
+      color: #fff;
+    }
+
+    @media (max-width: 860px) {
+      .showcase-pinned-track { min-height: auto; }
+      .split-card {
+        position: relative;
+        top: 0;
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 24px;
+      }
+      .stage-wrapper { max-width: 260px; }
+      .details-box { padding-left: 0; }
+      .partner-title { font-size: 24px; }
+      .partner-desc { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="showcase-header">
+      <div class="badge-pill">
+        <span>●</span>
+        <span>OFFICIAL ALLIANCE NETWORK</span>
+        <span>•</span>
+        <span>14 PARTNERS</span>
+      </div>
+      <h2 class="showcase-title">Strategic Partners & Guild Allies</h2>
+      <p class="showcase-desc">
+        Collaborating with industry pioneers, national esports associations, leading collegiate institutes, and regional gaming communities.
+      </p>
+    </div>
+
+    <!-- Pinned Split-Screen Showcase Track -->
+    <div class="showcase-pinned-track" id="pinnedTrack">
+      <div class="split-card" id="splitCard" style="--accent-color: #ff4d4d; --bg-color: #080808; --card-glow: rgba(255, 77, 77, 0.2);">
+        <!-- Left: 1:1 Logo Stage -->
+        <div class="stage-wrapper">
+          <div class="stage-box" id="stageBox">
+            <span class="stage-corner tl"></span>
+            <span class="stage-corner tr"></span>
+            <span class="stage-corner bl"></span>
+            <span class="stage-corner br"></span>
+            <img id="stageImg" src="assets/partners-1x1/partner-gdai-1x1.webp" alt="GDAI" class="stage-img">
+          </div>
+        </div>
+
+        <!-- Right: Details -->
+        <div class="details-box" id="detailsBox">
+          <div class="meta-row">
+            <span class="cat-badge" id="catBadge">Game Development Partner</span>
+            <span class="partner-index" id="partnerIndex">01 / 14</span>
+          </div>
+
+          <h3 class="partner-title" id="partnerTitle">GDAI</h3>
+          <div class="partner-fullname" id="partnerFullname">Game Developers Association of India</div>
+          <div class="accent-bar" id="accentBar"></div>
+
+          <p class="partner-desc" id="partnerDesc">
+            National game dev mentorship, developer showcase, and official Game Jam Partner for GameJam X Esports hackathons.
+          </p>
+
+          <div class="nav-bar">
+            <div class="dots-group" id="dotsGroup"></div>
+            <div class="arrows-group">
+              <button class="arrow-btn" id="prevBtn">◀ PREV</button>
+              <button class="arrow-btn" id="nextBtn">NEXT ▶</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spacer">Scroll down to see the end of page</div>
+
+  <script>
+    const partners = [
+      { id: 'gdai', name: 'GDAI', fullName: 'Game Developers Association of India', category: 'Game Development Partner', desc: 'National game dev mentorship, developer showcase, and official Game Jam Partner for GameJam X Esports.', accent: '#ff4d4d', bgColor: '#080808', img: 'assets/partners-1x1/partner-gdai-1x1.webp' },
+      { id: 'decathlon', name: 'Decathlon Kilambakkam', fullName: 'Decathlon Sports India', category: 'Sports Partner', desc: 'Physical sports venue activations, community sporting culture, and active lifestyle crossovers.', accent: '#0284c7', bgColor: '#ffffff', img: 'assets/partners-1x1/partner-decathlon-1x1.webp' },
+      { id: 'playo', name: 'Playo', fullName: 'Playo Sports Platform', category: 'Sports Partner', desc: 'Sports tech collaborations, turf tournament integrations, and active community tournaments.', accent: '#10b981', bgColor: '#000000', img: 'assets/partners-1x1/partner-playo-1x1.webp' },
+      { id: 'srm-easwari', name: 'Easwari Engineering College', fullName: 'Easwari Engineering College (SRM, Ramapuram)', category: 'Event & Academic Partner', desc: 'Autonomous institution partnering for collegiate hackathons, esports events, and youth symposiums.', accent: '#b91c1c', bgColor: '#f7f7f7', img: 'assets/partners-1x1/partner-easwari-1x1.webp' },
+      { id: 'srmist', name: 'SRMIST Ramapuram', fullName: 'SRM Institute of Science and Technology', category: 'Event & Academic Partner', desc: 'Campus host for GameJam X Esports hackathons and intercollegiate gaming tournaments.', accent: '#f59e0b', bgColor: '#000000', img: 'assets/partners-1x1/partner-srmist-1x1.webp' },
+      { id: 'huddle-global', name: 'Huddle Global', fullName: 'Huddle Global (Kerala Startup Mission)', category: 'Tech Summit Partner', desc: 'Premier startup summit partner connecting esports innovation, creators, and gaming entrepreneurship.', accent: '#ef4444', bgColor: '#000000', img: 'assets/partners-1x1/partner-huddle-1x1.webp' },
+      { id: 'vit-ap', name: 'VIT-AP University', fullName: 'Vellore Institute of Technology - AP University', category: 'Academic & Collegiate Partner', desc: 'Collaborating on intercollegiate gaming tournaments and student esports chapter outreach.', accent: '#38bdf8', bgColor: '#000000', img: 'assets/partners-1x1/partner-vit-1x1.webp' },
+      { id: 'crescent', name: 'Crescent Institute', fullName: 'B.S. Abdur Rahman Crescent Institute of Science & Technology', category: 'Academic & Collegiate Partner', desc: 'Collegiate partner for campus esports championships and gaming community events.', accent: '#0284c7', bgColor: '#000000', img: 'assets/partners-1x1/partner-crescent-1x1.webp' },
+      { id: 'chennai-anime-club', name: 'Chennai Anime Club', fullName: 'Chennai Anime Club', category: 'Community & Culture Partner', desc: 'Youth pop-culture, anime watch parties, cosplay fests, and casual gaming crossovers.', accent: '#e11d48', bgColor: '#000000', img: 'assets/partners-1x1/partner-cac-1x1.webp' },
+      { id: 'otaku-nadu', name: 'Otaku Nadu', fullName: 'Otaku Nadu Community', category: 'Community & Culture Partner', desc: 'Regional manga, gaming, and anime community organizing interactive grassroots fan conventions.', accent: '#ec4899', bgColor: '#000000', img: 'assets/partners-1x1/partner-otaku-1x1.webp' },
+      { id: 'game-com', name: 'Game Com', fullName: 'Game Com Community', category: 'Community Partner', desc: 'Gaming community co-organizing esports challenges, tournament brackets, and casual gaming meetups.', accent: '#84cc16', bgColor: '#f4f4f4', img: 'assets/partners-1x1/partner-gamecom-1x1.webp' },
+      { id: 'drushya-dag', name: 'DAG - Drushya', fullName: 'Drushya Animation and Gaming Club', category: 'Animation & Gaming Partner', desc: 'Student animation and game design collective collaborating on digital creative arts and game jams.', accent: '#f97316', bgColor: '#000000', img: 'assets/partners-1x1/partner-dag-1x1.webp' },
+      { id: 'st-lourdes', name: 'St. Lourdes Engineering College', fullName: 'St. Lourdes Engineering College (Chennai)', category: 'Academic Partner', desc: 'Collegiate partner for grassroots campus esports tournaments and student engagement.', accent: '#dc2626', bgColor: '#000000', img: 'assets/partners-1x1/partner-stlourdes-1x1.webp' },
+      { id: 'easwari-incubator', name: 'Easwari Startup Peravai', fullName: 'R Shivakumar Innovation Foundation & Startup Peravai', category: 'Startup & Incubation Partner', desc: 'Section 8 Startup Incubator supporting entrepreneurial innovation and venture building in gaming.', accent: '#3b82f6', bgColor: '#f7f7f7', img: 'assets/partners-1x1/partner-incubator-1x1.webp' }
+    ];
+
+    let currentIndex = 0;
+    const splitCard = document.getElementById('splitCard');
+    const stageBox = document.getElementById('stageBox');
+    const stageImg = document.getElementById('stageImg');
+    const detailsBox = document.getElementById('detailsBox');
+    const catBadge = document.getElementById('catBadge');
+    const partnerIndex = document.getElementById('partnerIndex');
+    const partnerTitle = document.getElementById('partnerTitle');
+    const partnerFullname = document.getElementById('partnerFullname');
+    const partnerDesc = document.getElementById('partnerDesc');
+    const dotsGroup = document.getElementById('dotsGroup');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pinnedTrack = document.getElementById('pinnedTrack');
+
+    // Build dots
+    partners.forEach((p, idx) => {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (idx === 0 ? ' active' : '');
+      dot.title = p.name;
+      dot.onclick = () => renderPartner(idx);
+      dotsGroup.appendChild(dot);
+    });
+
+    function renderPartner(idx) {
+      if (idx === currentIndex) return;
+      currentIndex = idx;
+      const p = partners[idx];
+
+      // Update card styles
+      splitCard.style.setProperty('--accent-color', p.accent);
+      splitCard.style.setProperty('--bg-color', p.bgColor);
+      splitCard.style.setProperty('--card-glow', p.accent + '33');
+
+      // Animate logo with mask reveal
+      stageImg.style.animation = 'none';
+      void stageImg.offsetWidth;
+      stageImg.src = p.img;
+      stageImg.alt = p.name;
+      stageImg.style.animation = 'maskReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+
+      // Animate text slide-in
+      detailsBox.style.animation = 'none';
+      void detailsBox.offsetWidth;
+      catBadge.textContent = p.category;
+      partnerIndex.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(partners.length).padStart(2, '0');
+      partnerTitle.textContent = p.name;
+      partnerFullname.textContent = p.fullName;
+      partnerDesc.textContent = p.desc;
+      detailsBox.style.animation = 'detailSlideIn 0.35s ease forwards';
+
+      // Update active dot
+      Array.from(dotsGroup.children).forEach((d, i) => {
+        d.classList.toggle('active', i === idx);
+      });
+    }
+
+    prevBtn.onclick = () => {
+      const nextIdx = (currentIndex - 1 + partners.length) % partners.length;
+      renderPartner(nextIdx);
+    };
+
+    nextBtn.onclick = () => {
+      const nextIdx = (currentIndex + 1) % partners.length;
+      renderPartner(nextIdx);
+    };
+
+    // Scroll listener on pinned track
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (window.innerWidth > 860) {
+            const rect = pinnedTrack.getBoundingClientRect();
+            const totalScrollable = rect.height - window.innerHeight;
+            if (totalScrollable > 0) {
+              const progress = Math.min(1, Math.max(0, -rect.top / totalScrollable));
+              const targetIdx = Math.min(partners.length - 1, Math.floor(progress * partners.length));
+              if (targetIdx !== currentIndex) {
+                renderPartner(targetIdx);
+              }
+            }
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  </script>
+</body>
+</html>
