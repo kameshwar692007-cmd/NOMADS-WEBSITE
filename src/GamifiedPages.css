@@ -4254,7 +4254,7 @@ body.stitch-scroll-locked {
     transform: none !important;
     transition: none !important;
     will-change: auto !important;
-
+  }
 }
 
 /* ==========================================================================
