@@ -97,7 +97,9 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
         ? [root, ...root.querySelectorAll(selector)]
         : root.querySelectorAll?.(selector) || [];
       for (const element of candidates) {
-        if (element.classList.contains('scroll-reveal')) continue;
+        // Reattach existing hidden elements after pageLoaded triggers an effect rerun.
+        // Previously they retained the class but lost their observer permanently.
+        if (element.classList.contains('revealed')) continue;
         element.classList.add('scroll-reveal');
         observer.observe(element);
       }
