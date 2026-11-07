@@ -45,5 +45,6 @@ test('enhanced headquarters logo is a full resolution PNG used by the campus hea
  assert.equal(png.readUInt32BE(20),234);
  const header=read('src/game/components/Header.jsx');
  assert.ok(header.includes('src="/assets/game/headquarters-banner-hd.png"'));
- assert.ok(!header.includes('src="/assets/game/headquarters-banner.webp"'));
+ assert.ok(header.includes("image.src = '/assets/game/headquarters-banner.webp'"));
+ assert.ok(header.includes('onError={(event) => {'));
 });
