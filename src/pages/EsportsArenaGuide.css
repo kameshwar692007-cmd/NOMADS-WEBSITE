@@ -1,0 +1,70 @@
+/* Esports Arena: rich, accessible field guide and game circuit filters.
+   Isolated to the arena route so existing game pages remain unchanged. */
+.arena-field-guide {
+  padding:clamp(20px,3vw,32px);
+  border:1px solid rgba(255,106,106,.45);
+  background:linear-gradient(125deg,rgba(39,23,42,.98),rgba(16,26,45,.97));
+  box-shadow:inset 4px 0 0 #f97316,0 18px 35px #03071655;
+}
+.arena-guide-heading {max-width:790px}
+.arena-guide-kicker {color:#ffb08b;font-size:11px;font-weight:900;letter-spacing:.15em}
+.arena-guide-heading h2 {font-size:clamp(22px,3.2vw,34px);line-height:1.17;margin:10px 0;color:#fff}
+.arena-guide-heading p {color:#c8d4e6;font-size:15px;line-height:1.65;margin:0}
+.arena-guide-links {display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.arena-guide-links a {
+  color:#f6f8fc;text-decoration:none;font-size:13px;font-weight:800;
+  display:inline-flex;align-items:center;gap:12px;min-height:44px;
+  border:1px solid rgba(181,199,222,.55);border-radius:9px;
+  background:rgba(35,51,75,.7);padding:10px 16px;box-sizing:border-box;
+  transition:border-color .2s,transform .2s,background .2s
+}
+.arena-guide-links a span {color:#ff9d75;font-size:11px;font-weight:900}
+.arena-guide-links a:hover {background:#30425f;border-color:#ff9d75;transform:translateY(-2px)}
+.arena-guide-links a:focus-visible,.arena-game-filter:focus-visible,.arena-next-actions a:focus-visible {
+  outline:3px solid #ffe2a0;outline-offset:3px
+}
+.arena-circuit-anchor {scroll-margin-top:90px}
+#arena-progression {scroll-margin-top:90px}
+.arena-game-filters {
+  display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 10px;
+}
+.arena-game-filter {
+  border:1px solid #506581;color:#c9d6e7;
+  background:rgba(28,41,61,.96);padding:11px 15px;min-height:43px;
+  border-radius:9px;font:inherit;font-size:13px;font-weight:800;
+  cursor:pointer;transition:border-color .2s,background .2s,color .2s
+}
+.arena-game-filter.active {border-color:#ff9a80;background:rgba(124,42,39,.53);color:#fff}
+.arena-game-filter:hover {border-color:#ff9a80;color:#fff}
+.arena-filter-count {font-size:12px;line-height:1.4;color:#aabbcf;margin:0 0 18px}
+.arena-next-step {
+  display:flex;justify-content:space-between;align-items:center;
+  gap:24px;padding:clamp(20px,3vw,32px);
+  background:linear-gradient(110deg,#172940,#1e2339);
+  border:1px solid #546c87
+}
+.arena-next-step>div:first-child {max-width:620px}
+.arena-next-step h3 {font-size:clamp(20px,2.8vw,28px);color:#fff;margin:8px 0}
+.arena-next-step p {font-size:14px;line-height:1.6;color:#c0cfe1;margin:0}
+.arena-next-actions {display:flex;flex-direction:column;gap:10px;min-width:220px}
+.arena-next-actions a {
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  border:1px solid #9dafc9;border-radius:9px;padding:13px 16px;
+  text-decoration:none;color:#fff;font-weight:800;font-size:12px;
+  background:rgba(35,53,78,.93);transition:background .2s,border-color .2s
+}
+.arena-next-actions a:hover {background:#364c6c;border-color:#ff9a80}
+@media(max-width:760px){
+  .arena-next-step {flex-direction:column;align-items:stretch}
+  .arena-next-actions {min-width:0}
+  .arena-game-filters {flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin}
+  .arena-game-filter {flex:0 0 auto}
+}
+@media(max-width:500px) {
+  .arena-guide-links {flex-direction:column}
+  .arena-guide-links a {width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .arena-guide-links a,.arena-game-filter,.arena-next-actions a {transition:none}
+  .arena-guide-links a:hover {transform:none}
+}
