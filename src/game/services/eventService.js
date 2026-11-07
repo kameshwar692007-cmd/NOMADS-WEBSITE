@@ -257,6 +257,17 @@ export const eventService = {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
+          if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+            const simulatedRole = storageGet(ROLES_KEY) || 'SUPER_ADMIN';
+            return {
+              role: simulatedRole,
+              email: 'admin@nomadsprovince.com',
+              isStaff: ['SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(simulatedRole),
+              isAdmin: ['SUPER_ADMIN', 'ADMIN'].includes(simulatedRole),
+              isSuperAdmin: simulatedRole === 'SUPER_ADMIN',
+              isSimulated: true
+            };
+          }
           return { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false };
         }
 
@@ -786,5 +797,91 @@ export const eventService = {
       reader.onerror = (err) => reject(err);
       reader.readAsDataURL(file);
     });
+  },
+
+  /**
+   * Retrieve dynamic site and contact settings (WhatsApp number & email)
+   */
+  async getContactSettings() {
+    const DEFAULT_SETTINGS = {
+      whatsappNumber: '+91 97897 20897',
+      email: 'nomadsprovince@gmail.com',
+      instagram: 'https://www.instagram.com/nomadsprovince?cplk=MWxzbHM3bWNrdXJ3Ng==',
+      location: 'Chennai, India'
+    };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('whatsapp_number, email, instagram, location')
+          .eq('id', 'primary_config')
+          .maybeSingle();
+
+        if (!error && data) {
+          return {
+            whatsappNumber: data.whatsapp_number || DEFAULT_SETTINGS.whatsappNumber,
+            email: data.email || DEFAULT_SETTINGS.email,
+            instagram: data.instagram || DEFAULT_SETTINGS.instagram,
+            location: data.location || DEFAULT_SETTINGS.location
+          };
+        }
+      } catch (err) {
+        console.warn('Supabase site_settings fetch error, falling back to local:', err);
+      }
+    }
+
+    const SETTINGS_KEY = 'nomads_site_settings_v1';
+    const local = storageGet(SETTINGS_KEY);
+    if (local) {
+      try { return JSON.parse(local); } catch (e) {}
+    }
+    return DEFAULT_SETTINGS;
+  },
+
+  /**
+   * Update site contact settings (WhatsApp number & email)
+   */
+  async updateContactSettings(newSettings) {
+    if (!newSettings.whatsappNumber || !newSettings.whatsappNumber.trim()) {
+      throw new Error('WhatsApp mobile number is required.');
+    }
+    if (!newSettings.email || !newSettings.email.trim() || !newSettings.email.includes('@')) {
+      throw new Error('Valid contact email is required.');
+    }
+
+    const payload = {
+      whatsappNumber: newSettings.whatsappNumber.trim(),
+      email: newSettings.email.trim(),
+      instagram: newSettings.instagram ? newSettings.instagram.trim() : 'https://www.instagram.com/nomadsprovince?cplk=MWxzbHM3bWNrdXJ3Ng==',
+      location: newSettings.location ? newSettings.location.trim() : 'Chennai, India'
+    };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .upsert({
+            id: 'primary_config',
+            whatsapp_number: payload.whatsappNumber,
+            email: payload.email,
+            instagram: payload.instagram,
+            location: payload.location
+          })
+          .select()
+          .single();
+
+        if (!error && data) {
+          recordLocalAuditLog('UPDATE', 'site_settings', 'STAFF', payload);
+        }
+      } catch (err) {
+        console.warn('Supabase site_settings update error, saving to local store:', err);
+      }
+    }
+
+    const SETTINGS_KEY = 'nomads_site_settings_v1';
+    storageSet(SETTINGS_KEY, JSON.stringify(payload));
+    recordLocalAuditLog('UPDATE', 'site_settings', 'STAFF', payload);
+    return payload;
   }
 };

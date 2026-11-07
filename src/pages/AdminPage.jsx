@@ -8,6 +8,8 @@ import GameShell from '../game/components/GameShell.jsx';
 import { eventService } from '../game/services/eventService.js';
 import { sound } from '../game/systems/soundFx.js';
 import {
+  IconWhatsApp,
+  IconMail,
   IconCrosshair,
   IconEvents,
   IconCheck,
@@ -31,6 +33,16 @@ export default function AdminPage() {
   });
   const [analyticsData, setAnalyticsData] = useState({});
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [activeAdminTab, setActiveAdminTab] = useState('EVENTS'); // 'EVENTS' | 'CONTACT'
+  const [contactSettings, setContactSettings] = useState({
+    whatsappNumber: '+91 97897 20897',
+    email: 'nomadsprovince@gmail.com',
+    instagram: 'https://www.instagram.com/nomadsprovince?cplk=MWxzbHM3bWNrdXJ3Ng==',
+    location: 'Chennai, India'
+  });
+  const [contactSuccess, setContactSuccess] = useState('');
+  const [contactError, setContactError] = useState('');
+  const [savingContact, setSavingContact] = useState(false);
   
   // Modal states
   const [editorOpen, setEditorOpen] = useState(false);
@@ -304,6 +316,26 @@ export default function AdminPage() {
     setAuditModalOpen(true);
   };
 
+  // Save Contact & Organization Settings
+  const handleSaveContactSettings = async (e) => {
+    e.preventDefault();
+    setContactError('');
+    setContactSuccess('');
+    setSavingContact(true);
+    sound.playSelect();
+    try {
+      await eventService.updateContactSettings(contactSettings);
+      sound.playArrival();
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+      setContactSuccess('Official contact details updated and synchronized successfully!');
+    } catch (err) {
+      sound.playCancel();
+      setContactError(err.message || 'Failed to update contact settings.');
+    } finally {
+      setSavingContact(false);
+    }
+  };
+
   // Poster File Upload
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -389,6 +421,20 @@ export default function AdminPage() {
             >
               {loggingIn ? 'VERIFYING CREDENTIALS...' : 'ACCESS COMMAND CENTER →'}
             </button>
+
+            {(typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) && (
+              <button
+                type="button"
+                className="gamified-btn secondary"
+                style={{ width: '100%', marginTop: '12px', background: '#1e293b', border: '1px solid #475569', color: '#38bdf8', padding: '10px', fontSize: '12px', fontWeight: 'bold' }}
+                onClick={() => {
+                  eventService.setSimulatedRole('SUPER_ADMIN');
+                  loadEventsAndRole();
+                }}
+              >
+                👑 ENTER AS LOCAL SUPER ADMIN (DEV MODE)
+              </button>
+            )}
           </form>
         </section>
       </GameShell>
@@ -489,7 +535,210 @@ export default function AdminPage() {
         </div>
       </section>
 
-      {/* 2. Action Bar & Status Filter */}
+      {/* Primary Admin Section Tabs */}
+      <div className="admin-section-tabs" style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          className="gamified-btn"
+          style={{
+            padding: '12px 24px',
+            fontSize: '13px',
+            fontWeight: 'bold',
+            background: activeAdminTab === 'EVENTS' ? '#e84537' : '#1e293b',
+            color: '#fff',
+            border: activeAdminTab === 'EVENTS' ? '1px solid #ff4d4d' : '1px solid #475569',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer'
+          }}
+          onClick={() => { sound.playSelect(); setActiveAdminTab('EVENTS'); }}
+        >
+          <IconEvents size={18} />
+          <span>🎮 TOURNAMENTS & EVENTS</span>
+        </button>
+
+        <button
+          type="button"
+          className="gamified-btn"
+          style={{
+            padding: '12px 24px',
+            fontSize: '13px',
+            fontWeight: 'bold',
+            background: activeAdminTab === 'CONTACT' ? '#e84537' : '#1e293b',
+            color: '#fff',
+            border: activeAdminTab === 'CONTACT' ? '1px solid #ff4d4d' : '1px solid #475569',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer'
+          }}
+          onClick={() => { sound.playSelect(); setActiveAdminTab('CONTACT'); }}
+        >
+          <IconWhatsApp size={18} />
+          <span>📞 CONTACT & COMMS SETTINGS</span>
+        </button>
+      </div>
+
+      {activeAdminTab === 'CONTACT' && (
+        <section className="gamified-card admin-contact-settings-card" style={{ padding: '32px', marginBottom: '32px' }}>
+          <div className="card-glitch-border" />
+          <div className="terminal-header" style={{ marginBottom: '24px' }}>
+            <span className="terminal-dot red" />
+            <span className="terminal-dot yellow" />
+            <span className="terminal-dot green" />
+            <span className="terminal-title">OFFICIAL CONTACT CHANNELS & COMMS CONFIGURATION</span>
+          </div>
+
+          <div style={{ maxWidth: '780px' }}>
+            <span className="quest-code" style={{ color: '#38bdf8', fontSize: '11px', letterSpacing: '1px', fontWeight: 'bold' }}>
+              DIRECT REACHABILITY CONFIG
+            </span>
+            <h2 style={{ color: '#fff', fontSize: '24px', margin: '8px 0 12px 0' }}>
+              Manage Public WhatsApp & Organization Email
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.6', marginBottom: '28px' }}>
+              Changes made here update the official contact links sitewide (Contact Page, About Page, WhatsApp inquiry dispatch, and partnership buttons).
+            </p>
+
+            {contactSuccess && (
+              <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7', padding: '12px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', marginBottom: '20px' }}>
+                ✓ {contactSuccess}
+              </div>
+            )}
+
+            {contactError && (
+              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#fca5a5', padding: '12px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', marginBottom: '20px' }}>
+                ⚠ {contactError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveContactSettings} style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+              {/* WhatsApp Mobile Number */}
+              <div className="form-group">
+                <label className="retro-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#25D366' }}>
+                  <IconWhatsApp size={16} /> WHATSAPP MOBILE NUMBER
+                </label>
+                <input
+                  type="text"
+                  required
+                  className="retro-input"
+                  style={{ fontSize: '15px', fontWeight: 'bold', letterSpacing: '0.5px' }}
+                  placeholder="+91 97897 20897"
+                  value={contactSettings.whatsappNumber}
+                  onChange={(e) => setContactSettings({ ...contactSettings, whatsappNumber: e.target.value })}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b' }}>
+                    Current active direct number for team coordination & event inquiries.
+                  </span>
+                  <a
+                    href={`https://wa.me/${contactSettings.whatsappNumber.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ fontSize: '12px', color: '#38bdf8', textDecoration: 'none', fontWeight: 'bold' }}
+                  >
+                    Test WhatsApp Link ↗
+                  </a>
+                </div>
+              </div>
+
+              {/* Official Contact Email */}
+              <div className="form-group">
+                <label className="retro-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8' }}>
+                  <IconMail size={16} /> OFFICIAL CONTACT EMAIL
+                </label>
+                <input
+                  type="email"
+                  required
+                  className="retro-input"
+                  style={{ fontSize: '15px', fontWeight: 'bold', letterSpacing: '0.5px' }}
+                  placeholder="nomadsprovince@gmail.com"
+                  value={contactSettings.email}
+                  onChange={(e) => setContactSettings({ ...contactSettings, email: e.target.value })}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b' }}>
+                    Official mailbox for sponsorship decks, college hackathon proposals, and inquiries.
+                  </span>
+                  <a
+                    href={`mailto:${contactSettings.email}`}
+                    style={{ fontSize: '12px', color: '#38bdf8', textDecoration: 'none', fontWeight: 'bold' }}
+                  >
+                    Test Mailto Link ↗
+                  </a>
+                </div>
+              </div>
+
+              {/* Official Instagram Handle / URL */}
+              <div className="form-group">
+                <label className="retro-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e1306c' }}>
+                  INSTAGRAM URL / HANDLE
+                </label>
+                <input
+                  type="text"
+                  className="retro-input"
+                  placeholder="https://www.instagram.com/nomadsprovince"
+                  value={contactSettings.instagram}
+                  onChange={(e) => setContactSettings({ ...contactSettings, instagram: e.target.value })}
+                />
+              </div>
+
+              {/* Base Location */}
+              <div className="form-group">
+                <label className="retro-label">BASE OPERATIONS LOCATION</label>
+                <input
+                  type="text"
+                  className="retro-input"
+                  placeholder="Chennai, India"
+                  value={contactSettings.location}
+                  onChange={(e) => setContactSettings({ ...contactSettings, location: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '14px', marginTop: '10px' }}>
+                <button
+                  type="submit"
+                  disabled={savingContact}
+                  className="gamified-btn"
+                  style={{
+                    background: '#10b981',
+                    color: '#fff',
+                    padding: '14px 28px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    border: '1px solid #059669',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {savingContact ? 'SYNCHRONIZING...' : '💾 SAVE CONTACT SETTINGS'}
+                </button>
+
+                <button
+                  type="button"
+                  className="gamified-btn secondary"
+                  style={{ background: '#1e293b', border: '1px solid #475569', color: '#cbd5e1' }}
+                  onClick={() => {
+                    sound.playBlip();
+                    setContactSettings({
+                      whatsappNumber: '+91 97897 20897',
+                      email: 'nomadsprovince@gmail.com',
+                      instagram: 'https://www.instagram.com/nomadsprovince?cplk=MWxzbHM3bWNrdXJ3Ng==',
+                      location: 'Chennai, India'
+                    });
+                  }}
+                >
+                  RESET TO DEFAULT
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+      )}
+
+      {activeAdminTab === 'EVENTS' && (
+        <>
+          {/* 2. Action Bar & Status Filter */}
       <div className="admin-action-bar">
         <div className="filter-buttons-group">
           {[
@@ -693,6 +942,8 @@ export default function AdminPage() {
           </div>
         )}
       </section>
+        </>
+      )}
 
       {/* 4. Event Creation / Edit Modal */}
       {editorOpen && (
