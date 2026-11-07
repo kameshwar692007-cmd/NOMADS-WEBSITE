@@ -10,7 +10,6 @@ export default function ProvinceSlider({ destinations }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [manualPause, setManualPause] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [pageVisible, setPageVisible] = useState(() => !document.hidden);
 
@@ -30,14 +29,15 @@ export default function ProvinceSlider({ destinations }) {
   }, []);
 
   const count = destinations.length;
-  const paused = hovered || focused || manualPause || reducedMotion || !pageVisible;
+
+  // Always scrolls automatically across destinations
   useEffect(() => {
-    if (paused || count < 2) return;
+    if (!pageVisible || count < 2) return;
     const timer = window.setInterval(() => {
       setActiveIndex(index => (index + 1) % count);
     }, SLIDE_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [paused, count]);
+  }, [pageVisible, count]);
 
   if (!count) return null;
 
@@ -57,7 +57,7 @@ export default function ProvinceSlider({ destinations }) {
       onBlurCapture={event => {
         if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
       }}>
-      <div className="province-slider-viewport" aria-live={paused ? 'polite' : 'off'}>
+      <div className="province-slider-viewport" aria-live="off">
         <article key={destination.id} className="province-slider-card gamified-card"
           aria-roledescription="slide"
           aria-label={`${activeIndex + 1} of ${count}: ${destination.displayName}`}
@@ -100,11 +100,6 @@ export default function ProvinceSlider({ destinations }) {
         <button type="button" className="province-slider-arrow"
           onClick={() => goTo(activeIndex + 1)}
           aria-label="Next destination">→</button>
-        <button type="button" className="province-slider-pause"
-          onClick={() => { sound.playSelect(); setManualPause(value => !value); }}
-          aria-pressed={manualPause} aria-label={manualPause ? 'Resume automatic slides' : 'Pause automatic slides'}>
-          {manualPause ? 'Play' : 'Pause'} <span aria-hidden="true">{manualPause ? '▶' : 'Ⅱ'}</span>
-        </button>
       </div>
     </div>
   );
