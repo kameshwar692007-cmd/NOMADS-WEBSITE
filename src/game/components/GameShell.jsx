@@ -7,6 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { sound } from '../systems/soundFx.js';
 import StitchCursorBuilder from './StitchCursorBuilder.jsx';
 import { LOCATIONS } from '../data/locationData.js';
+import { ORG_INFO } from '../data/campusContent.js';
 import { CAMPUS_NPCS } from '../data/npcDialogues.js';
 import NpcDialogue, { NpcPortrait } from './NpcDialogue.jsx';
 import './CampusContinuity.css';
@@ -414,8 +415,8 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
           </div>
 
           <div className="footer-links">
-            <a href="https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f" target="_blank" rel="noreferrer" onMouseEnter={() => sound.playBlip()}>
-              WhatsApp Channel
+            <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" onMouseEnter={() => sound.playBlip()}>
+              WhatsApp ({ORG_INFO.whatsappNumber || '+91 97897 20897'})
             </a>
             <a href="https://www.instagram.com/nomadsprovince?cplk=MWxzbHM3bWNrdXJ3Ng==" target="_blank" rel="noreferrer" onMouseEnter={() => sound.playBlip()}>
               Instagram (@nomadsprovince)

@@ -237,9 +237,9 @@ export default function ContactPage() {
                 <IconWhatsApp size={20} color="#22c55e" />
               </span>
               <div>
-                <div className="channel-label">Official WhatsApp Channel</div>
+                <div className="channel-label">Official WhatsApp</div>
                 <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="channel-link">
-                  Join WhatsApp Channel →
+                  Chat on WhatsApp ({ORG_INFO.whatsappNumber || '+91 97897 20897'}) →
                 </a>
               </div>
             </div>

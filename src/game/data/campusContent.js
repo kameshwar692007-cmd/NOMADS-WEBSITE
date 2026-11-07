@@ -9,7 +9,8 @@ export const ORG_INFO = {
   email: "nomadsprovince@gmail.com",
   instagram: "https://www.instagram.com/nomadsprovince?cplk=MWxzbHM3bWNrdXJ3Ng==",
   instagramHandle: "@nomadsprovince",
-  whatsapp: "https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f",
+  whatsappNumber: "+91 97897 20897",
+  whatsapp: "https://wa.me/919789720897",
   stats: [
     { label: "Core Pillars", value: "Esports & Game Dev", isText: true },
     { label: "Base Operations", value: "Chennai, India", isText: true },

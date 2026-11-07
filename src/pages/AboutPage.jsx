@@ -4,7 +4,7 @@
 
 import { Link } from 'react-router-dom';
 import GameShell from '../game/components/GameShell.jsx';
-import { PARTNERS, TEAM_STRUCTURE } from '../game/data/campusContent.js';
+import { PARTNERS, TEAM_STRUCTURE, ORG_INFO } from '../game/data/campusContent.js';
 import { LOCATIONS } from '../game/data/locationData.js';
 import { sound } from '../game/systems/soundFx.js';
 import { ThemedIcon, IconTrophy, IconCode, IconZap, IconGraduation, IconSparkles, IconRocket, IconWhatsApp } from '../game/components/Icons.jsx';
@@ -205,7 +205,7 @@ export default function AboutPage() {
           <h4>JOIN THE NOMAD'S PROVINCE TEAM</h4>
           <p>We are always expanding our team with student developers, tournament referees, casters, and collegiate ambassadors.</p>
           <a
-            href="https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f"
+            href={ORG_INFO.whatsapp}
             target="_blank"
             rel="noreferrer"
             className="gamified-btn stitch-target"

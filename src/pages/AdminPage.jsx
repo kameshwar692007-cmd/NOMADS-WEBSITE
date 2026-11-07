@@ -7,6 +7,7 @@ import confetti from 'canvas-confetti';
 import GameShell from '../game/components/GameShell.jsx';
 import { eventService } from '../game/services/eventService.js';
 import { sound } from '../game/systems/soundFx.js';
+import { ORG_INFO } from '../game/data/campusContent.js';
 import {
   IconWhatsApp,
   IconMail,
@@ -171,7 +172,7 @@ export default function AdminPage() {
       startDate: now.toISOString().slice(0, 16),
       endDate: later.toISOString().slice(0, 16),
       registrationDeadline: '',
-      registrationUrl: 'https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f',
+      registrationUrl: ORG_INFO.whatsapp || 'https://wa.me/919789720897',
       partner: "Nomad's Province",
       posterUrl: '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
       description: '',
@@ -1032,7 +1033,7 @@ export default function AdminPage() {
                   <label className="retro-label">EXTERNAL REGISTRATION LINK (Google Form / WhatsApp)</label>
                   <input
                     type="url"
-                    placeholder="https://forms.google.com/... or https://whatsapp.com/channel/..."
+                    placeholder="https://forms.google.com/... or https://wa.me/919789720897"
                     className="retro-input"
                     value={formData.registrationUrl}
                     onChange={(e) => setFormData({ ...formData, registrationUrl: e.target.value })}

@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import GameShell from '../game/components/GameShell.jsx';
+import { ORG_INFO } from '../game/data/campusContent.js';
 import { eventService } from '../game/services/eventService.js';
 import { sound } from '../game/systems/soundFx.js';
 import {
@@ -42,7 +43,7 @@ export default function EventDetailPage() {
     if (event?.id) {
       eventService.trackRegistrationClick(event.id, event.title);
     }
-    const targetUrl = event?.registrationUrl || 'https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f';
+    const targetUrl = event?.registrationUrl || ORG_INFO.whatsapp;
     window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 

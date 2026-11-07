@@ -53,7 +53,7 @@ export default function CommunityPage() {
         <div className="community-links-row">
           <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="gamified-btn comm-btn whatsapp-comm stitch-target" data-stitch-label="Compiling WhatsApp Community CTA..." onMouseEnter={() => sound.playBlip()}>
             <IconWhatsApp size={16} />
-            <span>JOIN WHATSAPP CHANNEL</span>
+            <span>CONNECT ON WHATSAPP</span>
           </a>
           <a href={ORG_INFO.instagram} target="_blank" rel="noreferrer" className="gamified-btn comm-btn insta-comm" onMouseEnter={() => sound.playBlip()}>
             <IconInstagram size={16} />

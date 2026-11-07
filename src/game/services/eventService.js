@@ -185,7 +185,7 @@ function initializeFallbackStore() {
           manualStatus: isConcluded ? 'ENDED' : null,
           isDraft: false,
           posterUrl: ev.image || '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
-          registrationUrl: 'https://whatsapp.com/channel/0029VbCLLDiAjPXQTWkJP00f',
+          registrationUrl: 'https://wa.me/919789720897',
           partner: ev.partner || "Nomad's Province",
           description: ev.desc || '',
           results: {
