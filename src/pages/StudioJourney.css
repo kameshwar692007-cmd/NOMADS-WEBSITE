@@ -26,3 +26,19 @@
 @media(max-width:900px){.studio-pathway-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.studio-pathway-steps{grid-template-columns:1fr}.studio-journey-navigation{flex-direction:column}.studio-journey-navigation a{width:100%}.studio-project-detail div{flex-direction:column;gap:5px}.studio-project-detail strong{text-align:left;max-width:100%}}
 @media(prefers-reduced-motion:reduce){.studio-journey-navigation a,.studio-project-expand{transition:none}}
+
+/* Studio pitch is only a draft until the visitor sends the email. */
+.studio-pitch-draft{padding:22px;border:1px solid #81cce4;border-radius:11px;background:linear-gradient(130deg,#173748,#192b40);color:#f3fbff}
+.studio-pitch-draft h4{font-size:20px;color:#fff;margin:0 0 10px}
+.studio-pitch-draft p{font-size:14px;color:#d0e3ed;line-height:1.6;margin:0}
+.studio-pitch-draft-actions{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+.studio-pitch-draft-actions a,.studio-pitch-draft-actions button{
+ display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;
+ padding:12px 17px;border-radius:9px;font-size:13px;font-weight:900;box-sizing:border-box;
+ cursor:pointer;font-family:inherit
+}
+.studio-pitch-draft-actions a{color:#122f43;background:#b5e7fa;border:1px solid #e0f7ff;text-decoration:none}
+.studio-pitch-draft-actions button{color:#edf9ff;background:#244b61;border:1px solid #8bc8e0}
+.studio-pitch-draft>p a{color:#b8eeff;margin-left:4px;overflow-wrap:anywhere}
+.studio-pitch-draft a:focus-visible,.studio-pitch-draft button:focus-visible{outline:3px solid #ffdfa2;outline-offset:3px}
+@media(max-width:500px){.studio-pitch-draft-actions{flex-direction:column}.studio-pitch-draft-actions a,.studio-pitch-draft-actions button{width:100%}}
