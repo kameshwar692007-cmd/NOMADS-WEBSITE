@@ -3,6 +3,8 @@
 // Progressive blueprint assembly animation on featured studio creations
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './StudioJourney.css';
 import GameShell from '../game/components/GameShell.jsx';
 import BlueprintAssembler from '../game/components/BlueprintAssembler.jsx';
 import { STUDIO_PROJECTS } from '../game/data/campusContent.js';
@@ -11,6 +13,7 @@ import { IconCode, IconZap, IconSparkles, IconGlobe, IconRocket, IconCheck } fro
 
 export default function StudioPage() {
   const [pitchSent, setPitchSent] = useState(false);
+  const [expandedProject, setExpandedProject] = useState(null);
   const [formData, setFormData] = useState({ name: '', role: 'Developer', pitch: '' });
 
   const handlePitchSubmit = (e) => {
@@ -44,8 +47,20 @@ export default function StudioPage() {
         </p>
       </section>
 
+      <section className="studio-journey-intro gamified-card" aria-labelledby="studio-journey-title">
+        <span className="studio-journey-overline">STUDIO FIELD GUIDE / PROJECT ARCHIVE</span>
+        <h2 id="studio-journey-title">From concept to playable worlds</h2>
+        <p>Explore our existing campus experience, creative programs, and developing work.
+          Open each project for its current focus and status — no fictional releases or placeholder download links.</p>
+        <div className="studio-journey-navigation">
+          <a href="#studio-projects" onMouseEnter={() => sound.playBlip()}>Explore projects <span aria-hidden="true">↓</span></a>
+          <a href="#studio-capabilities" onMouseEnter={() => sound.playBlip()}>Studio capabilities <span aria-hidden="true">↓</span></a>
+          <Link to="/events" onMouseEnter={() => sound.playBlip()}>Explore game jams <span aria-hidden="true">→</span></Link>
+        </div>
+      </section>
+
       {/* 2. Featured Projects Blueprint Assembly Showcase */}
-      <div className="section-title-wrap">
+      <div id="studio-projects" className="section-title-wrap studio-anchor">
         <h3 className="section-title">ORIGINAL CREATIONS & STUDIO PORTFOLIO</h3>
         <span className="section-badge" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>BLUEPRINT ASSEMBLY</span>
       </div>
@@ -60,9 +75,8 @@ export default function StudioPage() {
           <div
             key={proj.id}
             className="gamified-card project-card"
-            style={{ '--proj-accent': proj.accent, cursor: 'pointer' }}
+            style={{ '--proj-accent': proj.accent }}
             onMouseEnter={() => sound.playBlip()}
-            onClick={() => sound.playSelect()}
           >
             <div className="project-banner-wrap">
               <img src={proj.image} alt={proj.title} className="project-banner-img" />
@@ -76,13 +90,30 @@ export default function StudioPage() {
               <h4 className="project-title">{proj.title}</h4>
               <div className="project-genre">{proj.genre}</div>
               <p className="project-desc">{proj.desc}</p>
+              <button type="button" className="studio-project-expand"
+                aria-expanded={expandedProject === proj.id}
+                aria-controls={`studio-project-detail-${proj.id}`}
+                onClick={() => { sound.playSelect(); setExpandedProject(expandedProject === proj.id ? null : proj.id); }}>
+                {expandedProject === proj.id ? 'Hide details' : 'View More'}
+                <span aria-hidden="true">{expandedProject === proj.id ? '−' : '+'}</span>
+              </button>
+              {expandedProject === proj.id && (
+                <div id={`studio-project-detail-${proj.id}`} className="studio-project-detail">
+                  <div><span>PROJECT STATUS</span><strong>{proj.status}</strong></div>
+                  <div><span>FORMAT / TOOLS</span><strong>{proj.engine}</strong></div>
+                  <div><span>CREATIVE FOCUS</span><strong>{proj.genre}</strong></div>
+                  {proj.id === 'nomads-headquarters' && (
+                    <Link to="/" onMouseEnter={() => sound.playBlip()}>Explore the playable campus <span aria-hidden="true">→</span></Link>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         ))}
       </BlueprintAssembler>
 
       {/* 3. Studio Capabilities & Pipeline */}
-      <section className="gamified-card tech-tree-card">
+      <section id="studio-capabilities" className="gamified-card tech-tree-card studio-anchor">
         <h3 className="section-title">STUDIO CAPABILITIES & TECH STACK</h3>
         <div className="tech-tree-grid">
           <div className="tech-node" onMouseEnter={() => sound.playBlip()}>
@@ -117,6 +148,21 @@ export default function StudioPage() {
             <div className="node-sub">Mentorship, production support, and industry pathways for aspiring student game developers.</div>
           </div>
         </div>
+      </section>
+
+      <section className="studio-pathway gamified-card" aria-labelledby="studio-pathway-title">
+        <div className="studio-pathway-head">
+          <span className="studio-journey-overline">THE CREATOR'S ROUTE</span>
+          <h3 id="studio-pathway-title">How a game idea takes shape</h3>
+          <p>A practical creative workflow, from an early concept through a working prototype and feedback.</p>
+        </div>
+        <ol className="studio-pathway-steps">
+          <li><span>01</span><strong>Discover</strong><p>Identify the player, core experience, and the problem the game should solve.</p></li>
+          <li><span>02</span><strong>Prototype</strong><p>Test the game loop with simple mechanics, controls, and placeholder visuals.</p></li>
+          <li><span>03</span><strong>Playtest</strong><p>Gather feedback on usability, pacing, and what players find enjoyable.</p></li>
+          <li><span>04</span><strong>Refine</strong><p>Polish the strongest ideas and share progress through the creator community.</p></li>
+        </ol>
+        <p className="studio-pathway-note">These are creative stages, not claims that every listed project has reached a particular milestone.</p>
       </section>
 
       {/* 4. Pitch & Collaborate Terminal */}
