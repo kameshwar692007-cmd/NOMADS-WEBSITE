@@ -3,6 +3,8 @@
 // Delivers enquiries to official WhatsApp / Email at ₹0 cost without exposed keys
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './ContactJourney.css';
 import GameShell from '../game/components/GameShell.jsx';
 import { ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
@@ -23,17 +25,17 @@ const FAQS = [
   },
   {
     q: "Are tournaments streamed live?",
-    a: "Yes, featured tournament brackets and grand finals are broadcast live with match casting, spectator views, and highlight coverage."
+    a: "Some featured brackets and finals may have live streams, commentary, or highlight coverage. Check the current event listing and official channels for confirmed broadcasts."
   },
   {
     q: "How can I apply for the Campus Ambassador Program?",
-    a: "College students can apply directly through our Community Hub page or via WhatsApp. Ambassadors receive official certificates, priority tournament slots, and direct internship opportunities."
+    a: "College students can prepare an application email through the Community Hub. The organizers can confirm eligibility, selection, and any available ambassador benefits."
   }
 ];
 
 export default function ContactPage() {
   const [activeFaq, setActiveFaq] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [draftReady, setDraftReady] = useState(false);
   const [dispatchMethod, setDispatchMethod] = useState('whatsapp'); // 'whatsapp' | 'email'
   const [formData, setFormData] = useState({
     name: '',
@@ -42,24 +44,28 @@ export default function ContactPage() {
     message: ''
   });
 
+  const messageSubject = `[${formData.category}] Enquiry from ${formData.name.trim()}`;
+  const messageBody = [
+    "Nomad's Province enquiry",
+    '',
+    'Sender: ' + formData.name.trim(),
+    'Email: ' + formData.email.trim(),
+    'Category: ' + formData.category,
+    '',
+    'Message:',
+    formData.message.trim()
+  ].join('\n');
+  const emailUrl = `mailto:${ORG_INFO.email}?subject=${encodeURIComponent(messageSubject)}&body=${encodeURIComponent(messageBody)}`;
+  // WhatsApp has no verified direct recipient phone number in the source data.
+  // Share the draft with a recipient the visitor chooses; don't claim it was sent to us.
+  const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageBody)}`;
+
   const handleSubmit = (e) => {
     e.preventDefault();
     sound.playSelect();
-
-    if (dispatchMethod === 'whatsapp') {
-      const text = `*New Nomad's Province Enquiry*%0A%0A*Sender:* ${encodeURIComponent(formData.name)}%0A*Email:* ${encodeURIComponent(formData.email)}%0A*Category:* ${encodeURIComponent(formData.category)}%0A%0A*Message:*%0A${encodeURIComponent(formData.message)}`;
-      const waUrl = `https://api.whatsapp.com/send?text=${text}`;
-      window.open(waUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      const subject = `[${formData.category}] Enquiry from ${formData.name}`;
-      const body = `Sender: ${formData.name}\nEmail: ${formData.email}\nCategory: ${formData.category}\n\nMessage:\n${formData.message}`;
-      const mailtoUrl = `mailto:${ORG_INFO.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailtoUrl;
-    }
-
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
-    setFormData({ name: '', email: '', category: 'Brand Sponsorship', message: '' });
+    // The visitor must explicitly send the message from their email or WhatsApp app.
+    // Preserve their form entries until they confirm or choose to edit.
+    setDraftReady(true);
   };
 
   const toggleFaq = (idx) => {
@@ -73,6 +79,18 @@ export default function ContactPage() {
       subtitle="Partnerships, Sponsorships, Collegiate Fests & General Inquiries"
       accentColor="#c0cbdc"
     >
+      <section className="contact-journey gamified-card" aria-labelledby="contact-journey-title">
+        <span className="contact-journey-eyebrow">CONTACT CENTRE / QUEST BOARD</span>
+        <h2 id="contact-journey-title">Every collaboration starts with a conversation.</h2>
+        <p>Looking to host a tournament, build a game, partner with a community, or ask a question?
+          Choose your destination below, then prepare a message for our team.</p>
+        <nav className="contact-journey-links" aria-label="Explore before contacting">
+          <Link to="/events" onMouseEnter={() => sound.playBlip()}>Plan an event <span aria-hidden="true">→</span></Link>
+          <Link to="/studio" onMouseEnter={() => sound.playBlip()}>Explore game projects <span aria-hidden="true">→</span></Link>
+          <Link to="/community" onMouseEnter={() => sound.playBlip()}>Join the community <span aria-hidden="true">→</span></Link>
+        </nav>
+      </section>
+
       <div className="contact-main-grid">
         {/* Left Column: Interactive Dispatch Terminal */}
         <div className="gamified-card contact-form-card stitch-target" data-stitch-label="Constructing Inquiry Terminal...">
@@ -88,10 +106,35 @@ export default function ContactPage() {
             Connect with our core team for esports tournaments, game development collaborations, collegiate fest partnerships, or brand sponsorships.
           </p>
 
-          {submitted ? (
-            <div className="pitch-success-msg" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>
-              <span className="success-icon"><IconCheck size={18} /></span>
-              <div>INQUIRY TRANSMITTED: Opening your message channel to connect with Nomad's Province leadership!</div>
+          {draftReady ? (
+            <div className="contact-draft-card" role="status">
+              <h4>Your message draft is ready</h4>
+              <p>It has <strong>not been sent</strong>. Review your details and open your chosen app
+                to send the message yourself.</p>
+              <div className="contact-draft-details">
+                <div><span>Contact</span><strong>{formData.name} · {formData.email}</strong></div>
+                <div><span>Category</span><strong>{formData.category}</strong></div>
+                <div><span>Message</span><p>{formData.message}</p></div>
+              </div>
+              <div className="contact-draft-actions">
+                {dispatchMethod === 'email' ? (
+                  <a href={emailUrl} className="contact-draft-send"
+                    onClick={() => sound.playSelect()}>Open email draft <span aria-hidden="true">↗</span></a>
+                ) : (
+                  <a href={whatsappShareUrl} target="_blank" rel="noopener noreferrer"
+                    className="contact-draft-send" onClick={() => sound.playSelect()}>
+                    Share using WhatsApp <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+                <button type="button" onClick={() => { sound.playSelect(); setDraftReady(false); }}>Edit message</button>
+              </div>
+              {dispatchMethod === 'whatsapp' && <p className="contact-draft-note">
+                WhatsApp opens a share composer. Choose the recipient yourself; this does not send
+                a direct message to Nomad's Province. For a direct enquiry, use email instead.
+              </p>}
+              <p className="contact-draft-note">Official direct email:
+                <a href={`mailto:${ORG_INFO.email}`}>{ORG_INFO.email}</a>
+              </p>
             </div>
           ) : (
             <form className="contact-form" onSubmit={handleSubmit}>
@@ -150,10 +193,11 @@ export default function ContactPage() {
               {/* Delivery Channel Selector */}
               <div className="form-group" style={{ marginBottom: '16px' }}>
                 <label className="retro-label">DISPATCH CHANNEL</label>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div className="contact-channel-selector" role="group" aria-label="Choose message channel">
                   <button
                     type="button"
                     className={`filter-btn ${dispatchMethod === 'whatsapp' ? 'active' : ''}`}
+                    aria-pressed={dispatchMethod === 'whatsapp'}
                     onClick={() => { sound.playSelect(); setDispatchMethod('whatsapp'); }}
                     style={{ flex: 1, padding: '8px 12px', fontSize: '12px' }}
                   >
@@ -162,6 +206,7 @@ export default function ContactPage() {
                   <button
                     type="button"
                     className={`filter-btn ${dispatchMethod === 'email' ? 'active' : ''}`}
+                    aria-pressed={dispatchMethod === 'email'}
                     onClick={() => { sound.playSelect(); setDispatchMethod('email'); }}
                     style={{ flex: 1, padding: '8px 12px', fontSize: '12px' }}
                   >
@@ -172,8 +217,12 @@ export default function ContactPage() {
 
               <button type="submit" className="gamified-btn submit-dispatch-btn stitch-target" data-stitch-label="Compiling Dispatch Button..." onMouseEnter={() => sound.playBlip()}>
                 <IconRocket size={16} />
-                <span>{dispatchMethod === 'whatsapp' ? 'TRANSMIT VIA WHATSAPP →' : 'TRANSMIT VIA EMAIL →'}</span>
+                <span>{dispatchMethod === 'whatsapp' ? 'PREPARE WHATSAPP SHARE →' : 'PREPARE EMAIL DRAFT →'}</span>
               </button>
+              <p className="contact-form-disclosure">
+                This website prepares a message; it does not automatically send or store your enquiry.
+                Email can be addressed directly to the team. WhatsApp sharing requires you to choose a recipient.
+              </p>
             </form>
           )}
         </div>
@@ -236,12 +285,13 @@ export default function ContactPage() {
             <div className="faq-list">
               {FAQS.map((faq, idx) => (
                 <div key={idx} className={`faq-item ${activeFaq === idx ? 'expanded' : ''}`}>
-                  <button className="faq-question-btn" onClick={() => toggleFaq(idx)}>
+                  <button type="button" className="faq-question-btn" onClick={() => toggleFaq(idx)}
+                    aria-expanded={activeFaq === idx} aria-controls={`contact-faq-answer-${idx}`}>
                     <span>{faq.q}</span>
                     <span className="faq-arrow">{activeFaq === idx ? '▲' : '▼'}</span>
                   </button>
                   {activeFaq === idx && (
-                    <div className="faq-answer-pane fade-in">
+                    <div id={`contact-faq-answer-${idx}`} className="faq-answer-pane fade-in">
                       {faq.a}
                     </div>
                   )}
