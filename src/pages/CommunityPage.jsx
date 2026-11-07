@@ -190,7 +190,7 @@ export default function CommunityPage() {
         <p>Joining and any ambassador benefits depend on confirmation from the organizers.</p>
       </section>
 
-      {/* 4. Pop-Culture Guild Alliances */
+      {/* 4. Pop-Culture Guild Alliances */}
       <section id="community-allies" className="gamified-card culture-card">
         <h3 className="section-title">COMMUNITY & POP-CULTURE ALLIANCES</h3>
         <p className="culture-desc">
