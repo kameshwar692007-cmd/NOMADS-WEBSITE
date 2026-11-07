@@ -19,10 +19,12 @@ test('shared destination bridge uses the existing campus data and preserves navi
   const shell = read('src/game/components/GameShell.jsx');
   const style = read('src/game/components/CampusContinuity.css');
   assert.match(shell, /LOCATIONS\.find\(\(item\) => item\.route === location\.pathname\)/);
-  assert.match(shell, /className="campus-chapter-bridge"/);
+  assert.match(shell, /className="campus-chapter-bridge gamified-card"/);
   assert.match(shell, /campusLocation\.displayName/);
   assert.match(shell, /campusLocation\.description/);
-  assert.match(shell, /campusLocation\.badgeAsset/);
+  assert.match(shell, /chapterNpc\.portraitIndex/);
+  assert.match(shell, /campus-chapter-character/);
+  assert.match(shell, /talkToNpc\(chapterNpc, true\)/);
   assert.match(shell, /onClick=\{handleReturnToCampus\}/);
   assert.match(shell, /onClick=\{\(\) => handleNav\(dest\.path\)\}/);
   assert.match(shell, /<main className="shell-main-content">/);
