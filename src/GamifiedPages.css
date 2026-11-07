@@ -4670,3 +4670,26 @@ body.stitch-scroll-locked {
     max-width: 220px;
   }
 }
+
+
+/* Consistent content breathing room across inner pages, without changing campus gameplay. */
+.gamified-shell .shell-main-content > .gamified-card {
+  padding: clamp(24px, 3vw, 36px);
+}
+.gamified-shell .shell-main-content > :is(section, article, aside) + :is(section, article, aside) {
+  margin-top: max(32px, 3vw);
+}
+.gamified-shell .shell-main-content :is(.section-narrative-header, .province-explore-intro) > h2 {
+  line-height: 1.3;
+}
+.gamified-shell .shell-main-content :is(.section-narrative-header, .province-explore-intro) > p {
+  line-height: 1.7;
+}
+.gamified-shell .shell-main-content :is(.section-narrative-header, .province-explore-intro) > :is(h2, h3) + p {
+  margin-top: 12px;
+}
+@media (max-width: 768px) {
+  .gamified-shell .shell-main-content > :is(section, article, aside) + :is(section, article, aside) {
+    margin-top: 28px;
+  }
+}
