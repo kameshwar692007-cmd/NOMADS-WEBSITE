@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { sound } from '../systems/soundFx.js';
 import StitchCursorBuilder from './StitchCursorBuilder.jsx';
+import { LOCATIONS } from '../data/locationData.js';
+import './CampusContinuity.css';
 import {
   IconHQ,
   IconEsports,
@@ -31,6 +33,8 @@ const DESTINATIONS = [
 export default function GameShell({ title, subtitle, accentColor = '#e84537', children }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const campusLocation = LOCATIONS.find((item) => item.route === location.pathname);
+  const chapterNumber = campusLocation ? String(LOCATIONS.indexOf(campusLocation) + 1).padStart(2, '0') : null;
   const [muted, setMuted] = useState(() => sound.isMuted());
 
   // Keep muted state synchronized across route transitions
@@ -285,6 +289,25 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
           {subtitle && <p className="hero-subtitle">{subtitle}</p>}
         </div>
       </div>
+
+      {/* One location in the same campus world; the game remains the primary map. */}
+      {campusLocation && (
+        <section className="campus-chapter-bridge" aria-label="Campus destination">
+          <div className="campus-chapter-marker">
+            <img src={campusLocation.badgeAsset} alt="" loading="eager" />
+          </div>
+          <div className="campus-chapter-copy">
+            <span className="campus-chapter-eyebrow">NOMAD'S PROVINCE / DESTINATION {chapterNumber}</span>
+            <h2>{campusLocation.displayName}</h2>
+            <p>{campusLocation.description}</p>
+            <span className="campus-chapter-quest">YOUR NEXT STOP: {campusLocation.tagline}</span>
+          </div>
+          <button type="button" className="campus-chapter-map-link"
+            onClick={handleReturnToCampus} onMouseEnter={() => sound.playBlip()}>
+            <span aria-hidden="true">⌖</span> BACK TO CAMPUS MAP
+          </button>
+        </section>
+      )}
 
       {/* 4. Page Inner Body */}
       <main className="shell-main-content">
