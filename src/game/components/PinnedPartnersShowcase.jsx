@@ -234,7 +234,7 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS }) {
                   src={activePartner?.image1x1 || activePartner?.image}
                   alt={activePartner?.name}
                   className={`stage-img ${isReducedMotion ? 'reduced-motion' : ''}`}
-                  loading="eager"
+                  loading="eager" decoding="async"
                 />
               </div>
             </div>
@@ -313,7 +313,7 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS }) {
                         alt=""
                         aria-hidden="true"
                         className="tile-thumb-img"
-                        loading="lazy"
+                        loading="lazy" decoding="async"
                       />
                     </div>
                     <div className="tile-info">

@@ -4300,6 +4300,8 @@ body.stitch-scroll-locked {
 
 /* Pinned Partners Showcase Container — Stable Alliance Citadel Box */
 .pinned-partners-showcase-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
   margin-top: clamp(40px, 5vw, 64px);
   margin-bottom: clamp(40px, 5vw, 64px);
   position: relative;

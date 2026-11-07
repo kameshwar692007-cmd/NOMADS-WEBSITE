@@ -35,7 +35,7 @@ export function createCleanCampus(campus,cleanTiles){
 }
 export async function loadAllAssets(){
  const [campus,hero,headerLeft,headerRight,foregroundMask,npcSprites,cleanTiles]=await Promise.all([
-  loadImage('/assets/game/campus-world.png'),
+  loadImage('/assets/game/campus-world.webp').catch(() => loadImage('/assets/game/campus-world.png')),
   loadImage('/assets/game/characters/player/nomad-goggles-v4.png'),
   loadImage('/assets/game/header-clean-left.webp'),
   loadImage('/assets/game/header-clean-right.webp'),
