@@ -2,6 +2,9 @@
 // Clean, verified information aligned with official organization profile & partner network
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { LOCATIONS } from '../game/data/locationData.js';
+import './AboutExplore.css';
 import GameShell from '../game/components/GameShell.jsx';
 import { ORG_INFO, PARTNERS, TEAM_STRUCTURE } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
@@ -246,6 +249,40 @@ export default function AboutPage() {
           </div>
         </div>
       )}
+
+      {/* Each destination is still part of the same campus world. */}
+      <section className="province-explore-section" aria-labelledby="province-explore-title">
+        <div className="province-explore-intro">
+          <span className="quest-code">YOUR ADVENTURE CONTINUES</span>
+          <h2 id="province-explore-title">Explore the Province</h2>
+          <p>
+            Headquarters is the starting point. Step inside the other campus destinations to
+            discover our competitions, games, events, community, and collaboration opportunities.
+          </p>
+        </div>
+        <div className="province-explore-grid">
+          {LOCATIONS.filter((destination) => destination.route !== '/about').map((destination) => (
+            <article key={destination.id} className="province-explore-card gamified-card">
+              <div className="province-explore-symbol" style={{ '--province-accent': destination.accentColor }}>
+                <img src={destination.badgeAsset} alt="" loading="lazy" />
+              </div>
+              <div className="province-explore-copy">
+                <span className="province-explore-eyebrow">{destination.tagline}</span>
+                <h3>{destination.displayName}</h3>
+                <p>{destination.description}</p>
+                <Link to={destination.route} className="province-explore-more"
+                  onMouseEnter={() => sound.playBlip()}
+                  aria-label={'View more about ' + destination.displayName}>
+                  View More <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+        <p className="province-explore-map-note">
+          Prefer exploring on foot? <Link to="/" onMouseEnter={() => sound.playBlip()}>Return to the campus map</Link>.
+        </p>
+      </section>
     </GameShell>
   );
 }
