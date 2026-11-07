@@ -8,6 +8,7 @@ import { sound } from '../systems/soundFx.js';
 import StitchCursorBuilder from './StitchCursorBuilder.jsx';
 import { LOCATIONS } from '../data/locationData.js';
 import './CampusContinuity.css';
+import './DestinationDiscovery.css';
 import {
   IconHQ,
   IconEsports,
