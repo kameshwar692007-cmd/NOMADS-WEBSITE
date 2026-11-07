@@ -18,7 +18,7 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpO
     <header className="campus-fixed-header" aria-label="Nomad's Province navigation">
       <a className="campus-fixed-brand" href="/" aria-label="Nomad's Province — Home" onMouseEnter={() => sound.playBlip()}>
         <img
-          src="/assets/game/headquarters-banner-hd.svg"
+          src="/assets/game/headquarters-banner-client.png"
           onError={(event) => {
             // Fall back to the previously verified asset if the HD image is missing or corrupt.
             const image = event.currentTarget;
@@ -27,8 +27,8 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpO
             }
           }}
           alt="Nomad's Province Headquarters"
-          width="900"
-          height="260"
+          width="600"
+          height="212"
           draggable="false"
         />
       </a>
