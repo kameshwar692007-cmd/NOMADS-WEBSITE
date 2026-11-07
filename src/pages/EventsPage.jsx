@@ -3,6 +3,7 @@
 // Dynamic status filtering, auto-archiving, winner podiums & dedicated detail modal
 
 import { useState, useEffect } from 'react';
+import './EventGroundsGuide.css';
 import { Link } from 'react-router-dom';
 import GameShell from '../game/components/GameShell.jsx';
 import { eventService } from '../game/services/eventService.js';
@@ -14,6 +15,8 @@ export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');
+  const [category, setCategory] = useState('ALL');
+  const [search, setSearch] = useState('');
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   // Load public events (excludes drafts)
@@ -33,11 +36,13 @@ export default function EventsPage() {
     loadEvents();
   }, []);
 
+  const categories = [...new Set(events.map(ev => ev.category).filter(Boolean))].sort();
   const filteredEvents = events.filter((ev) => {
-    if (filter === 'ALL') return true;
-    if (filter === 'ONGOING') return ev.computedStatus === 'ONGOING';
-    if (filter === 'UPCOMING') return ev.computedStatus === 'UPCOMING';
-    if (filter === 'ENDED') return ev.computedStatus === 'ENDED';
+    if (filter !== 'ALL' && ev.computedStatus !== filter) return false;
+    if (category !== 'ALL' && ev.category !== category) return false;
+    const query = search.trim().toLocaleLowerCase();
+    if (query && ![ev.title, ev.description, ev.venue, ev.partner, ev.category]
+      .some(field => String(field || '').toLocaleLowerCase().includes(query))) return false;
     return true;
   });
 
@@ -52,6 +57,19 @@ export default function EventsPage() {
       subtitle="Collegiate LANs, Game Jams, Summits & Sports Festivals"
       accentColor="#fdbe53"
     >
+      <section className="events-field-guide gamified-card" aria-labelledby="event-guide-title">
+        <span className="events-field-kicker">EVENT GROUNDS / EXPLORER'S GUIDE</span>
+        <h2 id="event-guide-title">Your next adventure starts with an event</h2>
+        <p>Explore actual event announcements, check schedules, and open the details of competitions,
+          creative jams, and community experiences. Filters use the published event list, so results
+          reflect the latest entries available to visitors.</p>
+        <div className="events-guide-links">
+          <a href="#event-listings" onMouseEnter={() => sound.playBlip()}>Browse event listings <span aria-hidden="true">↓</span></a>
+          <Link to="/esports" onMouseEnter={() => sound.playBlip()}>Explore Esports Arena <span aria-hidden="true">→</span></Link>
+          <Link to="/studio" onMouseEnter={() => sound.playBlip()}>Discover Game Studio <span aria-hidden="true">→</span></Link>
+        </div>
+      </section>
+
       {/* 1. Event Grounds Festival Hero */}
       <section className="gamified-card events-hero-card stitch-target" data-stitch-label="Synthesizing Event Grounds Festival Hub...">
         <div className="events-partner-strip">
@@ -74,6 +92,7 @@ export default function EventsPage() {
             <button
               key={cat.id}
               className={`filter-btn ${filter === cat.id ? 'active' : ''}`}
+              aria-pressed={filter === cat.id}
               onClick={() => { sound.playSelect(); setFilter(cat.id); }}
               onMouseEnter={() => sound.playBlip()}
             >
@@ -81,6 +100,25 @@ export default function EventsPage() {
             </button>
           ))}
         </div>
+      </section>
+
+      <section id="event-listings" className="events-search-panel" aria-label="Explore event listings">
+        <div className="events-search-input-wrap">
+          <label htmlFor="events-search">Find an event</label>
+          <input id="events-search" type="search" value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by event, venue, or organizer..." />
+        </div>
+        <div className="events-category-select-wrap">
+          <label htmlFor="events-category">Event category</label>
+          <select id="events-category" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="ALL">All categories</option>
+            {categories.map(item => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </div>
+        <p className="events-filter-summary" role="status" aria-live="polite">
+          {loading ? 'Loading published events…' : `Showing ${filteredEvents.length} of ${events.length} published events`}
+        </p>
       </section>
 
       {/* 2. Events Grid */}
@@ -92,7 +130,13 @@ export default function EventsPage() {
       ) : filteredEvents.length === 0 ? (
         <div className="events-empty-pane">
           <IconEvents size={40} color="#64748b" />
-          <p>No events found for this filter category.</p>
+          <p>No published events match the selected filters.</p>
+          {(filter !== 'ALL' || category !== 'ALL' || search.trim()) && (
+            <button type="button" className="events-clear-filters"
+              onClick={() => { setFilter('ALL'); setCategory('ALL'); setSearch(''); sound.playSelect(); }}>
+              Clear filters
+            </button>
+          )}
         </div>
       ) : (
         <div className="events-grid">
@@ -262,6 +306,18 @@ export default function EventsPage() {
           </div>
         </div>
       )}
+
+      <section className="events-visitor-notes gamified-card" aria-labelledby="events-visitor-title">
+        <span className="events-field-kicker">BEFORE YOU JOIN</span>
+        <h3 id="events-visitor-title">Plan your visit to Event Grounds</h3>
+        <ol>
+          <li><strong>Find your event.</strong> Browse by status, category, or title above.</li>
+          <li><strong>Read the details.</strong> Check the published venue, schedule, and organizer information.</li>
+          <li><strong>Use official links.</strong> If registration is available, follow the event's listed registration link.</li>
+        </ol>
+        <p>Dates, availability and registration instructions are provided by individual event listings.
+          Confirm the latest announcements before making travel plans.</p>
+      </section>
 
       {/* 4. Host an Event CTA */}
       <section className="gamified-card host-event-card">
