@@ -36,3 +36,14 @@ test('all header controls are fixed and accessible',()=>{
  assert.match(css,/\.campus-fixed-header\s*\{[^}]*z-index:60/s);
  assert.ok(!page.includes('isMobile && <Header'),'header must exist at every viewport size');
 });
+
+test('enhanced headquarters logo is a full resolution PNG used by the campus header',()=>{
+ const path='public/assets/game/headquarters-banner-hd.png';
+ const png=readFileSync(new URL('../'+path,import.meta.url));
+ assert.equal(png.toString('hex',0,8),'89504e470d0a1a0a');
+ assert.equal(png.readUInt32BE(16),720);
+ assert.equal(png.readUInt32BE(20),234);
+ const header=read('src/game/components/Header.jsx');
+ assert.ok(header.includes('src="/assets/game/headquarters-banner-hd.png"'));
+ assert.ok(!header.includes('src="/assets/game/headquarters-banner.webp"'));
+});
