@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260" role="img" aria-label="Nomad's Province Headquarters">
+  <defs>
+    <linearGradient id="navy" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1d345b"/><stop offset="1" stop-color="#09152e"/></linearGradient>
+    <linearGradient id="ice" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#aecbeb"/></linearGradient>
+  </defs>
+  <path d="M32 12H217L236 30H858L886 58V207L858 235H236L217 250H32L11 227V36Z" fill="#07132d" stroke="#08102c" stroke-width="10"/>
+  <path d="M35 22H214L236 41H856L875 61V203L856 224H236L214 239H35L21 220V43Z" fill="url(#navy)" stroke="url(#ice)" stroke-width="10"/>
+  <path d="M35 29H209L231 51H851L865 67V197L851 215H230L209 230H36L30 216V47Z" fill="none" stroke="#59739a" stroke-width="3"/>
+  <path d="M223 30V227" stroke="#e3f1ff" stroke-width="9"/>
+  <path d="M228 41V215" stroke="#314b70" stroke-width="3"/>
+  <path d="M58 67L88 103V183L109 198V126L156 174L178 157L58 67Z" fill="#f8faff"/>
+  <path d="M102 73H183L200 97L165 132L149 116L172 92H127L102 73Z" fill="#f8faff"/>
+  <path d="M118 105L141 122L156 173L137 183L118 105Z" fill="#f8faff"/>
+  <path d="M88 183L107 196V128L92 115Z" fill="#b3c1dc"/>
+  <text x="268" y="131" font-family="Impact,Arial Black,DejaVu Sans,sans-serif" font-weight="900" font-size="55" fill="#f9fbff" textLength="582" lengthAdjust="spacingAndGlyphs">NOMAD’S PROVINCE</text>
+  <path d="M272 155H520" stroke="#fa295d" stroke-width="9" stroke-linecap="square"/>
+  <path d="M618 155H850" stroke="#fa295d" stroke-width="9" stroke-linecap="square"/>
+  <path d="M570 139L586 155L570 171L554 155Z" fill="#f9fcff" stroke="#97c7f1" stroke-width="4"/>
+  <path d="M570 146L578 155L570 164L561 155Z" fill="#aad5ff"/>
+  <text x="336" y="207" font-family="Arial,DejaVu Sans,sans-serif" font-weight="900" font-size="36" fill="#7fceff" textLength="473" lengthAdjust="spacingAndGlyphs">HEADQUARTERS</text>
+</svg>
