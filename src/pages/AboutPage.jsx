@@ -9,6 +9,7 @@ import { LOCATIONS } from '../game/data/locationData.js';
 import { sound } from '../game/systems/soundFx.js';
 import { ThemedIcon, IconTrophy, IconCode, IconZap, IconGraduation, IconSparkles, IconRocket, IconWhatsApp } from '../game/components/Icons.jsx';
 import PinnedPartnersShowcase from '../game/components/PinnedPartnersShowcase.jsx';
+import ProvinceSlider from './ProvinceSlider.jsx';
 import './AboutExplore.css';
 
 export default function AboutPage() {
@@ -220,7 +221,7 @@ export default function AboutPage() {
       <PinnedPartnersShowcase partners={PARTNERS} />
 
       {/* 5. Connected Province Exploration */}
-      <section className="province-explore-section" aria-labelledby="province-explore-title" style={{ marginTop: '48px' }}>
+      <section className="province-explore-section" aria-labelledby="province-explore-title">
         <div className="province-explore-intro">
           <span className="quest-code">YOUR ADVENTURE CONTINUES</span>
           <h2 id="province-explore-title">Explore the Province</h2>
@@ -229,25 +230,7 @@ export default function AboutPage() {
             discover our competitions, games, events, community, and collaboration opportunities.
           </p>
         </div>
-        <div className="province-explore-grid">
-          {LOCATIONS.filter((destination) => destination.route !== '/about').map((destination) => (
-            <article key={destination.id} className="province-explore-card gamified-card">
-              <div className="province-explore-symbol" style={{ '--province-accent': destination.accentColor }}>
-                <img src={destination.badgeAsset} alt="" loading="lazy" />
-              </div>
-              <div className="province-explore-copy">
-                <span className="province-explore-eyebrow">{destination.tagline}</span>
-                <h3>{destination.displayName}</h3>
-                <p>{destination.description}</p>
-                <Link to={destination.route} className="province-explore-more"
-                  onMouseEnter={() => sound.playBlip()}
-                  aria-label={'View more about ' + destination.displayName}>
-                  View More <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+        <ProvinceSlider destinations={LOCATIONS.filter(destination => destination.route !== '/about')} />
         <p className="province-explore-map-note">
           Prefer exploring on foot? <Link to="/" onMouseEnter={() => sound.playBlip()}>Return to the campus map</Link>.
         </p>
