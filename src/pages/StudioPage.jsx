@@ -7,22 +7,32 @@ import { Link } from 'react-router-dom';
 import './StudioJourney.css';
 import GameShell from '../game/components/GameShell.jsx';
 import BlueprintAssembler from '../game/components/BlueprintAssembler.jsx';
-import { STUDIO_PROJECTS } from '../game/data/campusContent.js';
+import { STUDIO_PROJECTS, ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
-import { IconCode, IconZap, IconSparkles, IconGlobe, IconRocket, IconCheck } from '../game/components/Icons.jsx';
+import { IconCode, IconZap, IconSparkles, IconGlobe, IconRocket } from '../game/components/Icons.jsx';
 
 export default function StudioPage() {
-  const [pitchSent, setPitchSent] = useState(false);
+  const [pitchDraftReady, setPitchDraftReady] = useState(false);
   const [expandedProject, setExpandedProject] = useState(null);
   const [formData, setFormData] = useState({ name: '', role: 'Developer', pitch: '' });
 
   const handlePitchSubmit = (e) => {
     e.preventDefault();
-    sound.playArrival();
-    setPitchSent(true);
-    setTimeout(() => setPitchSent(false), 4000);
-    setFormData({ name: '', role: 'Developer', pitch: '' });
+    sound.playSelect();
+    // No backend receives this form. The visitor must send the email draft.
+    setPitchDraftReady(true);
   };
+
+  const pitchBody = [
+    "Nomad's Province Game Studio — Project Pitch",
+    '',
+    'Creator / Team: ' + formData.name.trim(),
+    'Primary role: ' + formData.role,
+    '',
+    'Project brief:',
+    formData.pitch.trim(),
+  ].join('\n');
+  const pitchMailto = `mailto:${ORG_INFO.email}?subject=${encodeURIComponent('Studio Project Pitch — ' + formData.name.trim())}&body=${encodeURIComponent(pitchBody)}`;
 
   return (
     <GameShell
@@ -180,10 +190,21 @@ export default function StudioPage() {
           Pitch your project to gain development mentorship, showcase opportunities at GameJam X, and technical collaboration.
         </p>
 
-        {pitchSent ? (
-          <div className="pitch-success-msg">
-            <span className="success-icon"><IconCheck size={18} /></span>
-            <div>TRANSMISSION LOGGED: Our studio leads will review your concept and reach out via official channels!</div>
+        {pitchDraftReady ? (
+          <div className="studio-pitch-draft" role="status">
+            <h4>Your project pitch is ready for review</h4>
+            <p>Nothing has been submitted yet. Open the prepared email in your mail app,
+              check the details, and press Send to contact Nomad's Province.</p>
+            <div className="studio-pitch-draft-actions">
+              <a href={pitchMailto} onClick={() => sound.playSelect()}>
+                Open pitch email <span aria-hidden="true">↗</span>
+              </a>
+              <button type="button" onClick={() => { sound.playSelect(); setPitchDraftReady(false); }}>
+                Edit pitch
+              </button>
+            </div>
+            <p>If your mail app doesn't open, send your pitch to
+              <a href={`mailto:${ORG_INFO.email}`}>{ORG_INFO.email}</a>.</p>
           </div>
         ) : (
           <form className="pitch-form" onSubmit={handlePitchSubmit}>
@@ -238,7 +259,7 @@ export default function StudioPage() {
               onMouseEnter={() => sound.playBlip()}
             >
               <IconRocket size={16} />
-              <span>TRANSMIT STUDIO PITCH</span>
+              <span>PREPARE STUDIO PITCH EMAIL</span>
             </button>
           </form>
         )}
