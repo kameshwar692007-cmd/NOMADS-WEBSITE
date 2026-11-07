@@ -1,0 +1,96 @@
+/* Campus-to-page continuity: uses the existing canonical location metadata. */
+.campus-chapter-bridge {
+  position: relative;
+  z-index: 10;
+  width: min(1120px, calc(100% - 48px));
+  margin: 24px auto 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 84px minmax(0,1fr) auto;
+  align-items: center;
+  gap: clamp(16px, 2.5vw, 30px);
+  padding: 20px clamp(18px, 3vw, 32px);
+  background: linear-gradient(120deg, rgba(19,34,56,.96), rgba(10,18,34,.96));
+  border: 1px solid color-mix(in srgb, var(--accent-color) 65%, #7b91b4);
+  border-radius: 14px;
+  box-shadow: 0 18px 48px #02061055, inset 4px 0 0 var(--accent-color);
+  color: #eef5ff;
+}
+.campus-chapter-marker {
+  width: 84px;
+  height: 84px;
+  background: radial-gradient(circle, #233d5d, #101b30);
+  border: 1px solid #7992b3;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+}
+.campus-chapter-marker img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.campus-chapter-copy { min-width: 0; }
+.campus-chapter-eyebrow {
+  color: var(--accent-color);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+.campus-chapter-copy h2 {
+  font-size: clamp(19px, 2.3vw, 26px);
+  line-height: 1.2;
+  margin: 6px 0 8px;
+  color: #fff;
+}
+.campus-chapter-copy p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #c5d4e9;
+  margin: 0 0 10px;
+}
+.campus-chapter-quest {
+  font-size: 11px;
+  font-weight: 800;
+  color: #a9c4df;
+  letter-spacing: .08em;
+}
+.campus-chapter-map-link {
+  justify-self: end;
+  cursor: pointer;
+  background: #182942;
+  color: #edf4ff;
+  border: 1px solid #879bb5;
+  border-radius: 9px;
+  padding: 13px 15px;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: .03em;
+  transition: border-color .2s, background .2s, transform .2s;
+}
+.campus-chapter-map-link:hover {
+  border-color: var(--accent-color);
+  background: #263b58;
+  transform: translateY(-2px);
+}
+.campus-chapter-map-link:focus-visible {
+  outline: 3px solid #f9d48d;
+  outline-offset: 4px;
+}
+@media(max-width:800px) {
+  .campus-chapter-bridge {
+    grid-template-columns: 66px minmax(0,1fr);
+    width: calc(100% - 24px);
+    padding: 16px;
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .campus-chapter-marker {width:66px;height:66px;}
+  .campus-chapter-marker img {width:56px;height:56px;}
+  .campus-chapter-map-link {grid-column:1/-1;justify-self:stretch;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .campus-chapter-map-link {transition:none;}
+  .campus-chapter-map-link:hover {transform:none;}
+}
