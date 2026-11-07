@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { PNG } from 'pngjs';
 
 const read = path => readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const size = path => statSync(new URL('../'+path,import.meta.url)).size;
@@ -37,15 +39,16 @@ test('all header controls are fixed and accessible',()=>{
  assert.ok(!page.includes('isMobile && <Header'),'header must exist at every viewport size');
 });
 
-test('enhanced logo is a self-contained scalable SVG used by the campus header',()=>{
- const svg=read('public/assets/game/headquarters-banner-hd.svg');
- assert.ok(svg.includes('viewBox="0 0 900 260"'));
- assert.ok(svg.includes('NOMAD’S PROVINCE'));
- assert.ok(svg.includes('HEADQUARTERS'));
- assert.ok(svg.includes('linearGradient'));
- assert.ok(!svg.includes('<image '),'SVG should be self-contained and never depend on external bitmap files');
- const header=read('src/game/components/Header.jsx');
- assert.ok(header.includes('src="/assets/game/headquarters-banner-hd.svg"'));
+test('official client logo decodes in full and is displayed in campus header', () => {
+ const path = 'public/assets/game/headquarters-banner-client.png';
+ const bytes = readFileSync(new URL('../'+path, import.meta.url));
+ const hash = createHash('sha256').update(bytes).digest('hex');
+ assert.equal(hash, 'ece30d54027a47d00a786d14da0f0aa2646f1b28c33039714757b35772c36d36');
+ const decoded = PNG.sync.read(bytes);
+ assert.equal(decoded.width, 600);
+ assert.equal(decoded.height, 212);
+ assert.ok(decoded.data.some((channel, index) => index % 4 === 3 && channel > 0), 'visible logo pixels');
+ const header = read('src/game/components/Header.jsx');
+ assert.ok(header.includes('src="/assets/game/headquarters-banner-client.png"'));
  assert.ok(header.includes("image.src = '/assets/game/headquarters-banner.webp'"));
- assert.ok(!header.includes('src="/assets/game/headquarters-banner-hd.png"'));
 });
