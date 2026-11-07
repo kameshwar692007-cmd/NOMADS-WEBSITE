@@ -28,7 +28,9 @@ export const PARTNERS = [
     desc: 'National game dev mentorship, developer showcase, and official Game Jam Partner for GameJam X Esports.',
     accent: '#ff4d4d',
     iconType: 'code',
-    image: '/assets/events-and-logos/img_13_2026-11-05_at_10.30.15_AM__1_.jpeg'
+    image: '/assets/events-and-logos/img_13_2026-11-05_at_10.30.15_AM__1_.jpeg',
+    image1x1: '/assets/partners-1x1/partner-gdai-1x1.webp',
+    bgColor: '#080808'
   },
   {
     id: 'decathlon',
@@ -38,7 +40,9 @@ export const PARTNERS = [
     desc: 'Physical sports venue activations, community sporting culture, and active lifestyle crossovers.',
     accent: '#0284c7',
     iconType: 'zap',
-    image: '/assets/events-and-logos/img_15_2026-11-05_at_10.30.15_AM__3_.jpeg'
+    image: '/assets/events-and-logos/img_15_2026-11-05_at_10.30.15_AM__3_.jpeg',
+    image1x1: '/assets/partners-1x1/partner-decathlon-1x1.webp',
+    bgColor: '#ffffff'
   },
   {
     id: 'playo',
@@ -48,7 +52,9 @@ export const PARTNERS = [
     desc: 'Sports tech collaborations, turf tournament integrations, and active community tournaments.',
     accent: '#10b981',
     iconType: 'zap',
-    image: '/assets/events-and-logos/img_8_2026-11-05_at_10.30.13_AM__1_.jpeg'
+    image: '/assets/events-and-logos/img_8_2026-11-05_at_10.30.13_AM__1_.jpeg',
+    image1x1: '/assets/partners-1x1/partner-playo-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'srm-easwari',
@@ -58,7 +64,9 @@ export const PARTNERS = [
     desc: 'Autonomous institution partnering for collegiate hackathons, esports events, and youth symposiums.',
     accent: '#b91c1c',
     iconType: 'graduation',
-    image: '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg'
+    image: '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
+    image1x1: '/assets/partners-1x1/partner-easwari-1x1.webp',
+    bgColor: '#f7f7f7'
   },
   {
     id: 'srmist',
@@ -68,7 +76,9 @@ export const PARTNERS = [
     desc: 'Campus host for GameJam X Esports hackathons and intercollegiate gaming tournaments.',
     accent: '#f59e0b',
     iconType: 'graduation',
-    image: '/assets/events-and-logos/img_4_2026-11-05_at_10.30.10_AM__1_.jpeg'
+    image: '/assets/events-and-logos/img_4_2026-11-05_at_10.30.10_AM__1_.jpeg',
+    image1x1: '/assets/partners-1x1/partner-srmist-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'huddle-global',
@@ -78,7 +88,9 @@ export const PARTNERS = [
     desc: 'Premier startup summit partner connecting esports innovation, creators, and gaming entrepreneurship.',
     accent: '#ef4444',
     iconType: 'globe',
-    image: '/assets/events-and-logos/img_6_2026-11-05_at_10.30.10_AM.jpeg'
+    image: '/assets/events-and-logos/img_6_2026-11-05_at_10.30.10_AM.jpeg',
+    image1x1: '/assets/partners-1x1/partner-huddle-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'vit-ap',
@@ -88,7 +100,9 @@ export const PARTNERS = [
     desc: 'Collaborating on intercollegiate gaming tournaments and student esports chapter outreach.',
     accent: '#38bdf8',
     iconType: 'graduation',
-    image: '/assets/events-and-logos/img_9_2026-11-05_at_10.30.13_AM.jpeg'
+    image: '/assets/events-and-logos/img_9_2026-11-05_at_10.30.13_AM.jpeg',
+    image1x1: '/assets/partners-1x1/partner-vit-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'crescent',
@@ -98,7 +112,9 @@ export const PARTNERS = [
     desc: 'Collegiate partner for campus esports championships and gaming community events.',
     accent: '#0284c7',
     iconType: 'graduation',
-    image: '/assets/events-and-logos/img_12_2026-11-05_at_10.30.14_AM.jpeg'
+    image: '/assets/events-and-logos/img_12_2026-11-05_at_10.30.14_AM.jpeg',
+    image1x1: '/assets/partners-1x1/partner-crescent-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'chennai-anime-club',
@@ -108,7 +124,9 @@ export const PARTNERS = [
     desc: 'Youth pop-culture, anime watch parties, cosplay fests, and casual gaming crossovers.',
     accent: '#e11d48',
     iconType: 'sparkles',
-    image: '/assets/events-and-logos/img_16_2026-11-05_at_10.30.15_AM.jpeg'
+    image: '/assets/events-and-logos/img_16_2026-11-05_at_10.30.15_AM.jpeg',
+    image1x1: '/assets/partners-1x1/partner-cac-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'otaku-nadu',
@@ -118,7 +136,9 @@ export const PARTNERS = [
     desc: 'Regional manga, gaming, and anime community organizing interactive grassroots fan conventions.',
     accent: '#ec4899',
     iconType: 'sparkles',
-    image: '/assets/events-and-logos/img_11_2026-11-05_at_10.30.14_AM__2_.jpeg'
+    image: '/assets/events-and-logos/img_11_2026-11-05_at_10.30.14_AM__2_.jpeg',
+    image1x1: '/assets/partners-1x1/partner-otaku-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'game-com',
@@ -128,7 +148,9 @@ export const PARTNERS = [
     desc: 'Gaming community co-organizing esports challenges, tournament brackets, and casual gaming meetups.',
     accent: '#84cc16',
     iconType: 'crosshair',
-    image: '/assets/events-and-logos/img_5_2026-11-05_at_10.30.10_AM__2_.jpeg'
+    image: '/assets/events-and-logos/img_5_2026-11-05_at_10.30.10_AM__2_.jpeg',
+    image1x1: '/assets/partners-1x1/partner-gamecom-1x1.webp',
+    bgColor: '#f4f4f4'
   },
   {
     id: 'drushya-dag',
@@ -138,7 +160,9 @@ export const PARTNERS = [
     desc: 'Student animation and game design collective collaborating on digital creative arts and game jams.',
     accent: '#f97316',
     iconType: 'code',
-    image: '/assets/events-and-logos/img_14_2026-11-05_at_10.30.15_AM__2_.jpeg'
+    image: '/assets/events-and-logos/img_14_2026-11-05_at_10.30.15_AM__2_.jpeg',
+    image1x1: '/assets/partners-1x1/partner-dag-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'st-lourdes',
@@ -148,7 +172,9 @@ export const PARTNERS = [
     desc: 'Collegiate partner for grassroots campus esports tournaments and student engagement.',
     accent: '#dc2626',
     iconType: 'shield',
-    image: '/assets/events-and-logos/img_10_2026-11-05_at_10.30.14_AM__1_.jpeg'
+    image: '/assets/events-and-logos/img_10_2026-11-05_at_10.30.14_AM__1_.jpeg',
+    image1x1: '/assets/partners-1x1/partner-stlourdes-1x1.webp',
+    bgColor: '#000000'
   },
   {
     id: 'easwari-incubator',
@@ -158,7 +184,9 @@ export const PARTNERS = [
     desc: 'Section 8 Startup Incubator supporting entrepreneurial innovation and venture building in gaming.',
     accent: '#3b82f6',
     iconType: 'rocket',
-    image: '/assets/events-and-logos/img_3_2026-11-05_at_10.30.09_AM.jpeg'
+    image: '/assets/events-and-logos/img_3_2026-11-05_at_10.30.09_AM.jpeg',
+    image1x1: '/assets/partners-1x1/partner-incubator-1x1.webp',
+    bgColor: '#f7f7f7'
   }
 ];
 
