@@ -65,26 +65,45 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
-  // Automated Scroll Reveal using Intersection Observer
+  // Progressive, one-shot scroll reveals for initially rendered and async/tabbed content.
+  // Never hide anything for reduced-motion visitors or browsers without the API.
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
-    );
+    const content = document.querySelector('.gamified-shell .shell-main-content');
+    if (!content || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ||
+        typeof IntersectionObserver === 'undefined') return;
 
-    const elements = document.querySelectorAll('.gamified-card, .section-title-wrap, .pipeline-step, .tech-node');
-    elements.forEach((el) => {
-      el.classList.add('scroll-reveal');
-      observer.observe(el);
+    const selector = '.gamified-card, .section-title-wrap, .pipeline-step, .tech-node, .province-explore-intro';
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+
+    const observeNewContent = (root) => {
+      const candidates = root.matches?.(selector)
+        ? [root, ...root.querySelectorAll(selector)]
+        : root.querySelectorAll?.(selector) || [];
+      for (const element of candidates) {
+        if (element.classList.contains('scroll-reveal')) continue;
+        element.classList.add('scroll-reveal');
+        observer.observe(element);
+      }
+    };
+    observeNewContent(content);
+
+    // Event listings and About tabs mount content after initial page rendering.
+    const mutations = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (node.nodeType === 1) observeNewContent(node);
+        }
+      }
     });
-
-    return () => observer.disconnect();
+    mutations.observe(content, { childList: true, subtree: true });
+    return () => { mutations.disconnect(); observer.disconnect(); };
   }, [location.pathname, pageLoaded]);
 
   const handleNav = (targetPath) => {
