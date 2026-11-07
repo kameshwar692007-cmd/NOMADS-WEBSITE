@@ -19,6 +19,13 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpO
       <a className="campus-fixed-brand" href="/" aria-label="Nomad's Province — Home" onMouseEnter={() => sound.playBlip()}>
         <img
           src="/assets/game/headquarters-banner-hd.png"
+          onError={(event) => {
+            // Fall back to the previously verified asset if the HD image is missing or corrupt.
+            const image = event.currentTarget;
+            if (!image.src.endsWith('/assets/game/headquarters-banner.webp')) {
+              image.src = '/assets/game/headquarters-banner.webp';
+            }
+          }}
           alt="Nomad's Province Headquarters"
           width="720"
           height="234"
