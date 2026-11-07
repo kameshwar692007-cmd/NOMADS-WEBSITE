@@ -22,7 +22,9 @@ test('shared destination bridge uses the existing campus data and preserves navi
   assert.match(shell, /className="campus-chapter-bridge"/);
   assert.match(shell, /campusLocation\.displayName/);
   assert.match(shell, /campusLocation\.description/);
-  assert.match(shell, /campusLocation\.badgeAsset/);
+  assert.match(shell, /chapterNpc\.portraitIndex/);
+  assert.match(shell, /campus-chapter-character/);
+  assert.match(shell, /talkToNpc\(chapterNpc, true\)/);
   assert.match(shell, /onClick=\{handleReturnToCampus\}/);
   assert.match(shell, /onClick=\{\(\) => handleNav\(dest\.path\)\}/);
   assert.match(shell, /<main className="shell-main-content">/);
