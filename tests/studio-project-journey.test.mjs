@@ -23,8 +23,13 @@ test('studio showcases genuine records with accessible expandable details',()=>{
 test('studio field guide retains pitch terminal and connects to existing campus routes',()=>{
  const page=read('src/pages/StudioPage.jsx'),css=read('src/pages/StudioJourney.css');
  assert.ok(page.includes("onSubmit={handlePitchSubmit}"));
- assert.ok(page.includes("setFormData({ name: '', role: 'Developer', pitch: '' })"));
- assert.ok(page.includes("pitchSent ?"));
+ assert.ok(page.includes("const pitchMailto = `mailto:${ORG_INFO.email}"));
+ assert.ok(page.includes("pitchDraftReady ?"));
+ assert.ok(page.includes("href={pitchMailto}"));
+ assert.ok(page.includes("Nothing has been submitted yet."));
+ assert.ok(page.includes("Edit pitch"));
+ assert.ok(!page.includes("TRANSMISSION LOGGED"));
+ assert.ok(!page.includes("setTimeout(() => setPitchSent"));
  assert.ok(page.includes("to=\"/\""));
  assert.ok(page.includes("to=\"/events\""));
  assert.ok(LOCATIONS.some(loc=>loc.route==='/events'));
