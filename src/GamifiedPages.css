@@ -4114,13 +4114,8 @@
    ENHANCED GLOBAL RESPONSIVENESS & STITCH SCROLL LOCK
    ========================================================================== */
 
-/* 1. Stitch Assembly Scroll Locking */
-html.stitch-scroll-locked,
-body.stitch-scroll-locked {
-  overflow: hidden !important;
-  touch-action: none !important;
-  overscroll-behavior: none !important;
-}
+/* Stitch animation no longer locks document scrolling.
+   The visitor must be able to scroll even while elements are animated. */
 
 /* 2. Global Content Container */
 .shell-main-content {
@@ -4937,4 +4932,23 @@ body.stitch-scroll-locked {
  .gamified-shell .shell-hud-bar{padding:7px 6px;gap:4px;}
  .gamified-shell .hud-sandwich-btn{min-width:48px;padding:8px 7px;}
  .gamified-shell .sandwich-label{display:none;}
+}
+
+
+/* Scrolling hotfix: the destination shell is a normal scrolling document.
+   Keep its navigation fixed at the viewport top, independent of scroll
+   containment and ancestor animations. */
+.gamified-shell {
+  padding-top: 66px;
+  box-sizing: border-box;
+}
+.gamified-shell .shell-hud-bar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  width: 100%;
+  z-index: 4000;
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  .gamified-shell { padding-top: 60px; }
 }

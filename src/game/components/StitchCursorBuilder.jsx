@@ -1,7 +1,7 @@
 // Nomad's Province — Stitch AI Cursor Page Builder
 // Dynamic scroll-triggered AI UI assembly effect with authentic SFX & zero auto-scroll
 // Re-creates the iconic Google Stitch prompt-to-UI assembly experience.
-// Locks page scrolling during active element synthesis to prevent coordinate disruption.
+// Never locks page scrolling: user can browse while the cursor animation runs.
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { sound } from '../systems/soundFx.js';
@@ -17,21 +17,6 @@ export default function StitchCursorBuilder({ accentColor = '#38bdf8' }) {
   const activeElementRef = useRef(null);
   const isDestroyedRef = useRef(false);
   const builtElementsRef = useRef(new WeakSet());
-
-  // Helper to lock/unlock page scroll during AI cursor assembly
-  const setPageScrollLocked = useCallback((locked) => {
-    try {
-      if (typeof document !== 'undefined') {
-        if (locked) {
-          document.documentElement.classList.add('stitch-scroll-locked');
-          document.body.classList.add('stitch-scroll-locked');
-        } else {
-          document.documentElement.classList.remove('stitch-scroll-locked');
-          document.body.classList.remove('stitch-scroll-locked');
-        }
-      }
-    } catch (_) {}
-  }, []);
 
   // Real-time synchronization: keeps cursor & laser bounding box magnetically attached while user is actively scrolling
   const syncPositionWithScroll = useCallback(() => {
@@ -70,7 +55,6 @@ export default function StitchCursorBuilder({ accentColor = '#38bdf8' }) {
     async function processQueue() {
       if (isProcessingRef.current || queueRef.current.length === 0 || isDestroyedRef.current) return;
       isProcessingRef.current = true;
-      setPageScrollLocked(true); // Temporarily lock scroll while AI cursor is actively building
 
       while (queueRef.current.length > 0 && !isDestroyedRef.current) {
         const el = queueRef.current.shift();
@@ -134,7 +118,6 @@ export default function StitchCursorBuilder({ accentColor = '#38bdf8' }) {
       }
 
       isProcessingRef.current = false;
-      setPageScrollLocked(false); // Restore page scroll immediately
 
       // When queue is empty, cleanly fade cursor out until next element scrolls into view
       if (queueRef.current.length === 0) {
@@ -189,13 +172,12 @@ export default function StitchCursorBuilder({ accentColor = '#38bdf8' }) {
 
     return () => {
       isDestroyedRef.current = true;
-      setPageScrollLocked(false);
       clearTimeout(initTimer);
       window.removeEventListener('scroll', handleScrollOrResize);
       window.removeEventListener('resize', handleScrollOrResize);
       if (observer) observer.disconnect();
     };
-  }, [syncPositionWithScroll, setPageScrollLocked]);
+  }, [syncPositionWithScroll]);
 
   return (
     <div className="stitch-builder-overlay" style={{ pointerEvents: 'none' }}>

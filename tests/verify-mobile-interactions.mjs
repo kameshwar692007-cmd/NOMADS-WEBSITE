@@ -61,8 +61,22 @@ async function runViewport(w,h){
  await navigate('/studio');
  check(w+'px Studio projects visible',await waitFor('.studio-project-grid'));
  check(w+'px Re-Assemble removed',!(await exists('.blueprint-assembler')));
+ // Verify actual page scrolling instead of only checking a sticky navbar.
+ const styles=await evalJs('(()=>({html:getComputedStyle(document.documentElement).overflowY,body:getComputedStyle(document.body).overflowY,touch:getComputedStyle(document.body).touchAction}))()');
+ check(w+'px normal document overflow',styles.html!=='hidden'&&styles.body!=='hidden'&&styles.touch!=='none',JSON.stringify(styles));
  await evalJs('window.scrollTo(0,900)');
  await pause(400);
+ const scrollAfter=await evalJs('window.scrollY');
+ check(w+'px scrolling genuinely changes window.scrollY',scrollAfter>150,scrollAfter+'px');
+ await cmd('Input.dispatchMouseEvent',{type:'mouseWheel',x:Math.floor(w/2),y:Math.floor(h/2),deltaX:0,deltaY:320});
+ await pause(350);
+ const scrollAfterWheel=await evalJs('window.scrollY');
+ check(w+'px mouse wheel scrolls page',scrollAfterWheel>scrollAfter+50,scrollAfter+'px → '+scrollAfterWheel+'px');
+ await cmd('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowDown',code:'ArrowDown',windowsVirtualKeyCode:40,nativeVirtualKeyCode:40});
+ await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowDown',code:'ArrowDown',windowsVirtualKeyCode:40,nativeVirtualKeyCode:40});
+ await pause(250);
+ const scrollAfterArrow=await evalJs('window.scrollY');
+ check(w+'px ArrowDown scrolls inner page',scrollAfterArrow>scrollAfterWheel,scrollAfterWheel+'px → '+scrollAfterArrow+'px');
  const menu=await evalJs('(()=>{const b=document.querySelector(".hud-sandwich-btn");if(!b)return null;const r=b.getBoundingClientRect();return {top:r.top,bottom:r.bottom,right:r.right,display:getComputedStyle(b).display}})()');
  if(w<=1040){
   check(w+'px Studio hamburger stays visible after scroll',!!menu&&menu.display!=='none'&&menu.top>=-1&&menu.bottom<=h+1&&menu.right<=w+1,JSON.stringify(menu));
