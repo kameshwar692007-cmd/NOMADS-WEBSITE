@@ -49,6 +49,6 @@ test('official client logo decodes in full and is displayed in campus header', (
  assert.equal(decoded.height, 212);
  assert.ok(decoded.data.some((channel, index) => index % 4 === 3 && channel > 0), 'visible logo pixels');
  const header = read('src/game/components/Header.jsx');
- assert.ok(header.includes('src="/assets/game/headquarters-banner-client.png"'));
- assert.ok(header.includes("image.src = '/assets/game/headquarters-banner.webp'"));
+ assert.ok(header.includes('src="/assets/branding/nomads-client-logo.svg"'));\n assert.ok(header.includes("onClick={onLogoReplay}"));\n assert.ok(header.includes("campus-menu-button"));
+ assert.ok(read("src/pages/HomePage.jsx").includes("onLogoReplay={replayIntro}"));
 });
