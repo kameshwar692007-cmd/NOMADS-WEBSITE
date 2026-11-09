@@ -30,6 +30,9 @@ async function runViewport(w,h){
  check(w+'px header menu exists',await waitFor('.campus-menu-button'));
  const fit=await evalJs('(()=>{return [".campus-fixed-brand",".campus-menu-button"].every(s=>{const e=document.querySelector(s);if(!e)return false;const r=e.getBoundingClientRect();return r.left>=-1&&r.right<=innerWidth+1&&getComputedStyle(e).display!=="none"})})()');
  check(w+'px logo + menu fit viewport',fit);
+ const logoCheck=await evalJs('(()=>{const e=document.querySelector(".campus-fixed-brand"); const img=e?.querySelector("img");if(!e||!img)return null;const r=e.getBoundingClientRect();return {width:r.width,src:new URL(img.src).pathname}})()');
+ check(w+'px original Headquarters banner present',logoCheck?.src==='/assets/game/headquarters-banner-client.png',JSON.stringify(logoCheck));
+ if(w<=390)check(w+'px banner legible (at least 130px)',logoCheck?.width>=130,JSON.stringify(logoCheck));
  await screenshot('campus-'+w);
  await click('.campus-menu-button');
  check(w+'px campus menu opens',await waitFor('.menu-drawer'));
