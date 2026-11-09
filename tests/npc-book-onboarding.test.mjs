@@ -77,7 +77,7 @@ test('checked-in portrait atlas and logo intro retain valid assets',()=>{
  assert.ok(css.includes('@media(max-width:600px)'));
  const introCss=read('src/game/components/LogoRevolver.css');
  const introJsx=read('src/game/components/LogoRevolver.jsx');
- assert.ok(introCss.includes('np-revolver-turn'));
+ assert.ok(introCss.includes('np-revolver-arrive'));
  assert.ok(introCss.includes('prefers-reduced-motion:reduce'));
  assert.ok(introCss.includes('focus-visible'));
  assert.ok(introJsx.includes('np-revolver-logo'));
