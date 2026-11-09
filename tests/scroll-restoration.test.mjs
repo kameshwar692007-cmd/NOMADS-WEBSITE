@@ -28,3 +28,12 @@ test('inner pages preserve native scrolling and keyboard arrows', () => {
  assert.ok(game.includes("ArrowDown:'down'"),'campus arrow keys should move player');
  assert.ok(game.includes("window.addEventListener('keydown',onKeyDown)"));
 });
+
+test('Stitch cursor effect never deadlocks user scroll', () => {
+ const component=read('src/game/components/StitchCursorBuilder.jsx');
+ const styles=read('src/GamifiedPages.css');
+ assert.ok(component.includes('syncPositionWithScroll'));
+ assert.ok(!component.includes('setPageScrollLocked('));
+ assert.ok(!component.includes("classList.add('stitch-scroll-locked')"));
+ assert.ok(!styles.includes('html.stitch-scroll-locked'));
+});
