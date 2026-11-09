@@ -13,7 +13,6 @@ import ControlHints from '../game/components/ControlHints.jsx';
 import NpcDialogue from '../game/components/NpcDialogue.jsx';
 import BookIntro from '../game/components/BookIntro.jsx';
 import HelpModal from '../game/components/HelpModal.jsx';
-import { HERO_GUIDE } from '../game/data/npcDialogues.js';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -24,8 +23,7 @@ export default function HomePage() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [travelTarget, setTravelTarget] = useState(null);
-  // First visit of this tab only; returning from section pages must not
-  // force visitors to replay the book or tutorial.
+  // Show the brief logo once per tab; returning from other pages goes straight to the map.
   const [introOpen, setIntroOpen] = useState(() => {
     try { return sessionStorage.getItem('np-campus-welcomed-v2') !== 'yes'; }
     catch { return true; }
@@ -34,7 +32,6 @@ export default function HomePage() {
   const completeIntro = useCallback(() => {
     try { sessionStorage.setItem('np-campus-welcomed-v2', 'yes'); } catch { /* private mode */ }
     setIntroOpen(false);
-    setNpcDialogue(HERO_GUIDE);
   }, []);
 
   // Responsive device check

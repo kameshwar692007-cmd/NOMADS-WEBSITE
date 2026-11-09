@@ -34,9 +34,14 @@ test('onboarding is skippable and first-session only with a short control tutori
  assert.ok(home.includes('sessionStorage.setItem('));
  assert.ok(home.includes('onNpcInteract={setNpcDialogue}'));
  assert.ok(home.includes('paused={Boolean(introOpen || npcDialogue'));
- assert.match(book,/SKIP INTRO|Skip intro/);
- assert.ok(book.includes("e.key==='Escape'"));
+ assert.ok(book.includes('Skip intro and enter campus map'));
+ assert.ok(book.includes("event.key === 'Escape'"));
  assert.ok(book.includes('prefers-reduced-motion'));
+ assert.ok(book.includes('INTRO_DURATION_MS = 2000'));
+ assert.ok(book.includes('window.setTimeout(onComplete'));
+ assert.ok(book.includes('/assets/game/headquarters-banner-client.png'));
+ assert.ok(!book.includes('np-book-object'));
+ assert.ok(!home.includes('setNpcDialogue(HERO_GUIDE)'));
 });
 test('NPC clicks override buildings without affecting manual movement or AGY pages',()=>{
  const game=read('src/game/components/GameCanvas.jsx');
@@ -51,7 +56,7 @@ test('NPC clicks override buildings without affecting manual movement or AGY pag
  assert.ok(home.includes('<LocationPanel'),'building UI retained');
  assert.ok(home.includes('<Directory'),'directory retained');
 });
-test('checked-in portrait atlas and book cover have valid signatures',()=>{
+test('checked-in portrait atlas and logo intro retain valid assets',()=>{
  const portrait=readFileSync(new URL('../public/assets/onboarding/npc-portraits-atlas.webp',import.meta.url));
  assert.equal(portrait.toString('ascii',0,4),'RIFF');
  assert.equal(portrait.toString('ascii',8,12),'WEBP');
@@ -70,10 +75,14 @@ test('checked-in portrait atlas and book cover have valid signatures',()=>{
  assert.equal(sprites.readUInt32BE(16),192);
  assert.equal(sprites.readUInt32BE(20),48);
  assert.ok(css.includes('@media(max-width:600px)'));
- assert.ok(read('src/game/components/BookIntro.css').includes('np-book-hardcover'));
- assert.ok(read('src/game/components/BookIntro.css').includes('perspective:1500px'));
- assert.ok(read('src/game/components/BookIntro.jsx').includes('np-book-turn-page'));
- assert.ok(read('src/game/components/BookIntro.jsx').includes('np-cinematic-progress'));
+ const introCss=read('src/game/components/BookIntro.css');
+ const introJsx=read('src/game/components/BookIntro.jsx');
+ assert.ok(introCss.includes('np-logo-revolve'));
+ assert.ok(introCss.includes('prefers-reduced-motion:reduce'));
+ assert.ok(introCss.includes('focus-visible'));
+ assert.ok(introJsx.includes('np-logo-intro-mark'));
+ assert.ok(!introJsx.includes('np-book-turn-page'));
+ assert.ok(!introJsx.includes('Enter Headquarters'));
 });
 
 test('all six complete 32x48 sprites actually decode and contain visible body pixels',async()=>{
