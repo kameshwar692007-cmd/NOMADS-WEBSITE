@@ -128,7 +128,7 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
               <span className="hq-stage-corner bl" aria-hidden="true" />
               <span className="hq-stage-corner br" aria-hidden="true" />
               <img key={active.id} src={active.image1x1 || active.image} alt={active.name + ' logo'}
-                loading="lazy" decoding="async"
+                loading="eager" decoding="async"
                 onError={event => {
                   if (active.image && !event.currentTarget.src.endsWith(active.image)) {
                     event.currentTarget.src = active.image;
