@@ -73,6 +73,8 @@ html, body {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  /* Block native panning only on the game surface, not the whole website. */
+  touch-action: none;
   background: #05080f;
 }
 
@@ -1334,7 +1336,7 @@ html, body {
   pointer-events:none;
 }
 .game-action-message{border-color:#c83246;bottom:105px;}
-.world-canvas{touch-action:manipulation;cursor:crosshair;}
+.world-canvas{touch-action:none;cursor:crosshair;}
 @media(max-width:768px){
   .game-header{padding:0 10px;height:52px;}
   .header-brand-name{font-size:11px;}
