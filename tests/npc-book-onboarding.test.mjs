@@ -29,18 +29,18 @@ test('onboarding is skippable and first-session only with a short control tutori
  assert.match(HERO_GUIDE.note,/WASD/);
  assert.match(HERO_GUIDE.note,/Mobile:/);
  const home=read('src/pages/HomePage.jsx');
- const book=read('src/game/components/BookIntro.jsx');
+ const logo=read('src/game/components/LogoRevolver.jsx');
  assert.ok(home.includes('sessionStorage.getItem('));
  assert.ok(home.includes('sessionStorage.setItem('));
  assert.ok(home.includes('onNpcInteract={setNpcDialogue}'));
  assert.ok(home.includes('paused={Boolean(introOpen || npcDialogue'));
- assert.ok(book.includes('Skip intro and enter campus map'));
+ assert.ok(logo.includes('Skip logo animation and enter campus map'));
  assert.ok(book.includes("event.key === 'Escape'"));
  assert.ok(book.includes('prefers-reduced-motion'));
- assert.ok(book.includes('INTRO_DURATION_MS = 2000'));
+ assert.ok(book.includes('LOGO_REVOLVE_MS = 1800'));
  assert.ok(book.includes('window.setTimeout(onComplete'));
  assert.ok(book.includes('/assets/game/headquarters-banner-client.png'));
- assert.ok(!book.includes('np-book-object'));
+ assert.ok(!logo.includes('np-book-object'));
  assert.ok(!home.includes('setNpcDialogue(HERO_GUIDE)'));
 });
 test('NPC clicks override buildings without affecting manual movement or AGY pages',()=>{
@@ -75,14 +75,21 @@ test('checked-in portrait atlas and logo intro retain valid assets',()=>{
  assert.equal(sprites.readUInt32BE(16),192);
  assert.equal(sprites.readUInt32BE(20),48);
  assert.ok(css.includes('@media(max-width:600px)'));
- const introCss=read('src/game/components/BookIntro.css');
- const introJsx=read('src/game/components/BookIntro.jsx');
- assert.ok(introCss.includes('np-logo-revolve'));
+ const introCss=read('src/game/components/LogoRevolver.css');
+ const introJsx=read('src/game/components/LogoRevolver.jsx');
+ assert.ok(introCss.includes('np-revolver-turn'));
  assert.ok(introCss.includes('prefers-reduced-motion:reduce'));
  assert.ok(introCss.includes('focus-visible'));
- assert.ok(introJsx.includes('np-logo-intro-mark'));
+ assert.ok(introJsx.includes('np-revolver-logo'));
  assert.ok(!introJsx.includes('np-book-turn-page'));
  assert.ok(!introJsx.includes('Enter Headquarters'));
+ assert.ok(!read('src/pages/HomePage.jsx').includes('BookIntro'));
+ assert.ok(introJsx.includes('window.setTimeout(onComplete'));
+ assert.ok(introCss.includes('np-revolver-dismiss'));
+ assert.ok(introJsx.includes('Skip logo animation and enter campus map'));
+ assert.ok(introJsx.includes('headquarters-banner-client.png'));
+ assert.ok(introJsx.includes('prefers-reduced-motion'));
+ assert.ok(!introJsx.includes('np-book-object'));
 });
 
 test('all six complete 32x48 sprites actually decode and contain visible body pixels',async()=>{
