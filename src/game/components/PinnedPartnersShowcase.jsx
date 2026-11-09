@@ -17,7 +17,6 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(
     () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
   );
@@ -45,10 +44,10 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
   }, []);
 
   useEffect(() => {
-    if (hovered || focused || paused || reducedMotion || !pageVisible || filtered.length < 2) return;
+    if (hovered || focused || reducedMotion || !pageVisible || filtered.length < 2) return;
     const timer = window.setInterval(() => setIndex(value => (value + 1) % filtered.length), 5500);
     return () => window.clearInterval(timer);
-  }, [hovered, focused, paused, reducedMotion, pageVisible, filtered.length]);
+  }, [hovered, focused, reducedMotion, pageVisible, filtered.length]);
 
   const move = delta => {
     if (!filtered.length) return;
@@ -59,6 +58,11 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
     sound.playBlip();
     setCategory(id);
     setIndex(0);
+  };
+  const showcasePartner = partnerIndex => {
+    sound.playSelect();
+    setCategory('all');
+    setIndex(partnerIndex);
   };
 
   return (
@@ -116,7 +120,7 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
         </div>
 
         {active ? (
-          <div className="hq-partner-slide" aria-live={paused || focused ? 'polite' : 'off'}>
+          <div className="hq-partner-slide" aria-live={focused ? 'polite' : 'off'}>
             <div className="hq-partner-image-wrap" style={{ '--ally-accent': active.accent }}>
               <img key={active.id} src={active.image1x1 || active.image} alt={active.name + ' logo'}
                 loading="lazy" decoding="async"
@@ -139,13 +143,39 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
         <div className="hq-partner-controls" role="group" aria-label="Partner carousel controls">
           <button type="button" onClick={() => move(-1)} disabled={filtered.length < 2}
             aria-label="Previous partner">←</button>
-          <button type="button" className="hq-partner-autoplay"
-            onClick={() => { sound.playSelect(); setPaused(value => !value); }}
-            aria-label={paused ? 'Resume partner carousel' : 'Pause partner carousel'} aria-pressed={paused}>
-            {paused ? 'Play' : 'Pause'}
-          </button>
           <button type="button" onClick={() => move(1)} disabled={filtered.length < 2}
             aria-label="Next partner">→</button>
+        </div>
+      </div>
+
+      {/* The complete partners showcase belongs below the featured slider.
+          Each logo selects the corresponding existing partner without duplicating copy. */}
+      <div className="hq-allies-logo-showcase" aria-labelledby="hq-allies-showcase-title">
+        <div className="hq-allies-showcase-heading">
+          <h3 id="hq-allies-showcase-title">Allies Showcase</h3>
+          <p>Explore the organizations in our network.</p>
+        </div>
+        <div className="hq-allies-logo-grid">
+          {partners.map((partner, partnerIndex) => (
+            <button
+              key={partner.id}
+              type="button"
+              className={category === 'all' && currentIndex === partnerIndex
+                ? 'hq-allies-logo-tile is-selected' : 'hq-allies-logo-tile'}
+              onClick={() => showcasePartner(partnerIndex)}
+              aria-label={`View ${partner.name} in the Allies carousel`}
+              aria-pressed={category === 'all' && currentIndex === partnerIndex}
+            >
+              <img src={partner.image1x1 || partner.image} alt=""
+                loading="lazy" decoding="async"
+                onError={event => {
+                  if (partner.image && !event.currentTarget.src.endsWith(partner.image)) {
+                    event.currentTarget.src = partner.image;
+                  }
+                }} />
+              <span>{partner.name}</span>
+            </button>
+          ))}
         </div>
       </div>
     </section>

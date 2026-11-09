@@ -200,3 +200,54 @@
 @media(prefers-reduced-motion:reduce) {
   .hq-operations-detail .hq-operations-expand, .hq-partners-carousel * {transition:none!important;animation:none!important;}
 }
+
+
+/* Complete partner-logo showcase below the featured Allies carousel. */
+.hq-partner-controls { gap: 18px; }
+.hq-partner-controls .hq-partner-autoplay { display: none; }
+.hq-allies-logo-showcase { margin-top: clamp(24px, 4vw, 40px); }
+.hq-allies-showcase-heading { margin: 0 0 18px; }
+.hq-allies-showcase-heading h3 {
+  color: #f3f7fc; font-size: clamp(19px, 2.5vw, 25px);
+  line-height: 1.3; margin: 0 0 6px;
+}
+.hq-allies-showcase-heading p { color: #aebed3; font-size: 13px; line-height: 1.6; margin: 0; }
+.hq-allies-logo-grid {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.hq-allies-logo-tile {
+  min-width: 0; min-height: 144px; border: 1px solid rgba(159, 181, 210, .33);
+  border-radius: 12px; background: rgba(15, 29, 50, .9);
+  color: #e5edf7; padding: 15px 11px 12px; cursor: pointer;
+  display: flex; flex-direction: column; justify-content: center;
+  align-items: center; gap: 12px;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+.hq-allies-logo-tile img {
+  display: block; width: 100%; max-width: 100px; height: 88px;
+  object-fit: contain;
+}
+.hq-allies-logo-tile span {
+  font-size: 12px; font-weight: 700; line-height: 1.35;
+  text-align: center; overflow-wrap: anywhere;
+}
+.hq-allies-logo-tile:hover,
+.hq-allies-logo-tile.is-selected {
+  background: #1d2d47; border-color: #e84537;
+}
+.hq-allies-logo-tile:focus-visible { outline: 3px solid #ffe19b; outline-offset: 3px; }
+@media (max-width: 980px) {
+  .hq-allies-logo-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+  .hq-allies-logo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+  .hq-allies-logo-tile { min-height: 124px; padding: 12px 8px; }
+  .hq-allies-logo-tile img { height: 70px; }
+}
+@media (max-width: 420px) {
+  .hq-allies-logo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hq-allies-logo-tile { transition: none; }
+}
