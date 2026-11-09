@@ -1,0 +1,49 @@
+/* Standalone logo revolver, no book/onboarding scene. */
+.np-revolver {
+  position:fixed; inset:0; z-index:150;
+  display:grid; place-items:center; isolation:isolate;
+  background:#070d1a; overflow:hidden; color:#f4f7fc;
+  animation:np-revolver-dismiss 1800ms ease-in both;
+}
+.np-revolver-orbit {
+  position:absolute; inset:-25%; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 50%,rgba(37,67,101,.4),transparent 57%);
+}
+.np-revolver-logo {
+  position:relative; z-index:1;
+  width:min(82vw,620px);
+  transform-origin:50% 50%;
+  transform-style:preserve-3d;
+  animation:np-revolver-turn 1500ms cubic-bezier(.24,.58,.26,1) both;
+}
+.np-revolver-logo img {
+  display:block;width:100%;height:auto;object-fit:contain;
+  max-height:min(40vh,250px);
+  filter:drop-shadow(0 10px 26px rgba(0,0,0,.55));
+  backface-visibility:visible;
+}
+.np-revolver-skip {
+  position:absolute; z-index:3;top:clamp(16px,4vh,36px);right:clamp(16px,4vw,40px);
+  min-height:44px;padding:10px 17px;
+  font:700 13px/1.2 system-ui,sans-serif;
+  color:#f4f7fc;background:#1d2f49;border:1px solid #7089a7;
+  border-radius:8px;cursor:pointer;
+}
+.np-revolver-skip:hover {background:#324c70;border-color:#cbd9ed;}
+.np-revolver-skip:focus-visible {outline:3px solid #ffd885;outline-offset:3px;}
+@keyframes np-revolver-turn {
+  0% {opacity:0;transform:perspective(1000px) rotateY(-85deg) scale(.88);}
+  25% {opacity:1;}
+  84% {opacity:1;}
+  100% {opacity:1;transform:perspective(1000px) rotateY(360deg) scale(1);}
+}
+@keyframes np-revolver-dismiss {
+  0%,81% {opacity:1;}
+  100% {opacity:0;}
+}
+@media (max-width:600px) {
+  .np-revolver-logo {width:min(92vw,500px);}
+}
+@media (prefers-reduced-motion:reduce) {
+  .np-revolver,.np-revolver-logo {animation:none;}
+}
