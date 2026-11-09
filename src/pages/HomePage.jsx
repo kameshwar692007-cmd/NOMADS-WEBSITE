@@ -28,10 +28,17 @@ export default function HomePage() {
     try { return sessionStorage.getItem('np-campus-welcomed-v2') !== 'yes'; }
     catch { return true; }
   });
+  const [introReplayKey, setIntroReplayKey] = useState(0);
   const [npcDialogue, setNpcDialogue] = useState(null);
   const completeIntro = useCallback(() => {
     try { sessionStorage.setItem('np-campus-welcomed-v2', 'yes'); } catch { /* private mode */ }
     setIntroOpen(false);
+  }, []);
+
+  const replayIntro = useCallback(() => {
+    setNpcDialogue(null);
+    setIntroReplayKey(current => current + 1);
+    setIntroOpen(true);
   }, []);
 
   // Responsive device check
@@ -87,6 +94,7 @@ export default function HomePage() {
         onMapOpen={() => setMapOpen(true)}
         onMenuOpen={() => setMenuOpen(true)}
         onHelpOpen={() => setHelpOpen(true)}
+        onLogoReplay={replayIntro}
       />
       {/* 2. Interactive Explorable Canvas World */}
       <main className="game-viewport">
@@ -127,7 +135,7 @@ export default function HomePage() {
       />
 
       {/* Cinematic onboarding and reusable NPC dialogue only cover the campus. */}
-      {introOpen && <LogoRevolver onComplete={completeIntro} />}
+      {introOpen && <LogoRevolver key={introReplayKey} onComplete={completeIntro} />}
       <NpcDialogue npc={npcDialogue} onClose={() => setNpcDialogue(null)} />
       <HelpModal isOpen={helpOpen} isMobile={isMobile} onClose={() => setHelpOpen(false)} />
 
