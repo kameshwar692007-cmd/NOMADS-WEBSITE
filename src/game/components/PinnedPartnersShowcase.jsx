@@ -18,7 +18,9 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(
+    () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+  );
   const [pageVisible, setPageVisible] = useState(() => !document.hidden);
   const touchX = useRef(null);
   const filtered = useMemo(() => {
@@ -32,7 +34,6 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
     const query = window.matchMedia?.('(prefers-reduced-motion: reduce)');
     if (!query) return;
     const update = () => setReducedMotion(query.matches);
-    update();
     query.addEventListener?.('change', update);
     return () => query.removeEventListener?.('change', update);
   }, []);
