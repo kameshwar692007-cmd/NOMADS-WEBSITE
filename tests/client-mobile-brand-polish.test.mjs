@@ -24,7 +24,7 @@ test('Huddle Global uses the exact full-wordmark client image instead of old log
  const partner = PARTNERS.find(item => item.id === 'huddle-global');
  assert.ok(partner);
  assert.equal(partner.image1x1, '/assets/partners-1x1/huddle-global-original-square.webp');
- assert.equal(partner.image, '/assets/branding/huddle-client-logo.svg');
+ assert.equal(partner.image, '/assets/partners-1x1/huddle-global-original-square.webp');
  assert.ok(existsSync(new URL('../public' + partner.image, import.meta.url)));
 });
 test('campus logo replay and mobile menu remain accessible', () => {
