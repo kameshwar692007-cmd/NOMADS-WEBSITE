@@ -51,23 +51,8 @@ export default function HomePage() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Prevent background touch scrolling on mobile while controlling the game
-  useEffect(() => {
-    const prevent = (e) => {
-      if (
-        !e.target.closest('.directory-panel') && 
-        !e.target.closest('.location-panel') &&
-        !e.target.closest('.map-modal-card') &&
-        !e.target.closest('.menu-drawer') &&
-        !e.target.closest('.campus-fixed-header') &&
-        !e.target.closest('.campus-help-overlay')
-      ) {
-        e.preventDefault();
-      }
-    };
-    document.addEventListener('touchmove', prevent, { passive: false });
-    return () => document.removeEventListener('touchmove', prevent);
-  }, []);
+  // Pointer gestures are scoped to the game canvas and joystick in CSS.
+  // Do not cancel document-wide touchmove: menus and dialogs must be scrollable.
 
   const handleLocationInteract = useCallback((loc) => {
     setNpcDialogue(null);
