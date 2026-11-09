@@ -23,13 +23,15 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
   const filteredPartners = partners.filter(filters.find(f => f.id === filter)?.test || filters[0].test);
   const safeIndex = Math.min(activeIndex, Math.max(0,filteredPartners.length - 1));
   const trackRef = useRef(null);
+  const touchX = useRef(null);
 
   // Check for prefers-reduced-motion
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!mediaQuery) return;
     const handler = (e) => setIsReducedMotion(e.matches);
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+    mediaQuery.addEventListener?.('change', handler);
+    return () => mediaQuery.removeEventListener?.('change', handler);
   }, []);
 
   const selectPartner = useCallback((index, playSfx = false) => {
@@ -40,21 +42,23 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
   }, []);
 
   const handlePrev = useCallback(() => {
+    if (!filteredPartners.length) return;
     const nextIdx = (safeIndex - 1 + filteredPartners.length) % filteredPartners.length;
     selectPartner(nextIdx, true);
   }, [safeIndex, filteredPartners.length, selectPartner]);
 
   const handleNext = useCallback(() => {
+    if (!filteredPartners.length) return;
     const nextIdx = (safeIndex + 1) % filteredPartners.length;
     selectPartner(nextIdx, true);
   }, [safeIndex, filteredPartners.length, selectPartner]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e) => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (e.key === 'ArrowRight') {
       e.preventDefault();
       handleNext();
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
       handlePrev();
     }
@@ -73,7 +77,7 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
     return () => window.clearInterval(timer);
   }, [hovered, focused, isReducedMotion, pageVisible, filteredPartners.length]);
 
-  const activePartner = filteredPartners[safeIndex] || filteredPartners[0];
+  const activePartner = filteredPartners[safeIndex] || filteredPartners[0] || partners[0];
   const showcasePartner = partnerIndex => {
     sound.playSelect();
     setFilter('all');
@@ -85,11 +89,6 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
     setFilter(id);
     setActiveIndex(0);
   };
-
-  return () => window.removeEventListener('scroll', handleScroll);
-  }, [partners.length]);
-
-  const activePartner = partners[activeIndex] || partners[0];
 
   return (
     <section
@@ -130,12 +129,15 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
           ))}
         </div>
       )}
-      <div className="showcase-original-filter-row" role="group" aria-label="Filter partner categories">
-        {filters.map(item => <button type="button" key={item.id} className={filter === item.id ? 'hq-filter active' : 'hq-filter'}
-          aria-pressed={filter === item.id} onClick={() => changeFilter(item.id)}>{item.label}</button>)}
-      </div>
       {/* Exact original video-style split-screen card and dot navigation. */}
-      <div className="showcase-pinned-track" ref={trackRef}>
+      <div className="showcase-pinned-track" ref={trackRef}
+        onTouchStart={e => { touchX.current = e.touches[0]?.clientX ?? null; }}
+        onTouchEnd={e => {
+          if (touchX.current === null) return;
+          const dx = (e.changedTouches[0]?.clientX ?? touchX.current) - touchX.current;
+          touchX.current = null;
+          if (Math.abs(dx) > 50) (dx < 0 ? handleNext : handlePrev)();
+        }}>
         <div
           className="split-card"
           style={{
@@ -178,7 +180,7 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
 
             {/* Navigation Bar with 14 Interactive Dots and Arrow Buttons */}
             <div className="nav-bar">
-              <div className="dots-group" role="tablist" aria-label="Partner Selection Dots">
+              <div className="dots-group" role="tablist" aria-label="Partner Selection Dots" onKeyDown={handleKeyDown}>
                 {filteredPartners.map((p, idx) => (
                   <button
                     key={p.id}
@@ -216,6 +218,10 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
             </div>
           </div>
         </div>
+      </div>
+      <div className="showcase-original-filter-row" role="group" aria-label="Filter partner categories">
+        {filters.map(item => <button type="button" key={item.id} className={filter === item.id ? 'hq-filter active' : 'hq-filter'}
+          aria-pressed={filter === item.id} onClick={() => changeFilter(item.id)}>{item.label}</button>)}
       </div>
       {/* Partner overview uses the same restrained card language as the split-screen above. */}
       <div className="showcase-allies-overview" aria-labelledby="showcase-allies-overview-title">
