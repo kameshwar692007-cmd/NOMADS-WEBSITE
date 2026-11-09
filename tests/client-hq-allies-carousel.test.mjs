@@ -43,3 +43,22 @@ test('Partner carousel is compact and supports mobile / keyboard focus',()=>{
  assert.ok(css.includes('focus-visible'));
  assert.ok(css.includes('prefers-reduced-motion:reduce'));
 });
+
+test('full partner-logo showcase is restored below featured carousel without a Pause button',()=>{
+ const jsx=read('src/game/components/PinnedPartnersShowcase.jsx');
+ const css=read('src/pages/AboutExplore.css');
+ assert.ok(jsx.includes('className="hq-allies-logo-showcase"'));
+ assert.ok(jsx.includes('className="hq-allies-logo-grid"'));
+ assert.ok(jsx.includes('partners.map((partner, partnerIndex) =>'));
+ assert.ok(jsx.indexOf('hq-allies-logo-showcase')>jsx.indexOf('hq-partner-controls'));
+ assert.ok(jsx.includes('onClick={() => showcasePartner(partnerIndex)}'));
+ assert.ok(jsx.includes("setCategory('all')"));
+ assert.ok(jsx.includes('setIndex(partnerIndex)'));
+ assert.ok(!jsx.includes('Pause partner carousel'));
+ assert.ok(!jsx.includes('className="hq-partner-autoplay"'));
+ assert.ok(jsx.includes('aria-label="Previous partner"'));
+ assert.ok(jsx.includes('aria-label="Next partner"'));
+ assert.ok(css.includes('.hq-allies-logo-grid'));
+ assert.ok(css.includes('max-width: 420px'));
+ assert.ok(css.includes('focus-visible'));
+});
