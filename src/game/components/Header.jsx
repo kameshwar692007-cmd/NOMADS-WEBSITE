@@ -19,8 +19,14 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpO
       <button type="button" className="campus-fixed-brand" onClick={onLogoReplay}
         aria-label="Replay Nomad's Province opening logo animation"
         title="Replay opening animation">
-        <img src="/assets/branding/nomads-client-logo.svg"
-          alt="Nomad's Province" width="514" height="410" draggable="false" />
+        <img src="/assets/game/headquarters-banner-client.png"
+          alt="Nomad's Province Headquarters" width="600" height="212" draggable="false"
+          onError={(event) => {
+            const image = event.currentTarget;
+            if (!image.src.endsWith('/assets/game/headquarters-banner.webp')) {
+              image.src = '/assets/game/headquarters-banner.webp';
+            }
+          }} />
       </button>
       <nav className="campus-fixed-nav" aria-label="Campus controls">
         <button
