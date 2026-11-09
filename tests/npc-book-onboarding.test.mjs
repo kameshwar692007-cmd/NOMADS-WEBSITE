@@ -85,7 +85,9 @@ test('checked-in portrait atlas and logo intro retain valid assets',()=>{
  assert.ok(!introJsx.includes('Enter Headquarters'));
  assert.ok(!read('src/pages/HomePage.jsx').includes('BookIntro'));
  assert.ok(introJsx.includes('window.setTimeout(onComplete'));
- assert.ok(introCss.includes('np-revolver-dismiss'));\n assert.ok(introCss.includes('np-revolver-letter-in'));\n assert.ok(introJsx.includes('ENTER THE PROVINCE'));
+ assert.ok(introCss.includes('np-revolver-dismiss'));
+ assert.ok(introCss.includes('np-revolver-letter-in'));
+ assert.ok(introJsx.includes('ENTER THE PROVINCE'));
  assert.ok(introJsx.includes('Skip logo animation and enter campus map'));
  assert.ok(introJsx.includes('nomads-client-logo.svg'));
  assert.ok(introJsx.includes('prefers-reduced-motion'));
