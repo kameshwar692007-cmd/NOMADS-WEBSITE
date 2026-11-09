@@ -1,4 +1,4 @@
-// Campus controller: click-to-travel, keyboard WASD/arrows and mobile D-pad.
+// Campus controller: click-to-travel, keyboard WASD/arrows and mobile thumb joystick.
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { LOCATIONS, findClickedBuilding, findNearbyLocation } from '../data/locationData.js';
 import { getSpawnPoint, buildPathToPoint } from '../data/travelPaths.js';
@@ -38,6 +38,8 @@ export default function GameCanvas({
   const npcRef=useRef(onNpcInteract);
   const keyRef=useRef(new Set());
   const touchRef=useRef(null);
+  const joystickPointer=useRef(null);
+  const [joystickOffset,setJoystickOffset]=useState({x:0,y:0});
   const pausedRef=useRef(paused);
   const nearbyPromptedRef=useRef(null);
   const [loaded,setLoaded]=useState(false);
@@ -158,17 +160,47 @@ export default function GameCanvas({
     setMessage(started?'':'That area is blocked. Click an open path or move with the controls.');
   },[isMobile,goToLocation]);
 
-  const startTouchDirection=(e,direction)=>{
+  const updateJoystick=(e)=>{
+    const rect=e.currentTarget.getBoundingClientRect();
+    const dx=e.clientX-(rect.left+rect.width/2);
+    const dy=e.clientY-(rect.top+rect.height/2);
+    const radius=Math.min(rect.width,rect.height)*.3;
+    const distance=Math.hypot(dx,dy);
+    const scale=distance>radius?radius/distance:1;
+    const x=dx*scale,y=dy*scale;
+    setJoystickOffset({x,y});
+    if(distance<radius*.24){touchRef.current=null;return;}
+    touchRef.current=Math.abs(dx)>Math.abs(dy)
+      ? (dx>0?'right':'left')
+      : (dy>0?'down':'up');
+  };
+  const startJoystick=e=>{
     if(pausedRef.current)return;
     e.preventDefault();
-    sound.playHapticClick();
+    if(joystickPointer.current!==null)return;
+    joystickPointer.current=e.pointerId;
     e.currentTarget.setPointerCapture?.(e.pointerId);
-    touchRef.current=direction;
+    sound.playHapticClick();
+    updateJoystick(e);
   };
-  const endTouchDirection=(e,direction)=>{
+  const moveJoystick=e=>{
+    if(joystickPointer.current!==e.pointerId)return;
     e.preventDefault();
-    if(touchRef.current===direction)touchRef.current=null;
-    if(e.currentTarget.hasPointerCapture?.(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);
+    if(pausedRef.current){resetJoystick();return;}
+    updateJoystick(e);
+  };
+  const resetJoystick=()=>{
+    joystickPointer.current=null;
+    touchRef.current=null;
+    setJoystickOffset({x:0,y:0});
+  };
+  const endJoystick=e=>{
+    if(joystickPointer.current!==e.pointerId)return;
+    e.preventDefault();
+    if(e.currentTarget.hasPointerCapture?.(e.pointerId)){
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    resetJoystick();
   };
 
   useEffect(()=>{
@@ -254,18 +286,20 @@ export default function GameCanvas({
   if(loadError)return <div className="game-loading" role="alert">Could not load the game: {loadError}</div>;
   if(!loaded)return <div className="game-loading"><div className="loading-content">Loading Nomad's Province...</div></div>;
   return <div className="canvas-wrapper">
-    <canvas ref={canvasRef} className="world-canvas" onClick={handleClick} aria-label="Interactive campus. Use WASD or arrows, tap the mobile direction pad, or click a destination."/>
-    {isMobile&&<div className="campus-dpad" aria-label="Touch movement controls">
-      {['up','left','down','right'].map(direction=><button
-        key={direction} type="button"
-        className={'campus-dpad-key campus-dpad-'+direction}
-        aria-label={'Move '+direction}
-        onPointerDown={e=>startTouchDirection(e,direction)}
-        onPointerUp={e=>endTouchDirection(e,direction)}
-        onPointerCancel={e=>endTouchDirection(e,direction)}
-        onLostPointerCapture={()=>{if(touchRef.current===direction)touchRef.current=null;}}
-        onContextMenu={e=>e.preventDefault()}
-      >{{up:'▲',left:'◀',down:'▼',right:'▶'}[direction]}</button>)}
+    <canvas ref={canvasRef} className="world-canvas" onClick={handleClick} aria-label="Interactive campus. Use WASD or arrows, drag the mobile joystick, or click a destination."/>
+    {isMobile&&<div className="campus-joystick" aria-label="Touch movement controls">
+      <button type="button" className="campus-joystick-base"
+        aria-label="Movement joystick; drag to walk"
+        onPointerDown={startJoystick}
+        onPointerMove={moveJoystick}
+        onPointerUp={endJoystick}
+        onPointerCancel={endJoystick}
+        onLostPointerCapture={resetJoystick}
+        onContextMenu={e=>e.preventDefault()}>
+        <span className="campus-joystick-guide" aria-hidden="true" />
+        <span className="campus-joystick-knob" aria-hidden="true"
+          style={{transform:`translate(${joystickOffset.x}px,${joystickOffset.y}px)`}} />
+      </button>
     </div>}
     {message&&<div className="game-action-message" role="status" onClick={()=>setMessage('')}>{message}</div>}
     {traveling&&<div className="game-travel-status" role="status">Walking to destination...</div>}

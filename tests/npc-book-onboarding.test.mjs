@@ -37,9 +37,9 @@ test('onboarding is skippable and first-session only with a short control tutori
  assert.ok(logo.includes('Skip logo animation and enter campus map'));
  assert.ok(logo.includes("event.key === 'Escape'"));
  assert.ok(logo.includes('prefers-reduced-motion'));
- assert.ok(logo.includes('LOGO_REVOLVE_MS = 1800'));
+ assert.ok(logo.includes('LOGO_REVOLVE_MS = 2400'));
  assert.ok(logo.includes('window.setTimeout(onComplete'));
- assert.ok(logo.includes('/assets/game/headquarters-banner-client.png'));
+ assert.ok(logo.includes('/assets/branding/nomads-client-logo.svg'));
  assert.ok(!logo.includes('np-book-object'));
  assert.ok(!home.includes('setNpcDialogue(HERO_GUIDE)'));
 });
@@ -77,7 +77,7 @@ test('checked-in portrait atlas and logo intro retain valid assets',()=>{
  assert.ok(css.includes('@media(max-width:600px)'));
  const introCss=read('src/game/components/LogoRevolver.css');
  const introJsx=read('src/game/components/LogoRevolver.jsx');
- assert.ok(introCss.includes('np-revolver-turn'));
+ assert.ok(introCss.includes('np-revolver-arrive'));
  assert.ok(introCss.includes('prefers-reduced-motion:reduce'));
  assert.ok(introCss.includes('focus-visible'));
  assert.ok(introJsx.includes('np-revolver-logo'));
@@ -86,8 +86,10 @@ test('checked-in portrait atlas and logo intro retain valid assets',()=>{
  assert.ok(!read('src/pages/HomePage.jsx').includes('BookIntro'));
  assert.ok(introJsx.includes('window.setTimeout(onComplete'));
  assert.ok(introCss.includes('np-revolver-dismiss'));
+ assert.ok(introCss.includes('np-revolver-letter-in'));
+ assert.ok(introJsx.includes('ENTER THE PROVINCE'));
  assert.ok(introJsx.includes('Skip logo animation and enter campus map'));
- assert.ok(introJsx.includes('headquarters-banner-client.png'));
+ assert.ok(introJsx.includes('nomads-client-logo.svg'));
  assert.ok(introJsx.includes('prefers-reduced-motion'));
  assert.ok(!introJsx.includes('np-book-object'));
 });

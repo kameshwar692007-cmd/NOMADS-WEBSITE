@@ -89,8 +89,8 @@ export const PARTNERS = [
     desc: 'Premier startup summit partner connecting esports innovation, creators, and gaming entrepreneurship.',
     accent: '#ef4444',
     iconType: 'globe',
-    image: '/assets/events-and-logos/img_6_2026-11-05_at_10.30.10_AM.jpeg',
-    image1x1: '/assets/partners-1x1/partner-huddle-1x1.webp',
+    image: '/assets/branding/huddle-client-logo.svg',
+    image1x1: '/assets/branding/huddle-client-logo.svg',
     bgColor: '#000000'
   },
   {
