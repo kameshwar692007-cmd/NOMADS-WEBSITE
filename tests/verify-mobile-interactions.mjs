@@ -87,6 +87,26 @@ async function runViewport(w,h){
  }
  await screenshot('studio-menu-'+w);
  check(w+'px no horizontal overflow',!(await evalJs('document.documentElement.scrollWidth>innerWidth+1')));
+
+ // Client's restored HQ Allies showcase: full logo, 1:1 asset and cyber-stage layout.
+ await navigate('/about');
+ check(w+'px HQ partner showcase renders',await waitFor('.hq-allies-logo-grid'));
+ const partnerCount=await evalJs('document.querySelectorAll(".hq-allies-logo-tile").length');
+ check(w+'px all 14 allies are shown',partnerCount===14,String(partnerCount));
+ const huddleButton='[aria-label="View Huddle Global in the Allies carousel"]';
+ check(w+'px Huddle Global selectable',await click(huddleButton));
+ await pause(250);
+ const huddle=await evalJs('(()=>{const img=document.querySelector(".hq-partner-cyber-stage img");const stage=document.querySelector(".hq-partner-cyber-stage");if(!img||!stage)return null;const r=stage.getBoundingClientRect();return {src:new URL(img.src).pathname,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,width:r.width,height:r.height}})()');
+ check(w+'px original full Huddle Global logo loaded',
+   huddle?.src==='/assets/partners-1x1/huddle-global-original-square.webp' && huddle.naturalWidth===409 && huddle.naturalHeight===409,JSON.stringify(huddle));
+ check(w+'px logo showcase is visually square',
+   !!huddle && Math.abs(huddle.width-huddle.height)<=2,JSON.stringify(huddle));
+ check(w+'px HQ Previous/Next available',
+   await exists('[aria-label="Previous partner"]') && await exists('[aria-label="Next partner"]'));
+ check(w+'px no Pause button in HQ',
+   !(await exists('[aria-label="Pause partner carousel"]')));
+ check(w+'px HQ no horizontal overflow',!(await evalJs('document.documentElement.scrollWidth>innerWidth+1')));
+ await screenshot('hq-huddle-'+w);
 }
 try{
  await mkdir('qa-screenshots',{recursive:true});
