@@ -23,7 +23,7 @@ async function view(w,h){await cmd('Emulation.setDeviceMetricsOverride',{width:w
 async function navigate(path){await cmd('Page.navigate',{url:'http://127.0.0.1:5173'+path});await pause(650);}
 async function screenshot(name){const data=await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile('qa-screenshots/'+name+'.png',Buffer.from(data.data,'base64'));}
 async function runViewport(w,h){
- await view(w,h);await navigate('/');
+ await view(w,h);await navigate('/');await evalJs('sessionStorage.removeItem("np-campus-welcomed-v2")');await navigate('/');
  check(w+'px intro loads',await waitFor('.np-revolver'));
  await pause(2700);
  check(w+'px intro auto closes',!(await exists('.np-revolver')));
@@ -61,9 +61,13 @@ async function runViewport(w,h){
  await evalJs('window.scrollTo(0,900)');
  await pause(400);
  const menu=await evalJs('(()=>{const b=document.querySelector(".hud-sandwich-btn");if(!b)return null;const r=b.getBoundingClientRect();return {top:r.top,bottom:r.bottom,right:r.right,display:getComputedStyle(b).display}})()');
- check(w+'px Studio hamburger stays visible after scroll',!!menu&&menu.display!=='none'&&menu.top>=-1&&menu.bottom<=h+1&&menu.right<=w+1,JSON.stringify(menu));
- await click('.hud-sandwich-btn');
- check(w+'px Studio menu opens',await waitFor('.hud-mobile-drawer'));
+ if(w<=1040){
+  check(w+'px Studio hamburger stays visible after scroll',!!menu&&menu.display!=='none'&&menu.top>=-1&&menu.bottom<=h+1&&menu.right<=w+1,JSON.stringify(menu));
+  await click('.hud-sandwich-btn');
+  check(w+'px Studio menu opens',await waitFor('.hud-mobile-drawer'));
+ }else{
+  check(w+'px Studio desktop navigation visible',await evalJs('getComputedStyle(document.querySelector(".hud-center-nav")).display!=="none"'));
+ }
  await screenshot('studio-menu-'+w);
  check(w+'px no horizontal overflow',!(await evalJs('document.documentElement.scrollWidth>innerWidth+1')));
 }
