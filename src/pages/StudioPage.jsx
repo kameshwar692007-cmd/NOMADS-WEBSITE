@@ -1,12 +1,11 @@
 // Nomad's Province — Game Development Studio (/studio)
 // Showcasing original games, prototypes, and GDAI partnerships
-// Progressive blueprint assembly animation on featured studio creations
+// Featured studio creations are immediately visible without assembly controls.
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './StudioJourney.css';
 import GameShell from '../game/components/GameShell.jsx';
-import BlueprintAssembler from '../game/components/BlueprintAssembler.jsx';
 import { STUDIO_PROJECTS, ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
 import { IconCode, IconZap, IconSparkles, IconGlobe, IconRocket } from '../game/components/Icons.jsx';
@@ -69,18 +68,12 @@ export default function StudioPage() {
         </div>
       </section>
 
-      {/* 2. Featured Projects Blueprint Assembly Showcase */}
+      {/* 2. Featured Projects — direct, accessible project grid */}
       <div id="studio-projects" className="section-title-wrap studio-anchor">
         <h3 className="section-title">ORIGINAL CREATIONS & STUDIO PORTFOLIO</h3>
-        <span className="section-badge" style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>BLUEPRINT ASSEMBLY</span>
       </div>
 
-      <BlueprintAssembler
-        promptText="Construct Nomad's Province original creations, WebGL game engines, and hackathon prototypes..."
-        moduleTag="studio_engine.sh"
-        accentColor="#38bdf8"
-        layout="grid"
-      >
+      <div className="studio-project-grid">
         {STUDIO_PROJECTS.map((proj) => (
           <div
             key={proj.id}
@@ -120,7 +113,7 @@ export default function StudioPage() {
             </div>
           </div>
         ))}
-      </BlueprintAssembler>
+      </div>
 
       {/* 3. Studio Capabilities & Pipeline */}
       <section id="studio-capabilities" className="gamified-card tech-tree-card studio-anchor">
