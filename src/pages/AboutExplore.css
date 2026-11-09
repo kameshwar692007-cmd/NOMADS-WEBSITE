@@ -251,3 +251,119 @@
 @media (prefers-reduced-motion: reduce) {
   .hq-allies-logo-tile { transition: none; }
 }
+
+
+/* Restore original cyber / guild-showcase presence with responsive 1:1 logo stage.
+   The square Huddle Global asset retains the user's complete wordmark. */
+.hq-partners-carousel.gamified-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(232,69,55,.42);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(232,69,55,.10), transparent 38%),
+    linear-gradient(135deg,#0e182d 0%,#0b1222 65%,#121c30 100%);
+  box-shadow: 0 14px 38px #02061098, inset 0 1px 0 #ffffff1b;
+}
+.hq-partners-carousel.gamified-card::before {
+  content: ''; position: absolute; pointer-events: none;
+  top: 0; left: 26px; width: 92px; height: 3px; background: #e84537;
+  box-shadow: 0 0 18px rgba(232,69,55,.5);
+}
+.hq-partner-slide {
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: clamp(20px,4vw,52px);
+  min-height: 330px;
+}
+.hq-partner-image-wrap.hq-partner-cyber-stage {
+  position: relative; width: 100%; max-width: 320px;
+  height: auto; min-height: 300px; aspect-ratio: 1 / 1;
+  padding: 20px; flex: none;
+  background: var(--ally-bg,#090f1e);
+  border: 1px solid color-mix(in srgb,var(--ally-accent,#e84537) 70%,#7795bf);
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 8px rgba(7,14,27,.65), 0 0 32px color-mix(in srgb,var(--ally-accent,#e84537) 14%,transparent);
+}
+.hq-partner-cyber-stage img {
+  width: 100%; height: 100%; max-width: 100%; max-height: 100%;
+  object-fit: contain; display: block; animation: hq-ally-stage-in .35s ease-out both;
+}
+.hq-stage-corner { position:absolute; width:20px; height:20px; z-index:1; pointer-events:none; }
+.hq-stage-corner.tl { top:8px;left:8px;border-top:2px solid var(--ally-accent);border-left:2px solid var(--ally-accent); }
+.hq-stage-corner.tr { top:8px;right:8px;border-top:2px solid var(--ally-accent);border-right:2px solid var(--ally-accent); }
+.hq-stage-corner.bl { bottom:8px;left:8px;border-bottom:2px solid var(--ally-accent);border-left:2px solid var(--ally-accent); }
+.hq-stage-corner.br { bottom:8px;right:8px;border-bottom:2px solid var(--ally-accent);border-right:2px solid var(--ally-accent); }
+.hq-partner-meta-row { display:flex;gap:12px;align-items:center;justify-content:space-between; }
+.hq-partner-kicker {
+  color:#ffad9c;letter-spacing:.09em;font-size:11px;text-transform:uppercase;
+  background:rgba(232,69,55,.11);border:1px solid rgba(232,69,55,.45);border-radius:4px;padding:7px 10px;
+}
+.hq-partner-counter {font:800 13px/1.2 ui-monospace,monospace;color:#aabbd4;white-space:nowrap;}
+.hq-partner-details h3 {font-size:clamp(27px,3.8vw,43px);margin:16px 0 7px;}
+.hq-partner-cyber-rule {
+  display:block;width:72px;height:3px;background:var(--ally-accent,#e84537);
+  margin-top:19px;box-shadow:0 0 14px var(--ally-accent,#e84537);
+}
+.hq-partner-details p {margin:22px 0 26px;max-width:54ch;}
+.hq-partner-count {letter-spacing:.1em;font-size:10px;}
+.hq-partner-controls {justify-content:center;gap:18px;margin-top:22px;}
+.hq-partner-controls .hq-cyber-arrow {
+  min-width:92px;background:#233956;border:1px solid #7189a7;
+  letter-spacing:.05em;font-size:12px;
+}
+.hq-partner-dots {display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:8px;max-width:340px;}
+.hq-partner-controls button.hq-partner-dot {
+  min-height:12px;min-width:12px;width:12px;height:12px;padding:0;
+  border-radius:50%;border:1px solid #8498b2;background:#3c5271;
+}
+.hq-partner-controls button.hq-partner-dot.is-active {
+  background:#ef4b3f;border-color:#ff9f9a;box-shadow:0 0 0 3px #e845372a,0 0 9px #e8453766;
+}
+.hq-allies-logo-showcase {margin-top:clamp(32px,5vw,56px);}
+.hq-allies-showcase-heading {border-left:4px solid #e84537;padding-left:18px;margin-bottom:24px;}
+.hq-showcase-heading-top {color:#ff857e;letter-spacing:.12em;font-size:11px;font-weight:900;margin-bottom:10px;}
+.hq-showcase-status-dot {display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;}
+.hq-showcase-separator {padding:0 7px;color:#7185a3;}
+.hq-allies-showcase-heading h3 {font-size:clamp(24px,3vw,33px);}
+.hq-allies-logo-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;}
+.hq-allies-logo-tile {
+  position:relative;overflow:hidden;min-height:206px;gap:14px;padding:20px 16px;
+  border:1px solid color-mix(in srgb,var(--tile-accent,#e84537) 48%,#41516b);
+  background:linear-gradient(155deg,#121f35,#0a1325 70%);
+  box-shadow:inset 0 1px 0 #ffffff12,0 6px 20px #0005;
+}
+.hq-allies-logo-tile::before {
+  content:'';position:absolute;top:0;left:0;height:3px;width:55%;
+  background:var(--tile-accent,#e84537);
+  box-shadow:0 0 13px var(--tile-accent,#e84537);
+}
+.hq-allies-tile-number {align-self:flex-start!important;color:#95a9c6!important;font-size:10px!important;letter-spacing:.13em;font-weight:900;}
+.hq-allies-logo-tile img {width:100%;max-width:150px;height:116px;object-fit:contain;filter:drop-shadow(0 5px 12px #0009);}
+.hq-allies-logo-tile>span:last-child {font-size:13px;font-weight:800;letter-spacing:.01em;}
+.hq-allies-logo-tile:hover,.hq-allies-logo-tile.is-selected {
+  border-color:var(--tile-accent,#e84537);
+  background:linear-gradient(155deg,#22344e,#11223d);
+  box-shadow:0 9px 25px #0007,0 0 17px color-mix(in srgb,var(--tile-accent,#e84537) 25%,transparent);
+}
+@keyframes hq-ally-stage-in {from{opacity:.5;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+@media(max-width:960px){
+ .hq-partner-slide {grid-template-columns:minmax(195px,270px) minmax(0,1fr);min-height:275px;}
+ .hq-partner-image-wrap.hq-partner-cyber-stage {max-width:270px;min-height:240px;}
+ .hq-allies-logo-grid {grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media(max-width:650px){
+ .hq-partner-slide {grid-template-columns:1fr;justify-items:stretch;gap:18px;}
+ .hq-partner-image-wrap.hq-partner-cyber-stage {width:min(100%,300px);max-width:300px;min-height:0;justify-self:center;padding:18px;}
+ .hq-partner-details h3 {font-size:clamp(25px,7vw,34px);}
+ .hq-allies-logo-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;}
+ .hq-allies-logo-tile {min-height:176px;padding:16px 11px;}
+ .hq-allies-logo-tile img {height:105px;}
+ .hq-partner-controls {gap:10px;}
+ .hq-partner-controls .hq-cyber-arrow {min-width:70px;padding:9px 10px;}
+ .hq-partner-dots {gap:6px;}
+}
+@media(max-width:380px){
+ .hq-partner-controls button.hq-partner-dot {height:10px;width:10px;min-height:10px;min-width:10px;}
+ .hq-allies-logo-tile {min-height:156px;padding:12px 8px;}
+ .hq-allies-logo-tile img {height:88px;}
+}
+@media(prefers-reduced-motion:reduce){.hq-partner-cyber-stage img {animation:none;}}
