@@ -62,3 +62,34 @@ test('full partner-logo showcase is restored below featured carousel without a P
  assert.ok(css.includes('max-width: 420px'));
  assert.ok(css.includes('focus-visible'));
 });
+
+test('Huddle Global full-wordmark uses the exact user-supplied square WebP', async()=>{
+ const { readFileSync } = await import('node:fs');
+ const partner=PARTNERS.find(p=>p.id==='huddle-global');
+ assert.ok(partner);
+ assert.equal(partner.image,'/assets/partners-1x1/huddle-global-original-square.webp');
+ assert.equal(partner.image1x1,partner.image);
+ const data=readFileSync(new URL('../public'+partner.image,import.meta.url));
+ assert.equal(data.toString('ascii',0,4),'RIFF');
+ assert.equal(data.toString('ascii',8,12),'WEBP');
+ assert.equal(data.toString('ascii',12,16),'VP8 ');
+ const width=data.readUInt16LE(26)&0x3fff;
+ const height=data.readUInt16LE(28)&0x3fff;
+ assert.equal(width,409);
+ assert.equal(height,409);
+});
+test('Allies restores the original cyber-stage character without losing the full showcase',()=>{
+ const jsx=read('src/game/components/PinnedPartnersShowcase.jsx');
+ const css=read('src/pages/AboutExplore.css');
+ assert.ok(jsx.includes('hq-partner-cyber-stage'));
+ assert.ok(jsx.includes('hq-stage-corner tl'));
+ assert.ok(jsx.includes('hq-partner-dots'));
+ assert.ok(jsx.includes('hq-allies-logo-grid'));
+ assert.ok(jsx.includes('hq-allies-tile-number'));
+ assert.ok(jsx.includes('Strategic Partners &amp; Guild Allies'));
+ assert.ok(css.includes('hq-partner-cyber-stage'));
+ assert.ok(css.includes('min-height: 300px'));
+ assert.ok(css.includes('aspect-ratio: 1 / 1'));
+ assert.ok(css.includes('@media(max-width:650px)'));
+ assert.ok(!jsx.includes('Pause partner carousel'));
+});
