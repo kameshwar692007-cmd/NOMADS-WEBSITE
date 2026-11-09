@@ -121,7 +121,12 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
 
         {active ? (
           <div className="hq-partner-slide" aria-live={focused ? 'polite' : 'off'}>
-            <div className="hq-partner-image-wrap" style={{ '--ally-accent': active.accent }}>
+            <div className="hq-partner-image-wrap hq-partner-cyber-stage"
+              style={{ '--ally-accent': active.accent, '--ally-bg': active.bgColor || '#090f1e' }}>
+              <span className="hq-stage-corner tl" aria-hidden="true" />
+              <span className="hq-stage-corner tr" aria-hidden="true" />
+              <span className="hq-stage-corner bl" aria-hidden="true" />
+              <span className="hq-stage-corner br" aria-hidden="true" />
               <img key={active.id} src={active.image1x1 || active.image} alt={active.name + ' logo'}
                 loading="lazy" decoding="async"
                 onError={event => {
@@ -131,20 +136,33 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
                 }} />
             </div>
             <div className="hq-partner-details">
-              <span className="hq-partner-kicker">{active.category}</span>
+              <div className="hq-partner-meta-row">
+                <span className="hq-partner-kicker">{active.category}</span>
+                <span className="hq-partner-counter">{String(currentIndex + 1).padStart(2, '0')} / {String(filtered.length).padStart(2, '0')}</span>
+              </div>
               <h3>{active.name}</h3>
               <span className="hq-partner-full-name">{active.fullName}</span>
+              <span className="hq-partner-cyber-rule" style={{ '--ally-accent': active.accent }} aria-hidden="true" />
               <p>{active.desc}</p>
-              <span className="hq-partner-count">{currentIndex + 1} / {filtered.length} allies</span>
+              <span className="hq-partner-count">OFFICIAL ALLIES NETWORK</span>
             </div>
           </div>
         ) : <p className="hq-partner-empty">No partner entries in this category.</p>}
 
         <div className="hq-partner-controls" role="group" aria-label="Partner carousel controls">
-          <button type="button" onClick={() => move(-1)} disabled={filtered.length < 2}
-            aria-label="Previous partner">←</button>
-          <button type="button" onClick={() => move(1)} disabled={filtered.length < 2}
-            aria-label="Next partner">→</button>
+          <button type="button" className="hq-cyber-arrow" onClick={() => move(-1)} disabled={filtered.length < 2}
+            aria-label="Previous partner">← PREV</button>
+          <div className="hq-partner-dots" role="group" aria-label="Choose featured ally">
+            {filtered.map((partner, i) => (
+              <button key={partner.id} type="button"
+                aria-label={`Show ${partner.name}`}
+                aria-pressed={i === currentIndex}
+                className={i === currentIndex ? 'hq-partner-dot is-active' : 'hq-partner-dot'}
+                onClick={() => { sound.playSelect(); setIndex(i); }} />
+            ))}
+          </div>
+          <button type="button" className="hq-cyber-arrow" onClick={() => move(1)} disabled={filtered.length < 2}
+            aria-label="Next partner">NEXT →</button>
         </div>
       </div>
 
@@ -152,7 +170,8 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
           Each logo selects the corresponding existing partner without duplicating copy. */}
       <div className="hq-allies-logo-showcase" aria-labelledby="hq-allies-showcase-title">
         <div className="hq-allies-showcase-heading">
-          <h3 id="hq-allies-showcase-title">Allies Showcase</h3>
+          <div className="hq-showcase-heading-top"><span className="hq-showcase-status-dot" aria-hidden="true" /> OFFICIAL ALLIANCE NETWORK <span className="hq-showcase-separator">•</span> {partners.length} ALLIES</div>
+          <h3 id="hq-allies-showcase-title">Strategic Partners &amp; Guild Allies</h3>
           <p>Explore the organizations in our network.</p>
         </div>
         <div className="hq-allies-logo-grid">
@@ -162,10 +181,12 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
               type="button"
               className={category === 'all' && currentIndex === partnerIndex
                 ? 'hq-allies-logo-tile is-selected' : 'hq-allies-logo-tile'}
+              style={{ '--tile-accent': partner.accent || '#e84537' }}
               onClick={() => showcasePartner(partnerIndex)}
               aria-label={`View ${partner.name} in the Allies carousel`}
               aria-pressed={category === 'all' && currentIndex === partnerIndex}
             >
+              <span className="hq-allies-tile-number">ALLY {String(partnerIndex + 1).padStart(2, '0')}</span>
               <img src={partner.image1x1 || partner.image} alt=""
                 loading="lazy" decoding="async"
                 onError={event => {
