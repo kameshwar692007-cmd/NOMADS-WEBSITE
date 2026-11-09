@@ -39,8 +39,8 @@ test('all gameplay routes lead to actual pages with consistent shared shell',()=
  assert.ok(home.includes('|| helpOpen'));
  assert.ok(home.includes('<NpcDialogue'));
  assert.ok(home.includes('<LocationPanel'));
- assert.ok(shell.includes('campus-chapter-bridge'));
- assert.ok(shell.includes('campus-discover'));
+ assert.ok(!shell.includes('campus-chapter-bridge'));
+ assert.ok(!shell.includes('campus-discover'));
  assert.ok(shell.includes('handleReturnToCampus'));
 });
 

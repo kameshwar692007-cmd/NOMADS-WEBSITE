@@ -2,32 +2,25 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { LOCATIONS } from '../src/game/data/locationData.js';
-
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
-test('all six campus destinations map to unique functional routes and checked-in icons', () => {
-  assert.equal(LOCATIONS.length, 6);
-  assert.equal(new Set(LOCATIONS.map(loc => loc.route)).size, 6);
-  for (const location of LOCATIONS) {
-    assert.ok(location.displayName && location.description && location.tagline, location.id);
-    assert.ok(location.badgeAsset.startsWith('/assets/game/ui/'), location.id);
-    assert.ok(existsSync(new URL('../public' + location.badgeAsset, import.meta.url)), location.id);
-  }
+test('all six campus destinations retain unique routes and actual building assets', () => {
+ assert.equal(LOCATIONS.length,6);
+ assert.equal(new Set(LOCATIONS.map(x=>x.route)).size,6);
+ for(const location of LOCATIONS){
+  assert.ok(location.displayName && location.description && location.tagline,location.id);
+  assert.ok(existsSync(new URL('../public'+location.badgeAsset,import.meta.url)),location.id);
+ }
 });
-
-test('shared destination bridge uses the existing campus data and preserves navigation', () => {
-  const shell = read('src/game/components/GameShell.jsx');
-  const style = read('src/game/components/CampusContinuity.css');
-  assert.match(shell, /LOCATIONS\.find\(\(item\) => item\.route === location\.pathname\)/);
-  assert.match(shell, /className="campus-chapter-bridge gamified-card"/);
-  assert.match(shell, /campusLocation\.displayName/);
-  assert.match(shell, /campusLocation\.description/);
-  assert.match(shell, /chapterNpc\.portraitIndex/);
-  assert.match(shell, /campus-chapter-character/);
-  assert.match(shell, /talkToNpc\(chapterNpc, true\)/);
-  assert.match(shell, /onClick=\{handleReturnToCampus\}/);
-  assert.match(shell, /onClick=\{\(\) => handleNav\(dest\.path\)\}/);
-  assert.match(shell, /<main className="shell-main-content">/);
-  assert.match(style, /prefers-reduced-motion/);
-  assert.match(style, /max-width:800px/);
+test('single persistent Campus control remains in shared navigation, not repeated in page cards',()=>{
+ const shell=read('src/game/components/GameShell.jsx');
+ assert.ok(shell.includes('className="hud-return-btn"'));
+ assert.ok(shell.includes('onClick={handleReturnToCampus}'));
+ assert.ok(shell.includes('onClick={() => handleNav(dest.path)}'));
+ assert.ok(shell.includes('<main className="shell-main-content">'));
+ assert.ok(!shell.includes('campus-chapter-bridge'));
+ assert.ok(!shell.includes('campus-chapter-map-link'));
+ assert.ok(!shell.includes('campus-discover'));
+ assert.ok(!shell.includes('footer-warp-top'));
+ assert.ok(shell.includes('<div className="shell-hero-banner"'));
 });

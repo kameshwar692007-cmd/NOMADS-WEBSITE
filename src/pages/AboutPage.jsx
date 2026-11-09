@@ -1,13 +1,12 @@
 // Nomad's Province — Main Headquarters (/about)
 // Clean, verified information aligned with official organization profile & partner network
-// Modernized single-page narrative with Pinned Split-Screen Partners Showcase
+// Compact organizational overview with accessible Allies carousel
 
-import { Link } from 'react-router-dom';
 import GameShell from '../game/components/GameShell.jsx';
 import { PARTNERS, TEAM_STRUCTURE, ORG_INFO } from '../game/data/campusContent.js';
 import { LOCATIONS } from '../game/data/locationData.js';
 import { sound } from '../game/systems/soundFx.js';
-import { ThemedIcon, IconTrophy, IconCode, IconZap, IconGraduation, IconSparkles, IconRocket, IconWhatsApp } from '../game/components/Icons.jsx';
+import { ThemedIcon, IconTrophy, IconCode, IconWhatsApp } from '../game/components/Icons.jsx';
 import PinnedPartnersShowcase from '../game/components/PinnedPartnersShowcase.jsx';
 import ProvinceSlider from './ProvinceSlider.jsx';
 import './AboutExplore.css';
@@ -82,85 +81,29 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 2. Core Ecosystem Pillars Matrix */}
-      <section className="about-section-block" aria-label="Ecosystem Pillars">
+      {/* Compact overview: details and real organizations belong in Allies below. */}
+      <section className="about-section-block hq-pillars-section" aria-labelledby="hq-pillars-title">
         <div className="section-narrative-header">
-          <div className="narrative-tag-row">
-            <span className="live-radar-dot" style={{ backgroundColor: '#38bdf8' }} />
-            <span className="narrative-tag">FOUNDATIONAL PILLARS</span>
-          </div>
-          <h2 className="narrative-title">Ecosystem Governance & Operation Verticals</h2>
-          <p className="narrative-desc">
-            Six interconnected operational divisions driving collegiate tournaments, indie development hackathons, sports turf crossovers, and student creator incubation.
-          </p>
+          <span className="narrative-tag">WHAT WE DO</span>
+          <h2 id="hq-pillars-title" className="narrative-title">Esports, Games & Community</h2>
+          <p className="narrative-desc">Three connected areas, one creative ecosystem.</p>
         </div>
-
-        <div className="grid-3-col">
-          <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-            <div className="pillar-icon-box">
-              <IconTrophy size={26} color="#f59e0b" />
-            </div>
-            <h3 className="pillar-title">Esports & Tournaments</h3>
-            <p className="pillar-text">
-              Orchestrating competitive tournament circuits, collegiate scrims, and live-streamed matches across Free Fire Max, CODM, Indus, and BGMI.
-            </p>
-            <div className="pillar-tag">COMPETITIVE CIRCUITS</div>
-          </div>
-
-          <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-            <div className="pillar-icon-box">
-              <IconCode size={26} color="#38bdf8" />
-            </div>
-            <h3 className="pillar-title">Game Development Studio</h3>
-            <p className="pillar-text">
-              Creating original indie games, interactive WebGL experiences, and hosting 24-hr game dev hackathons in partnership with GDAI.
-            </p>
-            <div className="pillar-tag">GDAI ALLIANCE</div>
-          </div>
-
-          <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-            <div className="pillar-icon-box">
-              <IconZap size={26} color="#10b981" />
-            </div>
-            <h3 className="pillar-title">Sports & Active Gaming</h3>
-            <p className="pillar-text">
-              Combining physical turf sports activations and digital gaming tournaments in partnership with Decathlon and Playo.
-            </p>
-            <div className="pillar-tag">DECATHLON & PLAYO</div>
-          </div>
-
-          <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-            <div className="pillar-icon-box">
-              <IconGraduation size={26} color="#f97316" />
-            </div>
-            <h3 className="pillar-title">Collegiate Network</h3>
-            <p className="pillar-text">
-              Partnering with institutions like SRMIST, Easwari Engineering, VIT-AP, Crescent, and St. Lourdes to nurture campus talent.
-            </p>
-            <div className="pillar-tag">COLLEGE CHAPTERS</div>
-          </div>
-
-          <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-            <div className="pillar-icon-box">
-              <IconSparkles size={26} color="#a855f7" />
-            </div>
-            <h3 className="pillar-title">Pop-Culture Communities</h3>
-            <p className="pillar-text">
-              Collaborating with regional cultural groups like Chennai Anime Club and Otaku Nadu for anime screenings, cosplay, and gaming fests.
-            </p>
-            <div className="pillar-tag">CULTURE CROSSOVERS</div>
-          </div>
-
-          <div className="gamified-card pillar-card" onMouseEnter={() => sound.playBlip()}>
-            <div className="pillar-icon-box">
-              <IconRocket size={26} color="#ef4444" />
-            </div>
-            <h3 className="pillar-title">Startup & Innovation</h3>
-            <p className="pillar-text">
-              Supported by Huddle Global (KSUM) and Easwari Startup Incubator to connect gaming creators with industry and venture opportunities.
-            </p>
-            <div className="pillar-tag">HUDDLE GLOBAL & KSUM</div>
-          </div>
+        <div className="hq-pillars-grid">
+          <article className="gamified-card hq-pillar-card">
+            <IconTrophy size={24} color="#f59e0b" />
+            <h3>Competitive Esports</h3>
+            <p>Tournament operations, collegiate competitions and gaming events.</p>
+          </article>
+          <article className="gamified-card hq-pillar-card">
+            <IconCode size={24} color="#38bdf8" />
+            <h3>Game Development</h3>
+            <p>Original games, creative projects and developer collaboration.</p>
+          </article>
+          <article className="gamified-card hq-pillar-card">
+            <ThemedIcon name="graduation" size={24} color="#84c669" />
+            <h3>Campus & Community</h3>
+            <p>Student chapters, pop-culture communities and partner programs.</p>
+          </article>
         </div>
       </section>
 
@@ -173,12 +116,12 @@ export default function AboutPage() {
           </div>
           <h2 className="narrative-title">Core Guild Leadership & Department Heads</h2>
           <p className="narrative-desc">
-            Organized into dedicated operational divisions spanning strategy, studio engineering, tournament operations, and grassroots outreach.
+            Leadership and studio teams, with tournament and community operations summarized in the Allies section.
           </p>
         </div>
 
         <div className="grid-2-col">
-          {TEAM_STRUCTURE.map((group, idx) => (
+          {TEAM_STRUCTURE.slice(0, 2).map((group, idx) => (
             <div key={idx} className="gamified-card team-group-card" onMouseEnter={() => sound.playBlip()}>
               <div className="team-group-header">
                 <span className="role-chip">{group.roleCategory}</span>
@@ -218,7 +161,7 @@ export default function AboutPage() {
       </section>
 
       {/* 4. Strategic Partners & Sponsors Showcase (Pinned Split-Screen Mask Reveal) */}
-      <PinnedPartnersShowcase partners={PARTNERS} />
+      <PinnedPartnersShowcase partners={PARTNERS} operations={TEAM_STRUCTURE.slice(2)} />
 
       {/* 5. Connected Province Exploration */}
       <section className="province-explore-section" aria-labelledby="province-explore-title">
@@ -231,9 +174,6 @@ export default function AboutPage() {
           </p>
         </div>
         <ProvinceSlider destinations={LOCATIONS.filter(destination => destination.route !== '/about')} />
-        <p className="province-explore-map-note">
-          Prefer exploring on foot? <Link to="/" onMouseEnter={() => sound.playBlip()}>Return to the campus map</Link>.
-        </p>
       </section>
     </GameShell>
   );
