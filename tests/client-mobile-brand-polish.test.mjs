@@ -20,11 +20,11 @@ test('client logo assets exist and brand intro goes straight to campus', () => {
  assert.ok(home.includes('key={introReplayKey}'));
  assert.ok(!home.includes('setNpcDialogue(HERO_GUIDE)'));
 });
-test('Huddle Global uses the uploaded Huddle symbol instead of placeholder partner image', () => {
+test('Huddle Global uses the exact full-wordmark client image instead of old logo', () => {
  const partner = PARTNERS.find(item => item.id === 'huddle-global');
  assert.ok(partner);
- assert.equal(partner.image1x1, '/assets/branding/huddle-client-logo.svg');
- assert.equal(partner.image, '/assets/branding/huddle-client-logo.svg');
+ assert.equal(partner.image1x1, '/assets/partners-1x1/huddle-global-original-square.webp');
+ assert.equal(partner.image, '/assets/partners-1x1/huddle-global-original-square.webp');
  assert.ok(existsSync(new URL('../public' + partner.image, import.meta.url)));
 });
 test('campus logo replay and mobile menu remain accessible', () => {
