@@ -1420,3 +1420,43 @@ html, body {
   border-color: #64748b;
   color: #94a3b8;
 }
+
+
+/* Mobile-first header revision: the uploaded logo stays legible and Menu never gets clipped. */
+.campus-fixed-header{
+ z-index:3000;
+ align-items:flex-start;
+ background:linear-gradient(180deg,rgba(6,14,25,.93),rgba(6,14,25,.65) 75%,transparent);
+ box-sizing:border-box;
+}
+.campus-fixed-brand{
+ appearance:none;display:flex;align-items:center;justify-content:center;
+ width:clamp(105px,12vw,155px);min-width:0;flex:0 0 auto;
+ padding:5px 8px;border:1px solid #cbd4df;border-radius:9px;
+ background:#fff;cursor:pointer;filter:drop-shadow(0 3px 8px #0009);
+}
+.campus-fixed-brand img{display:block;max-width:100%;width:100%;height:auto;}
+.campus-fixed-brand:focus-visible{outline:3px solid #ffda82;outline-offset:3px;}
+.campus-fixed-nav{display:flex;align-items:flex-start;flex-wrap:nowrap;min-width:0;}
+.campus-menu-button{position:relative;z-index:2;flex-shrink:0;}
+@media(max-width:680px){
+ .campus-fixed-header{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;
+  gap:6px;padding:8px;
+ }
+ .campus-fixed-brand{width:clamp(105px,31vw,152px);padding:4px 6px;justify-self:start;}
+ .campus-fixed-nav{align-self:start;gap:4px;justify-content:flex-end;flex-wrap:nowrap;}
+ .campus-fixed-button{min-height:42px;min-width:42px;padding:7px 9px;font-size:11px;}
+ .campus-fixed-button span[aria-hidden]{font-size:16px;}
+ .campus-contact-button{display:none;}
+}
+@media(max-width:440px){
+ .campus-fixed-button{min-height:42px;min-width:42px;padding:7px;}
+ .campus-fixed-button:not(.campus-menu-button) span:not([aria-hidden]){display:none;}
+ .campus-sound-button{display:none;}
+ .campus-menu-button span:not([aria-hidden]){font-size:11px;}
+}
+@media(max-width:340px){
+ .campus-fixed-brand{width:96px;}
+ .campus-fixed-button{min-width:38px;}
+}
