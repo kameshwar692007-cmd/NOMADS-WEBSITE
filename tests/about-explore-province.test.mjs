@@ -18,7 +18,8 @@ test('About uses one carousel for all five real destinations', () => {
   assert.ok(slider.includes('to={destination.route}'));
   assert.ok(slider.includes('destination.description'));
   assert.ok(slider.includes("aria-label={'View more about ' + destination.displayName}"));
-  assert.ok(about.includes('to="/"'));
+  assert.ok(!about.includes('province-explore-map-note'));
+  assert.ok(about.includes('<PinnedPartnersShowcase partners={PARTNERS} operations={TEAM_STRUCTURE.slice(2)} />'));
   for (const item of other) {
     assert.ok(CAMPUS_NPCS.some(npc => npc.route === item.route), item.route);
     assert.ok(existsSync(new URL('../public' + item.badgeAsset, import.meta.url)), item.id);

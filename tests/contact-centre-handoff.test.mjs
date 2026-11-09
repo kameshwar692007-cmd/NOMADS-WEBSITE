@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { ORG_INFO } from '../src/game/data/campusContent.js';
-import { LOCATIONS } from '../src/game/data/locationData.js';
 const read = p => readFileSync(new URL('../'+p,import.meta.url),'utf8');
 
 test('contact handoff keeps form contents until visitor explicitly sends',()=>{
@@ -23,20 +22,39 @@ test('contact handoff keeps form contents until visitor explicitly sends',()=>{
  assert.ok(!p.includes('setFormData({ name:'));
  assert.ok(ORG_INFO.email.includes('@'));
 });
-test('contact guide follows real campus destinations and keeps FAQ and verified channels',()=>{
+
+test('contact page enforces strict three-section order, verified channels and accessible FAQ',()=>{
  const p=read('src/pages/ContactPage.jsx');
- for(const route of ['/events','/studio','/community']){
-   assert.ok(LOCATIONS.some(l=>l.route===route));
-   assert.ok(p.includes('to="'+route+'"'));
- }
+ 
+ // Enforce client requirement: exactly three main sections in order: 1. Form, 2. Direct Channels, 3. FAQ
+ const formPos = p.indexOf('id="contact-form-heading"');
+ const channelsPos = p.indexOf('id="contact-channels-heading"');
+ const faqPos = p.indexOf('id="contact-faq-heading"');
+ 
+ assert.ok(formPos !== -1, 'Section 1 (Contact Form) must exist');
+ assert.ok(channelsPos !== -1, 'Section 2 (Direct Channels) must exist');
+ assert.ok(faqPos !== -1, 'Section 3 (FAQ) must exist');
+ assert.ok(formPos < channelsPos, 'Contact Form must precede Direct Channels');
+ assert.ok(channelsPos < faqPos, 'Direct Channels must precede FAQ');
+
+ // Ensure Quest Board and redundant destination navigation are removed
+ assert.ok(!p.includes('contact-journey-links'), 'Quest Board links must be removed per client specification');
+ assert.ok(!p.includes('QUEST BOARD'), 'Quest Board header must be removed');
+
+ // Verified channels and direct communication links preserved
  assert.ok(p.includes('href={ORG_INFO.whatsapp}'));
  assert.ok(p.includes('href={ORG_INFO.instagram}'));
+ assert.ok(p.includes(`mailto:\${ORG_INFO.email}`));
+ assert.ok(p.includes('{ORG_INFO.location}'));
+
+ // Accessible FAQ and form interaction preserved
  assert.ok(p.includes('aria-expanded={activeFaq === idx}'));
  assert.ok(p.includes('aria-controls={`contact-faq-answer-${idx}`}'));
  assert.ok(p.includes('id={`contact-faq-answer-${idx}`}'));
  assert.ok(p.includes('onSubmit={handleSubmit}'));
  assert.ok(p.includes('aria-pressed={dispatchMethod ==='));
 });
+
 test('contact UI remains mobile and keyboard friendly',()=>{
  const css=read('src/pages/ContactJourney.css');
  assert.ok(css.includes('@media(max-width:480px)'));

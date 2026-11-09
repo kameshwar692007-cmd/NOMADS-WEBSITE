@@ -6,12 +6,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { sound } from '../systems/soundFx.js';
 import StitchCursorBuilder from './StitchCursorBuilder.jsx';
-import { LOCATIONS } from '../data/locationData.js';
 import { ORG_INFO } from '../data/campusContent.js';
-import { CAMPUS_NPCS } from '../data/npcDialogues.js';
-import NpcDialogue, { NpcPortrait } from './NpcDialogue.jsx';
-import './CampusContinuity.css';
-import './DestinationDiscovery.css';
 import {
   IconHQ,
   IconEsports,
@@ -25,14 +20,6 @@ import {
   IconClose
 } from './Icons.jsx';
 
-const NEXT_DESTINATION = {
-  '/esports': '/events',
-  '/studio': '/community',
-  '/events': '/esports',
-  '/community': '/studio',
-  '/contact': '/about',
-};
-
 const DESTINATIONS = [
   { path: '/about', label: 'Main HQ', Icon: IconHQ, color: '#e84537' },
   { path: '/esports', label: 'Esports Arena', Icon: IconEsports, color: '#ff4444' },
@@ -45,12 +32,6 @@ const DESTINATIONS = [
 export default function GameShell({ title, subtitle, accentColor = '#e84537', children }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const campusLocation = LOCATIONS.find((item) => item.route === location.pathname);
-  const chapterNumber = campusLocation ? String(LOCATIONS.indexOf(campusLocation) + 1).padStart(2, '0') : null;
-  const nextLocation = LOCATIONS.find(item => item.route === NEXT_DESTINATION[location.pathname]);
-  const chapterNpc = CAMPUS_NPCS.find(npc => npc.route === campusLocation?.route);
-  const nextNpc = CAMPUS_NPCS.find(npc => npc.route === nextLocation?.route);
-  const [speakingNpc, setSpeakingNpc] = useState(null);
   const [muted, setMuted] = useState(() => sound.isMuted());
 
   // Keep muted state synchronized across route transitions
@@ -63,10 +44,9 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
 
   // Scroll to top & trigger sleek page entrance loader
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
     setPageLoaded(false);
     setMobileMenuOpen(false);
-    setSpeakingNpc(null);
     const timer = setTimeout(() => setPageLoaded(true), 120);
     return () => clearTimeout(timer);
   }, [location.pathname]);
@@ -147,12 +127,6 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
       navigate('/');
       setWarping(false);
     }, 240);
-  };
-
-  const talkToNpc = (npc, stayOnPage = false) => {
-    if (!npc) return;
-    sound.playInteract();
-    setSpeakingNpc(stayOnPage ? { ...npc, route: null, actionLabel: 'Keep Exploring' } : npc);
   };
 
   const toggleAudio = () => {
@@ -296,24 +270,6 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
               })}
             </div>
 
-            {/* Mobile Footer Actions */}
-            <div className="mobile-drawer-footer">
-              <button
-                className="hud-return-btn mobile-return-btn"
-                onClick={handleReturnToCampus}
-              >
-                <span className="return-arrow">◀</span>
-                <span>RETURN TO CAMPUS MAP</span>
-              </button>
-
-              <button
-                className={`hud-sound-btn mobile-sound-btn ${muted ? 'muted' : 'active'}`}
-                onClick={toggleAudio}
-              >
-                {muted ? <IconSoundOff size={16} color="#64748b" /> : <IconSoundOn size={16} color="#38bdf8" />}
-                <span>{muted ? 'SOUND EFFECTS: OFF' : 'SOUND EFFECTS: ACTIVE'}</span>
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -334,76 +290,10 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
         </div>
       </div>
 
-      {/* One location in the same campus world; the game remains the primary map. */}
-      {campusLocation && (
-        <section className="campus-chapter-bridge gamified-card" aria-label="Campus destination">
-          {chapterNpc && (
-            <button type="button" className="campus-chapter-character"
-              onClick={() => talkToNpc(chapterNpc, true)}
-              aria-label={`Talk to ${chapterNpc.name}, ${chapterNpc.title}`}
-              title={`Talk to ${chapterNpc.name}`}>
-              <NpcPortrait portraitIndex={chapterNpc.portraitIndex} name={chapterNpc.name} />
-              <span className="campus-character-hint">TALK TO {chapterNpc.name.toUpperCase()} <span aria-hidden="true">↗</span></span>
-            </button>
-          )}
-          <div className="campus-chapter-copy">
-            <span className="campus-chapter-eyebrow">NOMAD'S PROVINCE / DESTINATION {chapterNumber}</span>
-            <h2>{campusLocation.displayName}</h2>
-            <p>{campusLocation.description}</p>
-            {chapterNpc && <span className="campus-chapter-quest">
-              <strong>{chapterNpc.name}</strong> · {chapterNpc.title} — {chapterNpc.message}
-            </span>}
-          </div>
-          <button type="button" className="campus-chapter-map-link"
-            onClick={handleReturnToCampus} onMouseEnter={() => sound.playBlip()}>
-            <span aria-hidden="true">⌖</span> BACK TO CAMPUS MAP
-          </button>
-        </section>
-      )}
-
       {/* 4. Page Inner Body */}
       <main className="shell-main-content">
         {children}
       </main>
-
-      {/* The same explorable destinations, expanded as useful page-specific information. */}
-      {campusLocation && campusLocation.route !== '/about' && campusLocation.sectionDetails && (
-        <aside className="campus-discover gamified-card" aria-labelledby="campus-discover-title">
-          <div className="campus-discover-heading">
-            <span className="campus-discover-eyebrow">DESTINATION FIELD NOTES</span>
-            <h2 id="campus-discover-title">What you can explore here</h2>
-            <p>Discover the different ways to get involved with {campusLocation.displayName}.</p>
-          </div>
-          <ul className="campus-discover-list">
-            {campusLocation.sectionDetails.highlights.map(highlight => (
-              <li key={highlight}><span aria-hidden="true">✦</span> {highlight}</li>
-            ))}
-          </ul>
-          {nextLocation && (
-            <div className="campus-discover-next">
-              {nextNpc && (
-                <button type="button" className="campus-next-character"
-                  onClick={() => talkToNpc(nextNpc)}
-                  title={`Talk to ${nextNpc.name}`}
-                  aria-label={`Talk to ${nextNpc.name} from ${nextLocation.displayName}`}>
-                  <NpcPortrait portraitIndex={nextNpc.portraitIndex} name={nextNpc.name} />
-                  <span className="campus-next-character-hint">TALK <span aria-hidden="true">↗</span></span>
-                </button>
-              )}
-              <div className="campus-discover-next-copy">
-                <span>CONTINUE YOUR JOURNEY</span>
-                <strong>{nextLocation.displayName}</strong>
-                {nextNpc && <p>Meet {nextNpc.name}, your {nextNpc.title.toLowerCase()}.</p>}
-              </div>
-              <button type="button" className="campus-next-view-more" onClick={() => handleNav(nextLocation.route)} onMouseEnter={() => sound.playBlip()}>
-                View More <span aria-hidden="true">→</span>
-              </button>
-            </div>
-          )}
-        </aside>
-      )}
-
-      <NpcDialogue npc={speakingNpc} onClose={() => setSpeakingNpc(null)} />
 
       {/* 5. Cyber Footer */}
       <footer className="shell-footer">
@@ -426,9 +316,7 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
             </a>
           </div>
 
-          <button className="footer-warp-top" onClick={handleReturnToCampus} onMouseEnter={() => sound.playBlip()}>
-            ▲ RETURN TO MAP
-          </button>
+
         </div>
       </footer>
     </div>
