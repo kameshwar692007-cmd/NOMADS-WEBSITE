@@ -4114,13 +4114,8 @@
    ENHANCED GLOBAL RESPONSIVENESS & STITCH SCROLL LOCK
    ========================================================================== */
 
-/* 1. Stitch Assembly Scroll Locking */
-html.stitch-scroll-locked,
-body.stitch-scroll-locked {
-  overflow: hidden !important;
-  touch-action: none !important;
-  overscroll-behavior: none !important;
-}
+/* Stitch animation no longer locks document scrolling.
+   The visitor must be able to scroll even while elements are animated. */
 
 /* 2. Global Content Container */
 .shell-main-content {
