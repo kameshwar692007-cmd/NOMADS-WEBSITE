@@ -7,6 +7,7 @@ import { PARTNERS } from '../data/campusContent.js';
 import { sound } from '../systems/soundFx.js';
 
 export default function PinnedPartnersShowcase({ partners = PARTNERS, operations = [] }) {
+  const ALLY_HOLD_MS = 3500;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReducedMotion, setIsReducedMotion] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
   const [hovered, setHovered] = useState(false);
@@ -73,7 +74,7 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
   }, []);
   useEffect(() => {
     if (hovered || focused || isReducedMotion || !pageVisible || filteredPartners.length < 2) return;
-    const timer = window.setInterval(() => setActiveIndex(i => (i + 1) % filteredPartners.length), 4800);
+    const timer = window.setInterval(() => setActiveIndex(i => (i + 1) % filteredPartners.length), ALLY_HOLD_MS);
     return () => window.clearInterval(timer);
   }, [hovered, focused, isReducedMotion, pageVisible, filteredPartners.length]);
 
