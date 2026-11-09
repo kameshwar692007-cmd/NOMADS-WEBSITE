@@ -26,7 +26,7 @@ test('carousel uses the original video design and authentic partner data',()=>{
  }
  for(const exact of ['className="showcase-pinned-track"','className="split-card"',
    'className="stage-wrapper"','className="stage-box"',
-   'className="stage-img','className="details-box"','className="meta-row"',
+   'className={`stage-img','className="details-box"','className="meta-row"',
    'className="cat-badge"','className="accent-bar"','className="nav-bar"',
    'className="dots-group"','className="arrow-btn"']){
    assert.ok(jsx.includes(exact),exact);
