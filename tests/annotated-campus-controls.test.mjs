@@ -63,18 +63,19 @@ test('marked props have ground collisions plus depth-correct foreground redraw',
  assert.equal(draw.length,0,'player in front should render above tree canopy');
 });
 
-test('WASD, arrow keys, mobile D-pad, and automatic arrival popup are wired',()=>{
+test('WASD, arrow keys, mobile joystick, and automatic arrival popup are wired',()=>{
  const canvas=read('src/game/components/GameCanvas.jsx');
  const css=read('src/game/components/GameControls.css');
  for(const key of ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',"w:'up'","a:'left'","s:'down'","d:'right'"]){
   assert.ok(canvas.includes(key),'missing keyboard control '+key);
  }
- assert.ok(canvas.includes('onPointerDown={e=>startTouchDirection(e,direction)}'));
- assert.ok(canvas.includes('onPointerUp={e=>endTouchDirection(e,direction)}'));
+ assert.ok(canvas.includes('onPointerDown={startJoystick}'));
+ assert.ok(canvas.includes('onPointerUp={endJoystick}'));
  assert.ok(canvas.includes('findNearbyLocation('));
  assert.ok(canvas.includes('interactRef.current(nearest)'));
  assert.ok(canvas.includes('travelRef.current.cancel()'));
  assert.ok(css.includes('touch-action:none'));
+  assert.ok(canvas.includes('onPointerMove={moveJoystick}'));
  assert.ok(read('src/pages/HomePage.jsx').includes('paused={Boolean(introOpen || npcDialogue || activeLocation'));
 });
 
