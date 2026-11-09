@@ -1,0 +1,42 @@
+/* Restrained, performant opening for the client's actual black-and-gray logo. */
+.np-revolver {
+ position:fixed;inset:0;z-index:150;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:clamp(12px,3vh,26px);
+ overflow:hidden;isolation:isolate;background:#fbfbfc;color:#121923;
+ animation:np-revolver-dismiss 2400ms ease-out both;
+}
+.np-revolver-logo{
+ width:min(66vw,440px);max-height:min(55dvh,400px);
+ transform-origin:center;
+ animation:np-revolver-arrive 1600ms cubic-bezier(.2,.8,.25,1) both;
+}
+.np-revolver-logo img{width:100%;height:auto;max-height:min(55dvh,400px);object-fit:contain;display:block;}
+.np-revolver-caption{display:flex;justify-content:center;align-items:center;
+ flex-wrap:nowrap;white-space:nowrap;gap:0;font:800 clamp(12px,2vw,19px)/1.4 system-ui,sans-serif;
+ letter-spacing:.17em;color:#18293d;text-align:center;max-width:92vw;}
+.np-revolver-letter{display:inline-block;opacity:0;transform:translateY(8px);
+ animation:np-revolver-letter-in 360ms ease-out forwards;
+ animation-delay:calc(500ms + var(--letter-index)*48ms);
+}
+.np-revolver-skip{
+ position:absolute;z-index:2;top:clamp(16px,3vh,30px);right:clamp(16px,4vw,36px);
+ border:1px solid #a5b0be;border-radius:8px;min-height:44px;
+ background:#eef1f5;color:#18293d;padding:10px 16px;
+ font:700 13px system-ui,sans-serif;cursor:pointer;
+}
+.np-revolver-skip:hover{background:#d9e3ed;}
+.np-revolver-skip:focus-visible{outline:3px solid #246cb8;outline-offset:3px;}
+@keyframes np-revolver-arrive{
+ 0%{opacity:0;transform:perspective(850px) rotateY(-80deg) scale(.88);}
+ 30%{opacity:1;}
+ 100%{opacity:1;transform:perspective(850px) rotateY(360deg) scale(1);}
+}
+@keyframes np-revolver-letter-in{to{opacity:1;transform:translateY(0);}}
+@keyframes np-revolver-dismiss{0%,86%{opacity:1}100%{opacity:0;}}
+@media(max-width:600px){
+ .np-revolver-logo{width:min(82vw,340px);}
+ .np-revolver-caption{font-size:clamp(10px,2.5vw,14px);letter-spacing:.1em;}
+}
+@media(prefers-reduced-motion:reduce){
+ .np-revolver,.np-revolver-logo,.np-revolver-letter{animation:none;opacity:1;transform:none;}
+}

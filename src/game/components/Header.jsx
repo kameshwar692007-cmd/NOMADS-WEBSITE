@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { sound } from '../systems/soundFx.js';
 
-export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpOpen }) {
+export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpOpen, onLogoReplay }) {
   const [muted, setMuted] = useState(() => sound.isMuted());
 
   useEffect(() => {
@@ -16,22 +16,12 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpO
 
   return (
     <header className="campus-fixed-header" aria-label="Nomad's Province navigation">
-      <a className="campus-fixed-brand" href="/" aria-label="Nomad's Province — Home" onMouseEnter={() => sound.playBlip()}>
-        <img
-          src="/assets/game/headquarters-banner-client.png"
-          onError={(event) => {
-            // Fall back to the previously verified asset if the HD image is missing or corrupt.
-            const image = event.currentTarget;
-            if (!image.src.endsWith('/assets/game/headquarters-banner.webp')) {
-              image.src = '/assets/game/headquarters-banner.webp';
-            }
-          }}
-          alt="Nomad's Province Headquarters"
-          width="600"
-          height="212"
-          draggable="false"
-        />
-      </a>
+      <button type="button" className="campus-fixed-brand" onClick={onLogoReplay}
+        aria-label="Replay Nomad's Province opening logo animation"
+        title="Replay opening animation">
+        <img src="/assets/branding/nomads-client-logo.svg"
+          alt="Nomad's Province" width="514" height="410" draggable="false" />
+      </button>
       <nav className="campus-fixed-nav" aria-label="Campus controls">
         <button
           type="button"
@@ -44,7 +34,7 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpO
         </button>
         <button
           type="button"
-          className="campus-fixed-button"
+          className="campus-fixed-button campus-map-button"
           onClick={onMapOpen}
           onMouseEnter={() => sound.playBlip()}
           aria-label="Open campus map"
@@ -58,7 +48,7 @@ export default function Header({ onDirectoryOpen, onMapOpen, onMenuOpen, onHelpO
         </button>
         <button
           type="button"
-          className="campus-fixed-button"
+          className="campus-fixed-button campus-menu-button"
           onClick={onMenuOpen}
           onMouseEnter={() => sound.playBlip()}
           aria-label="Open website menu"

@@ -4912,3 +4912,29 @@ body.stitch-scroll-locked {
     margin-top: 28px;
   }
 }
+
+
+/* Keep inner-page HUD sticky: overflow-x:hidden created a scroll container that
+   prevented sticky navigation from remaining visible during long Studio pages. */
+.gamified-shell{overflow-x:clip;overflow-y:visible;}
+.gamified-shell .shell-hud-bar{
+ position:sticky;top:0;z-index:4000;width:100%;box-sizing:border-box;
+}
+@media(max-width:1040px){
+ .gamified-shell .hud-center-nav{display:none!important;}
+ .gamified-shell .hud-sandwich-btn{display:inline-flex!important;align-items:center;}
+}
+@media(max-width:600px){
+ .gamified-shell .shell-hud-bar{padding:8px;gap:6px;min-height:60px;}
+ .gamified-shell .hud-left,.gamified-shell .hud-right{min-width:0;gap:6px;}
+ .gamified-shell .hud-return-btn{padding:8px 9px;min-height:42px;box-sizing:border-box;}
+ .gamified-shell .hud-sound-btn{min-width:42px;min-height:42px;padding:8px;justify-content:center;}
+ .gamified-shell .hud-sound-btn .sound-label,
+ .gamified-shell .hud-sound-btn .sound-visualizer{display:none;}
+ .gamified-shell .hud-sandwich-btn{min-width:66px;min-height:42px;padding:8px 10px;justify-content:center;}
+}
+@media(max-width:360px){
+ .gamified-shell .shell-hud-bar{padding:7px 6px;gap:4px;}
+ .gamified-shell .hud-sandwich-btn{min-width:48px;padding:8px 7px;}
+ .gamified-shell .sandwich-label{display:none;}
+}

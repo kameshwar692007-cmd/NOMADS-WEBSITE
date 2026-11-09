@@ -1,22 +1,33 @@
-/* Campus-only controls. No dependency on the AGY page design system. */
-.campus-dpad {
- position:absolute;left:clamp(12px,4vw,32px);bottom:clamp(80px,11vh,110px);
- z-index:45;display:grid;grid-template-columns:repeat(3,48px);
- grid-template-rows:repeat(3,48px);gap:3px;pointer-events:none;
+/* Mobile virtual joystick. Pointer capture drives existing collision-aware movement. */
+.campus-joystick{
+ position:absolute;left:clamp(16px,5vw,34px);bottom:clamp(76px,12vh,112px);
+ width:126px;height:126px;z-index:45;pointer-events:none;
 }
-.campus-dpad-key{
- pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;
- background:rgba(15,25,48,.91);color:#e6edf9;
- border:2px solid #acbdd6;border-radius:12px;
- font-size:20px;font-weight:900;box-shadow:0 3px 0 #0b1426,0 8px 18px #02061175;
- cursor:pointer;display:flex;align-items:center;justify-content:center;
+.campus-joystick-base{
+ position:relative;display:block;width:126px;height:126px;padding:0;pointer-events:auto;
+ border:2px solid rgba(191,212,233,.8);border-radius:50%;
+ background:radial-gradient(circle,rgba(30,53,83,.75),rgba(9,21,40,.93));
+ box-shadow:0 7px 22px #06102299,inset 0 0 22px #020915aa;
+ touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;
 }
-.campus-dpad-key:active{background:#d8334d;color:white;transform:translateY(2px);}
-.campus-dpad-up{grid-area:1/2;}
-.campus-dpad-left{grid-area:2/1;}
-.campus-dpad-down{grid-area:2/2;}
-.campus-dpad-right{grid-area:2/3;}
+.campus-joystick-base:active{cursor:grabbing;}
+.campus-joystick-base:focus-visible{outline:3px solid #ffda8a;outline-offset:4px;}
+.campus-joystick-guide{
+ position:absolute;inset:18px;border:1px dashed rgba(186,214,242,.35);
+ border-radius:50%;pointer-events:none;
+}
+.campus-joystick-knob{
+ position:absolute;left:50%;top:50%;margin:-28px 0 0 -28px;
+ width:56px;height:56px;border-radius:50%;pointer-events:none;
+ border:2px solid #c6d7ec;background:linear-gradient(150deg,#42688c,#203652);
+ box-shadow:0 3px 10px #030a17bb,inset 0 2px 5px #9fbad450;
+}
+.campus-joystick-knob::after{
+ content:'';position:absolute;inset:18px;border-radius:50%;background:#d4e8fa;opacity:.78;
+}
 @media(max-width:420px){
- .campus-dpad{grid-template-columns:repeat(3,43px);grid-template-rows:repeat(3,43px);bottom:85px;left:12px;}
- .campus-dpad-key{font-size:18px;}
+ .campus-joystick,.campus-joystick-base{width:110px;height:110px;}
+ .campus-joystick{left:14px;bottom:84px;}
+ .campus-joystick-knob{width:52px;height:52px;margin:-26px 0 0 -26px;}
 }
+@media(prefers-reduced-motion:reduce){.campus-joystick-base *{animation:none;transition:none;}}

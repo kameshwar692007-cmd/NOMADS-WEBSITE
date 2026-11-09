@@ -42,3 +42,14 @@
 .studio-pitch-draft>p a{color:#b8eeff;margin-left:4px;overflow-wrap:anywhere}
 .studio-pitch-draft a:focus-visible,.studio-pitch-draft button:focus-visible{outline:3px solid #ffdfa2;outline-offset:3px}
 @media(max-width:500px){.studio-pitch-draft-actions{flex-direction:column}.studio-pitch-draft-actions a,.studio-pitch-draft-actions button{width:100%}}
+
+
+/* The projects are visible immediately; no terminal or Re-Assemble action. */
+.studio-project-grid{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));
+ gap:20px;align-items:stretch;margin:16px 0 34px;
+}
+.studio-project-grid>.project-card{min-width:0;display:flex;flex-direction:column;}
+.studio-project-grid .project-body{flex:1;display:flex;flex-direction:column;}
+.studio-project-grid .studio-project-expand{margin-top:auto;}
+@media(max-width:600px){.studio-project-grid{grid-template-columns:1fr;gap:16px;}}

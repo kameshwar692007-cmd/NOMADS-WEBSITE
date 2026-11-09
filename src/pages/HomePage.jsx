@@ -11,7 +11,7 @@ import MapModal from '../game/components/MapModal.jsx';
 import MenuDrawer from '../game/components/MenuDrawer.jsx';
 import ControlHints from '../game/components/ControlHints.jsx';
 import NpcDialogue from '../game/components/NpcDialogue.jsx';
-import BookIntro from '../game/components/BookIntro.jsx';
+import LogoRevolver from '../game/components/LogoRevolver.jsx';
 import HelpModal from '../game/components/HelpModal.jsx';
 
 export default function HomePage() {
@@ -23,15 +23,22 @@ export default function HomePage() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [travelTarget, setTravelTarget] = useState(null);
-  // Show the brief logo once per tab; returning from other pages goes straight to the map.
+  // Brand reveal once per tab; return visits go directly to the interactive campus map.
   const [introOpen, setIntroOpen] = useState(() => {
     try { return sessionStorage.getItem('np-campus-welcomed-v2') !== 'yes'; }
     catch { return true; }
   });
+  const [introReplayKey, setIntroReplayKey] = useState(0);
   const [npcDialogue, setNpcDialogue] = useState(null);
   const completeIntro = useCallback(() => {
     try { sessionStorage.setItem('np-campus-welcomed-v2', 'yes'); } catch { /* private mode */ }
     setIntroOpen(false);
+  }, []);
+
+  const replayIntro = useCallback(() => {
+    setNpcDialogue(null);
+    setIntroReplayKey(current => current + 1);
+    setIntroOpen(true);
   }, []);
 
   // Responsive device check
@@ -87,6 +94,7 @@ export default function HomePage() {
         onMapOpen={() => setMapOpen(true)}
         onMenuOpen={() => setMenuOpen(true)}
         onHelpOpen={() => setHelpOpen(true)}
+        onLogoReplay={replayIntro}
       />
       {/* 2. Interactive Explorable Canvas World */}
       <main className="game-viewport">
@@ -127,7 +135,7 @@ export default function HomePage() {
       />
 
       {/* Cinematic onboarding and reusable NPC dialogue only cover the campus. */}
-      {introOpen && <BookIntro onComplete={completeIntro} />}
+      {introOpen && <LogoRevolver key={introReplayKey} onComplete={completeIntro} />}
       <NpcDialogue npc={npcDialogue} onClose={() => setNpcDialogue(null)} />
       <HelpModal isOpen={helpOpen} isMobile={isMobile} onClose={() => setHelpOpen(false)} />
 
