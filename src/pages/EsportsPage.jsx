@@ -1,8 +1,7 @@
 // Nomad's Province — Esports Arena (/esports)
-// High-energy competitive tournament dashboard with verified titles & authentic registration
+// Professional, minimal competitive tournament dashboard with responsive horizontal carousel
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import './EsportsArenaGuide.css';
 import GameShell from '../game/components/GameShell.jsx';
 import { TOURNAMENTS, ORG_INFO } from '../game/data/campusContent.js';
@@ -13,9 +12,44 @@ export default function EsportsPage() {
   const [selectedTournament, setSelectedTournament] = useState(TOURNAMENTS[0]);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeGame, setActiveGame] = useState('all');
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const carouselRef = useRef(null);
+  const touchStartX = useRef(0);
+
   const visibleTournaments = activeGame === 'all'
     ? TOURNAMENTS
     : TOURNAMENTS.filter(tourney => tourney.id === activeGame);
+
+  const scrollToIndex = useCallback((index) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const cards = el.querySelectorAll('.esports-carousel-card');
+    if (cards[index]) {
+      cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+      setActiveSlideIndex(index);
+    }
+  }, []);
+
+  const handlePrev = () => {
+    sound.playSelect();
+    const nextIdx = Math.max(0, activeSlideIndex - 1);
+    scrollToIndex(nextIdx);
+  };
+
+  const handleNext = () => {
+    sound.playSelect();
+    const nextIdx = Math.min(visibleTournaments.length - 1, activeSlideIndex + 1);
+    scrollToIndex(nextIdx);
+  };
+
+  const handleFilterChange = (gameId) => {
+    sound.playSelect();
+    setActiveGame(gameId);
+    setActiveSlideIndex(0);
+    if (carouselRef.current) {
+      carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+  };
 
   const handleRegisterClick = (tourney) => {
     sound.playSelect();
@@ -23,187 +57,287 @@ export default function EsportsPage() {
     setModalOpen(true);
   };
 
+  // Keep active index in sync during native scroll / touch swipe
+  const handleScroll = () => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const cards = el.querySelectorAll('.esports-carousel-card');
+    if (!cards.length) return;
+    const scrollLeft = el.scrollLeft;
+    let closestIndex = 0;
+    let minDiff = Infinity;
+    cards.forEach((card, idx) => {
+      const diff = Math.abs(card.offsetLeft - el.offsetLeft - scrollLeft);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = idx;
+      }
+    });
+    if (closestIndex !== activeSlideIndex) {
+      setActiveSlideIndex(closestIndex);
+    }
+  };
+
+  // Keyboard navigation within the carousel
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      handlePrev();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      handleNext();
+    }
+  };
+
+  // Touch swipe support
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+  };
+
+  // ESC key closes modal
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape' && modalOpen) {
+        sound.playCancel();
+        setModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [modalOpen]);
+
   return (
     <GameShell
       title="ESPORTS ARENA"
-      subtitle="Competitive Tournament Circuits, Collegiate Scrims & Community Showdowns"
+      subtitle="Tournament Operations, Collegiate Circuits & Competitive Showdowns"
       accentColor="#ff4444"
     >
-      {/* 1. Arena Live Radar Banner (Stitch Target) */}
-      <section className="gamified-card arena-hero-card stitch-target" data-stitch-label="Constructing Esports Radar Hub...">
-        <div className="arena-pulse-header">
-          <div className="arena-status-pill">
-            <span className="live-radar-dot" />
-            <span>COLLEGIATE & COMMUNITY CIRCUITS ACTIVE</span>
-          </div>
-          <div className="arena-scrim-alert">REGISTRATIONS OPEN VIA OFFICIAL CHANNELS</div>
+      {/* 1. Concise Professional Headline Banner */}
+      <section className="gamified-card esports-hero-card">
+        <div className="esports-header-meta">
+          <span className="esports-status-pill">
+            <span className="esports-live-dot" />
+            COMPETITIVE CIRCUITS ACTIVE
+          </span>
+          <span className="esports-badge-kicker">NOMAD'S PROVINCE ESPORTS</span>
         </div>
-
-        <div className="arena-headline-wrap">
-          <h2 className="arena-headline">Where Competitors Battle Across Premier Mobile & PC Titles</h2>
-          <p className="arena-sub">
-            Nomad's Province organizes structured esports tournaments, collegiate scrims, and community showdowns 
-            across India's top competitive titles including Free Fire Max, Call of Duty: Mobile, Indus Battle Royale, and BGMI.
-          </p>
-        </div>
+        <h2 className="esports-hero-title">Structured Esports & Collegiate Tournaments</h2>
+        <p className="esports-hero-desc">
+          Nomad's Province organizes structured tournaments, private collegiate scrims, and community showdowns 
+          across India's top competitive mobile and PC titles. Browse active circuits below to view match formats and register.
+        </p>
       </section>
 
-      {/* A playable-looking briefing, backed by the existing real tournament list. */}
-      <section className="arena-field-guide gamified-card" aria-labelledby="arena-guide-title">
-        <div className="arena-guide-heading">
-          <span className="arena-guide-kicker">ARENA FIELD GUIDE / START HERE</span>
-          <h2 id="arena-guide-title">Choose your game. Find your circuit.</h2>
-          <p>
-            Browse the formats below, open a tournament to find its official contact channels,
-            or explore current event announcements before joining a competition.
-          </p>
+      {/* 2. Interactive Game Filters & Circuit Carousel */}
+      <section className="esports-circuits-section" aria-labelledby="esports-circuits-heading">
+        <div className="section-title-wrap">
+          <h3 id="esports-circuits-heading" className="section-title">FEATURED TOURNAMENT CIRCUITS</h3>
+          <span className="section-badge">VERIFIED CIRCUITS</span>
         </div>
-        <nav className="arena-guide-links" aria-label="Arena quick navigation">
-          <a href="#arena-circuits" onMouseEnter={() => sound.playBlip()}>
-            <span aria-hidden="true">01</span> Tournament circuits
-          </a>
-          <a href="#arena-progression" onMouseEnter={() => sound.playBlip()}>
-            <span aria-hidden="true">02</span> Competitive pathway
-          </a>
-          <Link to="/events" onMouseEnter={() => sound.playBlip()}>
-            <span aria-hidden="true">↗</span> Event announcements
-          </Link>
-        </nav>
-      </section>
 
-      {/* 2. Active Tournaments Battle Grid */}
-      <div id="arena-circuits" className="section-title-wrap arena-circuit-anchor">
-        <h3 className="section-title">FEATURED TOURNAMENT CIRCUITS</h3>
-        <span className="section-badge">TOURNAMENT BRACKETS</span>
-      </div>
-
-      <div className="arena-game-filters" role="group" aria-label="Filter by game">
-        <button type="button" className={`arena-game-filter ${activeGame === 'all' ? 'active' : ''}`}
-          aria-pressed={activeGame === 'all'} onClick={() => { sound.playSelect(); setActiveGame('all'); }}>
-          All games
-        </button>
-        {TOURNAMENTS.map(tourney => (
-          <button type="button" key={tourney.id}
-            className={`arena-game-filter ${activeGame === tourney.id ? 'active' : ''}`}
-            aria-pressed={activeGame === tourney.id}
-            onClick={() => { sound.playSelect(); setActiveGame(tourney.id); }}>
-            {tourney.game}
-          </button>
-        ))}
-      </div>
-      <p className="arena-filter-count" aria-live="polite">
-        Showing {visibleTournaments.length} of {TOURNAMENTS.length} tournament circuits
-      </p>
-      <div className="tournaments-grid">
-        {visibleTournaments.map((t, idx) => (
-          <div 
-            key={t.id} 
-            className="gamified-card tournament-card"
-            style={{ '--tourney-accent': t.accent }}
-            onMouseEnter={() => sound.playBlip()}
+        {/* Game Filters */}
+        <div className="arena-game-filters" role="group" aria-label="Filter tournaments by game">
+          <button
+            type="button"
+            className={`arena-game-filter ${activeGame === 'all' ? 'active' : ''}`}
+            aria-pressed={activeGame === 'all'}
+            onClick={() => handleFilterChange('all')}
           >
-            <div className="tourney-header-chip-wrap">
-              <span className="tourney-status-chip" style={{ backgroundColor: t.accent }}>{t.status}</span>
-              <span className="tourney-game-badge">{t.game}</span>
-            </div>
+            All Games
+          </button>
+          {TOURNAMENTS.map(tourney => (
+            <button
+              type="button"
+              key={tourney.id}
+              className={`arena-game-filter ${activeGame === tourney.id ? 'active' : ''}`}
+              aria-pressed={activeGame === tourney.id}
+              onClick={() => handleFilterChange(tourney.id)}
+            >
+              {tourney.game}
+            </button>
+          ))}
+        </div>
 
-            <div className="tourney-body">
-              <div className="tourney-badge-sub" style={{ color: t.accent }}>{t.badge}</div>
-              <h4 className="tourney-title">{t.title}</h4>
-              <p className="tourney-desc">{t.desc}</p>
+        <div className="esports-filter-status-row">
+          <p className="arena-filter-count" aria-live="polite">
+            Showing {visibleTournaments.length} of {TOURNAMENTS.length} tournament circuits
+          </p>
 
-              <div className="tourney-partner-tag">
-                <span className="partner-bullet">●</span> {t.partnerInfo}
-              </div>
-
-              <div className="tourney-specs-grid">
-                <div className="spec-box">
-                  <span className="spec-label">AWARDS & RECOGNITION</span>
-                  <span className="spec-val" style={{ color: t.accent }}>{t.prizePool}</span>
-                </div>
-                <div className="spec-box">
-                  <span className="spec-label">MATCH FORMAT</span>
-                  <span className="spec-val">{t.format}</span>
-                </div>
-              </div>
-
+          {/* Carousel Controls */}
+          {visibleTournaments.length > 1 && (
+            <div className="esports-carousel-nav" aria-label="Carousel pagination">
               <button
-                className={`gamified-btn tourney-btn ${idx === 0 ? 'stitch-target' : ''}`}
-                data-stitch-label={idx === 0 ? "Compiling Tournament Register CTA..." : undefined}
-                style={{ backgroundColor: t.accent }}
-                onClick={() => handleRegisterClick(t)}
-                onMouseEnter={() => sound.playBlip()}
+                type="button"
+                className="carousel-nav-btn prev-btn"
+                aria-label="Previous tournament"
+                disabled={activeSlideIndex === 0}
+                onClick={handlePrev}
               >
-                <IconCrosshair size={16} />
-                <span>REGISTER FOR TOURNAMENT</span>
+                ‹
+              </button>
+              <span className="carousel-nav-counter">
+                {activeSlideIndex + 1} / {visibleTournaments.length}
+              </span>
+              <button
+                type="button"
+                className="carousel-nav-btn next-btn"
+                aria-label="Next tournament"
+                disabled={activeSlideIndex >= visibleTournaments.length - 1}
+                onClick={handleNext}
+              >
+                ›
               </button>
             </div>
-          </div>
-        ))}
-      </div>
+          )}
+        </div>
 
-      {/* 3. Three-Tier Progression Matrix */}
-      <section id="arena-progression" className="gamified-card progression-card">
-        <h3 className="section-title">THE THREE-TIER COMPETITIVE PIPELINE</h3>
-        <div className="pipeline-steps-grid">
-          <div className="pipeline-step" onMouseEnter={() => sound.playBlip()}>
-            <div className="step-num">01</div>
-            <h4 className="step-title">Community Scrims</h4>
-            <p className="step-desc">Regular practice rooms and custom lobbies for squads to build team chemistry and match discipline.</p>
+        {/* Horizontal Responsive Carousel */}
+        <div
+          className="esports-carousel-wrapper"
+          tabIndex={0}
+          role="region"
+          aria-label="Featured tournaments carousel"
+          onKeyDown={handleKeyDown}
+        >
+          <div
+            ref={carouselRef}
+            className="esports-carousel-track"
+            onScroll={handleScroll}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {visibleTournaments.map((t, idx) => (
+              <article
+                key={t.id}
+                className={`gamified-card esports-carousel-card ${activeSlideIndex === idx ? 'is-active-slide' : ''}`}
+                style={{ '--tourney-accent': t.accent }}
+                onMouseEnter={() => sound.playBlip()}
+                aria-label={`Tournament ${idx + 1} of ${visibleTournaments.length}: ${t.title}`}
+              >
+                <div className="tourney-header-chip-wrap">
+                  <span className="tourney-status-chip" style={{ backgroundColor: t.accent }}>
+                    {t.status}
+                  </span>
+                  <span className="tourney-game-badge">{t.game}</span>
+                </div>
+
+                <div className="tourney-body">
+                  <div className="tourney-badge-sub" style={{ color: t.accent }}>
+                    {t.badge}
+                  </div>
+                  <h4 className="tourney-title">{t.title}</h4>
+                  <p className="tourney-desc">{t.desc}</p>
+
+                  <div className="tourney-partner-tag">
+                    <span className="partner-bullet">●</span> {t.partnerInfo}
+                  </div>
+
+                  <div className="tourney-specs-grid">
+                    <div className="spec-box">
+                      <span className="spec-label">AWARDS & RECOGNITION</span>
+                      <span className="spec-val" style={{ color: t.accent }}>{t.prizePool}</span>
+                    </div>
+                    <div className="spec-box">
+                      <span className="spec-label">MATCH FORMAT</span>
+                      <span className="spec-val">{t.format}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="gamified-btn tourney-btn"
+                    style={{ backgroundColor: t.accent }}
+                    onClick={() => handleRegisterClick(t)}
+                    onMouseEnter={() => sound.playBlip()}
+                  >
+                    <IconCrosshair size={16} />
+                    <span>REGISTER FOR TOURNAMENT</span>
+                  </button>
+                </div>
+              </article>
+            ))}
           </div>
-          <div className="pipeline-step" onMouseEnter={() => sound.playBlip()}>
-            <div className="step-num">02</div>
-            <h4 className="step-title">Collegiate Cups</h4>
-            <p className="step-desc">Bracketed tournaments across partner colleges with verified team rosters and certificate recognition.</p>
-          </div>
-          <div className="pipeline-step" onMouseEnter={() => sound.playBlip()}>
-            <div className="step-num">03</div>
-            <h4 className="step-title">Broadcasted Finals</h4>
-            <p className="step-desc">Live-streamed showdowns featuring caster commentary, spectator replays, and MVP highlights.</p>
-          </div>
+
+          {/* Carousel Dot Indicators */}
+          {visibleTournaments.length > 1 && (
+            <div className="esports-dots-indicator" role="tablist" aria-label="Tournament slides">
+              {visibleTournaments.map((t, idx) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="tab"
+                  className={`esports-dot ${activeSlideIndex === idx ? 'active' : ''}`}
+                  aria-selected={activeSlideIndex === idx}
+                  aria-label={`Go to slide ${idx + 1}: ${t.title}`}
+                  onClick={() => scrollToIndex(idx)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      <section className="arena-next-step gamified-card" aria-labelledby="arena-next-title">
-        <div>
-          <span className="arena-guide-kicker">BEYOND THE ARENA</span>
-          <h3 id="arena-next-title">Part of a bigger province</h3>
-          <p>
-            Competitive events are one part of Nomad's Province. Visit the Event Grounds for
-            event updates or the Community Hub to discover ways to connect with other gamers.
-          </p>
-        </div>
-        <div className="arena-next-actions">
-          <Link to="/events" onMouseEnter={() => sound.playBlip()}>Explore Event Grounds <span aria-hidden="true">→</span></Link>
-          <Link to="/community" onMouseEnter={() => sound.playBlip()}>Visit Community Hub <span aria-hidden="true">→</span></Link>
-        </div>
-      </section>
-
-      {/* 4. Registration Modal with Official Channels */}
+      {/* 3. Tournament Details & Registration Modal */}
       {modalOpen && (
-        <div className="retro-modal-backdrop" onClick={() => { sound.playCancel(); setModalOpen(false); }}>
-          <div className="retro-modal-card" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="retro-modal-backdrop"
+          onClick={() => { sound.playCancel(); setModalOpen(false); }}
+        >
+          <div
+            className="retro-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header" style={{ borderColor: selectedTournament?.accent }}>
-              <h3>ENTER {selectedTournament?.title}</h3>
-              <button className="modal-close-btn" onClick={() => { sound.playCancel(); setModalOpen(false); }}>✕</button>
+              <h3 id="modal-title">ENTER {selectedTournament?.title}</h3>
+              <button
+                type="button"
+                className="modal-close-btn"
+                aria-label="Close registration dialog"
+                onClick={() => { sound.playCancel(); setModalOpen(false); }}
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
-              <p>Squad check-ins and external registration forms are coordinated via our official channels:</p>
+              <div className="modal-specs-summary">
+                <p><strong>Game:</strong> {selectedTournament?.game}</p>
+                <p><strong>Format:</strong> {selectedTournament?.format}</p>
+                <p><strong>Awards:</strong> {selectedTournament?.prizePool}</p>
+                <p><strong>Partner:</strong> {selectedTournament?.partnerInfo}</p>
+              </div>
+              <p className="modal-instruction">
+                Squad check-ins and external registration forms are coordinated via our official channels:
+              </p>
               <div className="modal-links">
-                <a 
-                  href={ORG_INFO.whatsapp} 
-                  target="_blank" 
-                  rel="noreferrer" 
+                <a
+                  href={ORG_INFO.whatsapp}
+                  target="_blank"
+                  rel="noreferrer"
                   className="modal-action-btn whatsapp-btn"
                   onClick={() => sound.playSelect()}
                 >
                   <IconWhatsApp size={18} />
-                  <span>Register via WhatsApp Channel</span>
+                  <span>Register via Official WhatsApp</span>
                 </a>
-                <a 
-                  href={ORG_INFO.instagram} 
-                  target="_blank" 
-                  rel="noreferrer" 
+                <a
+                  href={ORG_INFO.instagram}
+                  target="_blank"
+                  rel="noreferrer"
                   className="modal-action-btn insta-btn"
                   onClick={() => sound.playSelect()}
                 >

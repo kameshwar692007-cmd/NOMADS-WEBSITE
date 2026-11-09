@@ -1,19 +1,18 @@
 // Nomad's Province — Contact Centre (/contact)
-// Multi-category communication console with direct routing and FAQ terminal
-// Delivers enquiries to official WhatsApp / Email at ₹0 cost without exposed keys
+// Three focused sections: 1. Contact Form, 2. Direct Channels, 3. FAQ
+// Client requirement: Strict 3-section order, no Quest Board, no promotional buttons
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import './ContactJourney.css';
 import GameShell from '../game/components/GameShell.jsx';
 import { ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
-import { IconWhatsApp, IconInstagram, IconMail, IconMapPin, IconRocket, IconCheck } from '../game/components/Icons.jsx';
+import { IconWhatsApp, IconInstagram, IconMail, IconMapPin, IconRocket } from '../game/components/Icons.jsx';
 
 const FAQS = [
   {
     q: "How can I join tournaments organized by Nomad's Province?",
-    a: "You can register for any active tournament through our registration links announced on our website, WhatsApp community channel, and official Instagram (@nomadsprovince)."
+    a: "You can register for any active tournament through our registration links announced on our website, official WhatsApp, and official Instagram (@nomadsprovince)."
   },
   {
     q: "What games do you organize tournaments for?",
@@ -55,16 +54,14 @@ export default function ContactPage() {
     'Message:',
     formData.message.trim()
   ].join('\n');
+
   const emailUrl = `mailto:${ORG_INFO.email}?subject=${encodeURIComponent(messageSubject)}&body=${encodeURIComponent(messageBody)}`;
-  // WhatsApp has no verified direct recipient phone number in the source data.
-  // Share the draft with a recipient the visitor chooses; don't claim it was sent to us.
+  // WhatsApp share URL: user chooses the recipient
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageBody)}`;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     sound.playSelect();
-    // The visitor must explicitly send the message from their email or WhatsApp app.
-    // Preserve their form entries until they confirm or choose to edit.
     setDraftReady(true);
   };
 
@@ -76,41 +73,28 @@ export default function ContactPage() {
   return (
     <GameShell
       title="CONTACT CENTRE"
-      subtitle="Partnerships, Sponsorships, Collegiate Fests & General Inquiries"
-      accentColor="#c0cbdc"
+      subtitle="Direct Communications, Verified Inquiries & Official Channels"
+      accentColor="#60a5fa"
     >
-      <section className="contact-journey gamified-card" aria-labelledby="contact-journey-title">
-        <span className="contact-journey-eyebrow">CONTACT CENTRE / QUEST BOARD</span>
-        <h2 id="contact-journey-title">Every collaboration starts with a conversation.</h2>
-        <p>Looking to host a tournament, build a game, partner with a community, or ask a question?
-          Choose your destination below, then prepare a message for our team.</p>
-        <nav className="contact-journey-links" aria-label="Explore before contacting">
-          <Link to="/events" onMouseEnter={() => sound.playBlip()}>Plan an event <span aria-hidden="true">→</span></Link>
-          <Link to="/studio" onMouseEnter={() => sound.playBlip()}>Explore game projects <span aria-hidden="true">→</span></Link>
-          <Link to="/community" onMouseEnter={() => sound.playBlip()}>Join the community <span aria-hidden="true">→</span></Link>
-        </nav>
-      </section>
-
-      <div className="contact-main-grid">
-        {/* Left Column: Interactive Dispatch Terminal */}
-        <div className="gamified-card contact-form-card stitch-target" data-stitch-label="Constructing Inquiry Terminal...">
-          <div className="terminal-header">
-            <span className="terminal-dot red" />
-            <span className="terminal-dot yellow" />
-            <span className="terminal-dot green" />
-            <span className="terminal-title">DIRECT INQUIRY DISPATCH</span>
+      <div className="contact-page-container">
+        {/* ========================================================
+            SECTION 1: CONTACT FORM
+            ======================================================== */}
+        <section className="gamified-card contact-section-card" aria-labelledby="contact-form-heading">
+          <div className="contact-section-header">
+            <span className="contact-section-badge">SECTION 01</span>
+            <h2 id="contact-form-heading" className="contact-section-title">Send an Inquiry</h2>
+            <p className="contact-section-desc">
+              Connect with our core team for tournament operations, collegiate fest partnerships, game development collaborations, or brand sponsorships.
+            </p>
           </div>
-
-          <h3 className="section-title">CONNECT WITH NOMAD'S PROVINCE</h3>
-          <p className="contact-intro">
-            Connect with our core team for esports tournaments, game development collaborations, collegiate fest partnerships, or brand sponsorships.
-          </p>
 
           {draftReady ? (
             <div className="contact-draft-card" role="status">
               <h4>Your message draft is ready</h4>
-              <p>It has <strong>not been sent</strong>. Review your details and open your chosen app
-                to send the message yourself.</p>
+              <p>
+                It has <strong>not been sent</strong>. Review your details and open your chosen app to send the message yourself.
+              </p>
               <div className="contact-draft-details">
                 <div><span>Contact</span><strong>{formData.name} · {formData.email}</strong></div>
                 <div><span>Category</span><strong>{formData.category}</strong></div>
@@ -118,31 +102,50 @@ export default function ContactPage() {
               </div>
               <div className="contact-draft-actions">
                 {dispatchMethod === 'email' ? (
-                  <a href={emailUrl} className="contact-draft-send"
-                    onClick={() => sound.playSelect()}>Open email draft <span aria-hidden="true">↗</span></a>
+                  <a
+                    href={emailUrl}
+                    className="contact-draft-send"
+                    onClick={() => sound.playSelect()}
+                  >
+                    Open email draft <span aria-hidden="true">↗</span>
+                  </a>
                 ) : (
-                  <a href={whatsappShareUrl} target="_blank" rel="noopener noreferrer"
-                    className="contact-draft-send" onClick={() => sound.playSelect()}>
+                  <a
+                    href={whatsappShareUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-draft-send"
+                    onClick={() => sound.playSelect()}
+                  >
                     Share using WhatsApp <span aria-hidden="true">↗</span>
                   </a>
                 )}
-                <button type="button" onClick={() => { sound.playSelect(); setDraftReady(false); }}>Edit message</button>
+                <button
+                  type="button"
+                  className="contact-draft-edit-btn"
+                  onClick={() => { sound.playSelect(); setDraftReady(false); }}
+                >
+                  Edit message
+                </button>
               </div>
-              {dispatchMethod === 'whatsapp' && <p className="contact-draft-note">
-                WhatsApp opens a share composer. Choose the recipient yourself; this does not send
-                a direct message to Nomad's Province. For a direct enquiry, use email instead.
-              </p>}
-              <p className="contact-draft-note">Official direct email:
-                <a href={`mailto:${ORG_INFO.email}`}>{ORG_INFO.email}</a>
+              {dispatchMethod === 'whatsapp' && (
+                <p className="contact-draft-note">
+                  WhatsApp opens a share composer. Choose the recipient yourself; this does not send
+                  a direct message to Nomad's Province. For a direct enquiry, use email instead.
+                </p>
+              )}
+              <p className="contact-draft-note">
+                Official direct email: <a href={`mailto:${ORG_INFO.email}`}>{ORG_INFO.email}</a>
               </p>
             </div>
           ) : (
             <form className="contact-form" onSubmit={handleSubmit}>
               <div className="form-group">
-                <label className="retro-label">SENDER NAME / CONTACT PERSON</label>
-                <input 
-                  type="text" 
-                  placeholder="Your Full Name" 
+                <label className="retro-label" htmlFor="contact-name">SENDER NAME / CONTACT PERSON</label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  placeholder="Your Full Name"
                   className="retro-input"
                   required
                   value={formData.name}
@@ -151,10 +154,11 @@ export default function ContactPage() {
               </div>
 
               <div className="form-group">
-                <label className="retro-label">EMAIL ADDRESS</label>
-                <input 
-                  type="email" 
-                  placeholder="your.email@example.com" 
+                <label className="retro-label" htmlFor="contact-email">EMAIL ADDRESS</label>
+                <input
+                  id="contact-email"
+                  type="email"
+                  placeholder="your.email@example.com"
                   className="retro-input"
                   required
                   value={formData.email}
@@ -163,8 +167,9 @@ export default function ContactPage() {
               </div>
 
               <div className="form-group">
-                <label className="retro-label">INQUIRY CATEGORY</label>
-                <select 
+                <label className="retro-label" htmlFor="contact-category">INQUIRY CATEGORY</label>
+                <select
+                  id="contact-category"
                   className="retro-input"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -179,9 +184,10 @@ export default function ContactPage() {
               </div>
 
               <div className="form-group">
-                <label className="retro-label">MESSAGE / PROPOSAL BRIEF</label>
-                <textarea 
-                  placeholder="Describe your collaboration, event dates, or inquiry..." 
+                <label className="retro-label" htmlFor="contact-message">MESSAGE / PROPOSAL BRIEF</label>
+                <textarea
+                  id="contact-message"
+                  placeholder="Describe your collaboration, event dates, or inquiry..."
                   className="retro-input textarea"
                   required
                   rows={4}
@@ -191,7 +197,7 @@ export default function ContactPage() {
               </div>
 
               {/* Delivery Channel Selector */}
-              <div className="form-group" style={{ marginBottom: '16px' }}>
+              <div className="form-group">
                 <label className="retro-label">DISPATCH CHANNEL</label>
                 <div className="contact-channel-selector" role="group" aria-label="Choose message channel">
                   <button
@@ -199,7 +205,6 @@ export default function ContactPage() {
                     className={`filter-btn ${dispatchMethod === 'whatsapp' ? 'active' : ''}`}
                     aria-pressed={dispatchMethod === 'whatsapp'}
                     onClick={() => { sound.playSelect(); setDispatchMethod('whatsapp'); }}
-                    style={{ flex: 1, padding: '8px 12px', fontSize: '12px' }}
                   >
                     <span>💬 WHATSAPP DIRECT</span>
                   </button>
@@ -208,14 +213,17 @@ export default function ContactPage() {
                     className={`filter-btn ${dispatchMethod === 'email' ? 'active' : ''}`}
                     aria-pressed={dispatchMethod === 'email'}
                     onClick={() => { sound.playSelect(); setDispatchMethod('email'); }}
-                    style={{ flex: 1, padding: '8px 12px', fontSize: '12px' }}
                   >
                     <span>✉️ EMAIL (MAILTO)</span>
                   </button>
                 </div>
               </div>
 
-              <button type="submit" className="gamified-btn submit-dispatch-btn stitch-target" data-stitch-label="Compiling Dispatch Button..." onMouseEnter={() => sound.playBlip()}>
+              <button
+                type="submit"
+                className="gamified-btn submit-dispatch-btn"
+                onMouseEnter={() => sound.playBlip()}
+              >
                 <IconRocket size={16} />
                 <span>{dispatchMethod === 'whatsapp' ? 'PREPARE WHATSAPP SHARE →' : 'PREPARE EMAIL DRAFT →'}</span>
               </button>
@@ -225,81 +233,123 @@ export default function ContactPage() {
               </p>
             </form>
           )}
-        </div>
+        </section>
 
-        {/* Right Column: Direct Channels & Operational Comms */}
-        <div className="contact-sidebar">
-          <div className="gamified-card comms-channels-card">
-            <h4 className="sidebar-title">VERIFIED DIRECT CHANNELS</h4>
+        {/* ========================================================
+            SECTION 2: DIRECT CHANNELS
+            ======================================================== */}
+        <section className="gamified-card contact-section-card" aria-labelledby="contact-channels-heading">
+          <div className="contact-section-header">
+            <span className="contact-section-badge">SECTION 02</span>
+            <h2 id="contact-channels-heading" className="contact-section-title">Verified Direct Channels</h2>
+            <p className="contact-section-desc">
+              Direct official communication channels for tournament inquiries, collegiate operations, and partnerships.
+            </p>
+          </div>
 
+          <div className="comms-channels-grid">
+            {/* WhatsApp */}
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
-              <span className="channel-icon-frame">
-                <IconWhatsApp size={20} color="#22c55e" />
+              <span className="channel-icon-frame whatsapp-frame">
+                <IconWhatsApp size={22} color="#22c55e" />
               </span>
-              <div>
+              <div className="channel-content">
                 <div className="channel-label">Official WhatsApp</div>
-                <a href={ORG_INFO.whatsapp} target="_blank" rel="noreferrer" className="channel-link">
+                <a
+                  href={ORG_INFO.whatsapp}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="channel-link"
+                >
                   Chat on WhatsApp ({ORG_INFO.whatsappNumber || '+91 97897 20897'}) →
                 </a>
               </div>
             </div>
 
+            {/* Instagram */}
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
-              <span className="channel-icon-frame">
-                <IconInstagram size={20} color="#ec4899" />
+              <span className="channel-icon-frame insta-frame">
+                <IconInstagram size={22} color="#ec4899" />
               </span>
-              <div>
+              <div className="channel-content">
                 <div className="channel-label">Official Instagram (@nomadsprovince)</div>
-                <a href={ORG_INFO.instagram} target="_blank" rel="noreferrer" className="channel-link">
+                <a
+                  href={ORG_INFO.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="channel-link"
+                >
                   Follow on Instagram →
                 </a>
               </div>
             </div>
 
+            {/* Email */}
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
-              <span className="channel-icon-frame">
-                <IconMail size={20} color="#38bdf8" />
+              <span className="channel-icon-frame mail-frame">
+                <IconMail size={22} color="#38bdf8" />
               </span>
-              <div>
+              <div className="channel-content">
                 <div className="channel-label">Official Contact Email</div>
-                <a href={`mailto:${ORG_INFO.email}`} className="channel-link">
-                  {ORG_INFO.email}
+                <a
+                  href={`mailto:${ORG_INFO.email}`}
+                  className="channel-link"
+                >
+                  {ORG_INFO.email} →
                 </a>
               </div>
             </div>
 
+            {/* Operational Location */}
             <div className="comms-channel-item" onMouseEnter={() => sound.playBlip()}>
-              <span className="channel-icon-frame">
-                <IconMapPin size={20} color="#f59e0b" />
+              <span className="channel-icon-frame location-frame">
+                <IconMapPin size={22} color="#f59e0b" />
               </span>
-              <div>
+              <div className="channel-content">
                 <div className="channel-label">Operational Headquarters</div>
                 <div className="channel-val">{ORG_INFO.location}</div>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Quick FAQ Terminal */}
-          <div className="gamified-card faq-card">
-            <h4 className="sidebar-title">FREQUENTLY ASKED QUESTIONS</h4>
-            <div className="faq-list">
-              {FAQS.map((faq, idx) => (
-                <div key={idx} className={`faq-item ${activeFaq === idx ? 'expanded' : ''}`}>
-                  <button type="button" className="faq-question-btn" onClick={() => toggleFaq(idx)}
-                    aria-expanded={activeFaq === idx} aria-controls={`contact-faq-answer-${idx}`}>
-                    <span>{faq.q}</span>
-                    <span className="faq-arrow">{activeFaq === idx ? '▲' : '▼'}</span>
-                  </button>
-                  {activeFaq === idx && (
-                    <div id={`contact-faq-answer-${idx}`} className="faq-answer-pane fade-in">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+        {/* ========================================================
+            SECTION 3: FREQUENTLY ASKED QUESTIONS
+            ======================================================== */}
+        <section className="gamified-card contact-section-card" aria-labelledby="contact-faq-heading">
+          <div className="contact-section-header">
+            <span className="contact-section-badge">SECTION 03</span>
+            <h2 id="contact-faq-heading" className="contact-section-title">Frequently Asked Questions</h2>
+            <p className="contact-section-desc">
+              Common questions about tournament participation, college collaborations, and ecosystem partnerships.
+            </p>
           </div>
-        </div>
+
+          <div className="faq-list">
+            {FAQS.map((faq, idx) => (
+              <div key={idx} className={`faq-item ${activeFaq === idx ? 'expanded' : ''}`}>
+                <button
+                  type="button"
+                  className="faq-question-btn"
+                  onClick={() => toggleFaq(idx)}
+                  aria-expanded={activeFaq === idx}
+                  aria-controls={`contact-faq-answer-${idx}`}
+                >
+                  <span className="faq-question-text">{faq.q}</span>
+                  <span className="faq-arrow">{activeFaq === idx ? '▲' : '▼'}</span>
+                </button>
+                {activeFaq === idx && (
+                  <div
+                    id={`contact-faq-answer-${idx}`}
+                    className="faq-answer-pane fade-in"
+                  >
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </GameShell>
   );
