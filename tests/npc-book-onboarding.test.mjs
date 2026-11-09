@@ -35,11 +35,11 @@ test('onboarding is skippable and first-session only with a short control tutori
  assert.ok(home.includes('onNpcInteract={setNpcDialogue}'));
  assert.ok(home.includes('paused={Boolean(introOpen || npcDialogue'));
  assert.ok(logo.includes('Skip logo animation and enter campus map'));
- assert.ok(book.includes("event.key === 'Escape'"));
- assert.ok(book.includes('prefers-reduced-motion'));
- assert.ok(book.includes('LOGO_REVOLVE_MS = 1800'));
- assert.ok(book.includes('window.setTimeout(onComplete'));
- assert.ok(book.includes('/assets/game/headquarters-banner-client.png'));
+ assert.ok(logo.includes("event.key === 'Escape'"));
+ assert.ok(logo.includes('prefers-reduced-motion'));
+ assert.ok(logo.includes('LOGO_REVOLVE_MS = 1800'));
+ assert.ok(logo.includes('window.setTimeout(onComplete'));
+ assert.ok(logo.includes('/assets/game/headquarters-banner-client.png'));
  assert.ok(!logo.includes('np-book-object'));
  assert.ok(!home.includes('setNpcDialogue(HERO_GUIDE)'));
 });
