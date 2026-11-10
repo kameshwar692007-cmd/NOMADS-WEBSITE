@@ -266,17 +266,8 @@ export const eventService = {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
-          if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-            const simulatedRole = storageGet(ROLES_KEY) || 'SUPER_ADMIN';
-            return {
-              role: simulatedRole,
-              email: 'admin@nomadsprovince.com',
-              isStaff: ['SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(simulatedRole),
-              isAdmin: ['SUPER_ADMIN', 'ADMIN'].includes(simulatedRole),
-              isSuperAdmin: simulatedRole === 'SUPER_ADMIN',
-              isSimulated: true
-            };
-          }
+          // Connecting to a real Supabase project always requires a real Auth
+          // session. A localhost URL does NOT grant upload or admin privileges.
           return { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false };
         }
 
@@ -300,10 +291,11 @@ export const eventService = {
         };
       } catch (err) {
         console.warn('Failed to resolve role from database:', err);
+        return { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false };
       }
     }
 
-    // Local simulation fallback
+    // Only offline/demo mode uses simulated roles.
     const simulatedRole = storageGet(ROLES_KEY) || 'SUPER_ADMIN';
     return {
       role: simulatedRole,
@@ -805,29 +797,56 @@ export const eventService = {
     }
 
     if (isSupabaseConfigured && supabase) {
+      // The storage INSERT policy requires auth.uid() to belong to a real
+      // SUPER_ADMIN / ADMIN / EDITOR in public.admin_users. Running the
+      // events migration alone cannot grant an unauthenticated browser access.
+      let session;
       try {
-        const fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
-        // Unique collision-proof filename using crypto random UUID
-        const safeId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-        const filePath = `posters/${safeId}.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('event-posters')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (uploadError) throw uploadError;
-
-        const { data } = supabase.storage.from('event-posters').getPublicUrl(filePath);
-        return data.publicUrl;
-      } catch (err) {
-        console.warn('Storage upload error, falling back to data URL:', err);
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        session = data?.session;
+      } catch (error) {
+        throw new Error(`Supabase authentication check failed: ${error.message || 'unknown error'}. Please sign in again.`);
       }
+      if (!session?.user) {
+        throw new Error('Sign in with your Supabase staff account before uploading posters. Local demo admin access cannot upload to a protected storage bucket.');
+      }
+
+      const { data: staff, error: staffError } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      if (staffError) {
+        throw new Error(`Could not verify staff permissions: ${staffError.message}. Verify admin_users policies and your signed-in account.`);
+      }
+      if (!['SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(staff?.role)) {
+        throw new Error('This Supabase account is not an authorized staff member. Add its auth user ID to public.admin_users with an appropriate role.');
+      }
+
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+      const safeId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).substring(2)}`;
+      const filePath = `posters/${safeId}.${fileExt}`;
+      let uploadError;
+      try {
+        ({ error: uploadError } = await supabase.storage
+          .from('event-posters')
+          .upload(filePath, file, { cacheControl: '3600', upsert: false, contentType: file.type }));
+      } catch (error) {
+        throw new Error(`Poster upload request failed: ${error.message || 'network error'}. Check Supabase connection and browser console.`);
+      }
+      if (uploadError) {
+        const reason = uploadError.message || 'Unknown storage error';
+        throw new Error(`Supabase poster upload failed: ${reason}. Check the event-posters bucket and storage INSERT RLS policy for staff.`);
+      }
+
+      const { data } = supabase.storage.from('event-posters').getPublicUrl(filePath);
+      if (!data?.publicUrl) throw new Error('Poster uploaded but public URL was unavailable; check bucket visibility.');
+      return data.publicUrl;
     }
 
-    if (isSupabaseConfigured && supabase) throw new Error('Poster upload to Supabase failed. Please try again; no local-only poster was published.');
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
