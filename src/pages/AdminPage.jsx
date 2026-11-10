@@ -64,6 +64,8 @@ export default function AdminPage() {
     registrationUrl: '',
     partner: "Nomad's Province",
     posterUrl: '',
+    listingType: 'EVENT',
+    gameTitle: '', matchFormat: '', prizePool: '', partnerInfo: '',
     description: '',
     statusMode: 'AUTO',
     manualStatus: 'UPCOMING',
@@ -160,13 +162,15 @@ export default function AdminPage() {
   });
 
   // Open creation modal
-  const handleOpenCreate = () => {
+  const handleOpenCreate = (listingType = 'EVENT') => {
     sound.playSelect();
     setEditingEvent(null);
     const now = new Date();
     const later = new Date(now.getTime() + 4 * 3600000);
     setFormData({
       title: '',
+      listingType,
+      gameTitle: '', matchFormat: '', prizePool: '', partnerInfo: '',
       category: 'Esports',
       venue: 'Chennai Campus / Online',
       startDate: now.toISOString().slice(0, 16),
@@ -174,7 +178,7 @@ export default function AdminPage() {
       registrationDeadline: '',
       registrationUrl: ORG_INFO.whatsapp || 'https://wa.me/919789720897',
       partner: "Nomad's Province",
-      posterUrl: '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
+      posterUrl: '',
       description: '',
       statusMode: 'AUTO',
       manualStatus: 'UPCOMING',
@@ -199,6 +203,9 @@ export default function AdminPage() {
       registrationUrl: ev.registrationUrl || '',
       partner: ev.partner || '',
       posterUrl: ev.posterUrl || '',
+      listingType: ev.listingType || 'EVENT',
+      gameTitle: ev.gameTitle || '', matchFormat: ev.matchFormat || '',
+      prizePool: ev.prizePool || '', partnerInfo: ev.partnerInfo || '',
       description: ev.description || '',
       statusMode: ev.statusMode || 'AUTO',
       manualStatus: ev.manualStatus || 'UPCOMING',
@@ -214,6 +221,7 @@ export default function AdminPage() {
     e.preventDefault();
     setFormError('');
     setFormSuccess('');
+    if (uploadingPoster) { setFormError('Finish uploading the poster before saving.'); return; }
 
     try {
       if (editingEvent) {
@@ -343,6 +351,7 @@ export default function AdminPage() {
     if (!file) return;
 
     setUploadingPoster(true);
+    setFormError('');
     sound.playBlip();
     try {
       const url = await eventService.uploadPoster(file);
@@ -772,9 +781,15 @@ export default function AdminPage() {
           )}
 
           {userRoleState.isStaff && (
-            <button className="gamified-btn create-event-btn" onClick={handleOpenCreate} onMouseEnter={() => sound.playBlip()}>
+            <button className="gamified-btn create-event-btn" onClick={() => handleOpenCreate('EVENT')} onMouseEnter={() => sound.playBlip()}>
               <IconRocket size={16} />
               <span>+ CREATE NEW EVENT</span>
+            </button>
+          )}
+          {userRoleState.isStaff && (
+            <button type="button" className="gamified-btn create-event-btn" onClick={() => handleOpenCreate('TOURNAMENT')} style={{background:'#274469',border:'1px solid #38bdf8'}}>
+              <IconCrosshair size={16} />
+              <span>+ CREATE TOURNAMENT</span>
             </button>
           )}
         </div>
@@ -833,6 +848,7 @@ export default function AdminPage() {
 
                     <td className="details-col">
                       <div className="table-event-title">{ev.title}</div>
+                      <span style={{fontSize:11,color:'#8dd9f7'}}>{ev.listingType === 'TOURNAMENT' ? 'TOURNAMENT · ESPORTS + EVENTS' : 'EVENT GROUNDS'}</span>
                       <div className="table-venue">
                         <IconMapPin size={12} color="#38bdf8" /> {ev.venue}
                       </div>
@@ -951,7 +967,7 @@ export default function AdminPage() {
         <div className="retro-modal-backdrop" onClick={() => setEditorOpen(false)}>
           <div className="retro-modal-card admin-form-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{editingEvent ? 'EDIT EVENT DETAILS' : 'CREATE NEW NOMAD EVENT'}</h3>
+              <h3>{editingEvent ? 'EDIT LISTING' : formData.listingType === 'TOURNAMENT' ? 'CREATE NEW TOURNAMENT' : 'CREATE NEW EVENT'}</h3>
               <button className="modal-close-btn" onClick={() => setEditorOpen(false)}>✕</button>
             </div>
 
@@ -960,6 +976,30 @@ export default function AdminPage() {
               {formSuccess && <div className="admin-form-alert success">{formSuccess}</div>}
 
               <div className="form-grid-2">
+                <div className="form-group span-2">
+                  <label className="retro-label" htmlFor="listing-type">PUBLISH TO</label>
+                  <select id="listing-type" className="retro-input" value={formData.listingType}
+                    onChange={e => setFormData(prev => ({...prev, listingType:e.target.value, category:e.target.value==='TOURNAMENT'?'Esports':prev.category}))}>
+                    <option value="EVENT">Event Grounds (Event)</option>
+                    <option value="TOURNAMENT">Event Grounds + Esports Arena (Tournament)</option>
+                  </select>
+                </div>
+                {formData.listingType === 'TOURNAMENT' && (
+                  <>
+                    <div className="form-group"><label className="retro-label" htmlFor="admin-game-title">GAME TITLE</label>
+                      <input id="admin-game-title" className="retro-input" required maxLength={100} value={formData.gameTitle}
+                        placeholder="e.g. Free Fire Max" onChange={e=>setFormData({...formData,gameTitle:e.target.value})}/></div>
+                    <div className="form-group"><label className="retro-label" htmlFor="admin-match-format">MATCH FORMAT</label>
+                      <input id="admin-match-format" className="retro-input" value={formData.matchFormat} maxLength={160}
+                        placeholder="e.g. Battle Royale Squads" onChange={e=>setFormData({...formData,matchFormat:e.target.value})}/></div>
+                    <div className="form-group"><label className="retro-label" htmlFor="admin-prize-pool">AWARDS / PRIZE DETAILS</label>
+                      <input id="admin-prize-pool" className="retro-input" value={formData.prizePool} maxLength={160}
+                        placeholder="Only confirmed prizes" onChange={e=>setFormData({...formData,prizePool:e.target.value})}/></div>
+                    <div className="form-group"><label className="retro-label" htmlFor="admin-partner-info">PARTNER / COLLABORATION</label>
+                      <input id="admin-partner-info" className="retro-input" value={formData.partnerInfo} maxLength={180}
+                        placeholder="Verified partner information" onChange={e=>setFormData({...formData,partnerInfo:e.target.value})}/></div>
+                  </>
+                )}
                 <div className="form-group span-2">
                   <label className="retro-label">EVENT TITLE</label>
                   <input
@@ -1073,7 +1113,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="form-group span-2">
-                  <label className="retro-label">EVENT POSTER IMAGE (Upload or URL)</label>
+                  <label className="retro-label">EVENT / TOURNAMENT POSTER — ORIGINAL ASPECT RATIO</label>
                   <div className="poster-upload-row">
                     <input
                       type="file"
@@ -1092,9 +1132,10 @@ export default function AdminPage() {
                     value={formData.posterUrl}
                     onChange={(e) => setFormData({ ...formData, posterUrl: e.target.value })}
                   />
+                  <small style={{color:'#a6bdd5'}}>JPG, PNG, WebP or GIF · max 5 MB. Full poster displayed without cropping or stretching.</small>
                   {formData.posterUrl && (
-                    <div className="poster-preview-box">
-                      <img src={formData.posterUrl} alt="Poster Preview" className="poster-preview-img" />
+                    <div className="poster-preview-box poster-preview-original">
+                      <img src={formData.posterUrl} alt="Poster Preview" className="poster-preview-img" style={{objectFit:'contain',width:'100%',height:'auto',maxHeight:'400px'}} />
                     </div>
                   )}
                 </div>
@@ -1126,8 +1167,8 @@ export default function AdminPage() {
                 <button type="button" className="gamified-btn cancel-btn" onClick={() => setEditorOpen(false)}>
                   CANCEL
                 </button>
-                <button type="submit" className="gamified-btn save-btn">
-                  {editingEvent ? 'UPDATE EVENT' : 'REGISTER EVENT'}
+                <button type="submit" className="gamified-btn save-btn" disabled={uploadingPoster}>
+                  {uploadingPoster ? 'UPLOADING POSTER…' : editingEvent ? 'UPDATE LISTING' : 'PUBLISH LISTING'}
                 </button>
               </div>
             </form>
