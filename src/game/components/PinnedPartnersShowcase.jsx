@@ -10,7 +10,6 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
   const ALLY_HOLD_MS = 4000;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReducedMotion, setIsReducedMotion] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
-  const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [pageVisible, setPageVisible] = useState(() => !document.hidden);
   const [filter, setFilter] = useState('all');
@@ -73,10 +72,10 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
   useEffect(() => {
-    if (hovered || focused || isReducedMotion || !pageVisible || filteredPartners.length < 2) return;
+    if (focused || isReducedMotion || !pageVisible || filteredPartners.length < 2) return;
     const timer = window.setInterval(() => setActiveIndex(i => (i + 1) % filteredPartners.length), ALLY_HOLD_MS);
     return () => window.clearInterval(timer);
-  }, [hovered, focused, isReducedMotion, pageVisible, filteredPartners.length]);
+  }, [focused, isReducedMotion, pageVisible, filteredPartners.length]);
 
   const activePartner = filteredPartners[safeIndex] || filteredPartners[0] || partners[0];
   const changeFilter = id => {
@@ -89,8 +88,6 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
     <section
       className="pinned-partners-showcase-section"
       aria-label="Strategic Partners & Sponsors Showcase"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={e => { if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false); }}
     >
