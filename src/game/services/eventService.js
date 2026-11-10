@@ -108,6 +108,9 @@ export function validateEventPayload(data) {
     }
   }
 
+  if (data.listingType === 'TOURNAMENT' && !(data.gameTitle || '').trim()) {
+    errors.push('Game title is required for tournaments.');
+  }
   // Determine status_mode and manual_status
   let statusMode = 'AUTO';
   let manualStatus = null;
@@ -135,6 +138,11 @@ export function validateEventPayload(data) {
       manualStatus,
       isDraft: Boolean(data.isDraft),
       posterUrl: data.posterUrl ? data.posterUrl.trim() : '',
+      listingType: data.listingType === 'TOURNAMENT' ? 'TOURNAMENT' : 'EVENT',
+      gameTitle: typeof data.gameTitle === 'string' ? data.gameTitle.trim() : '',
+      matchFormat: typeof data.matchFormat === 'string' ? data.matchFormat.trim() : '',
+      prizePool: typeof data.prizePool === 'string' ? data.prizePool.trim() : '',
+      partnerInfo: typeof data.partnerInfo === 'string' ? data.partnerInfo.trim() : '',
       registrationUrl: data.registrationUrl ? data.registrationUrl.trim() : '',
       partner: data.partner ? data.partner.trim() : "Nomad's Province",
       description: data.description ? data.description.trim() : '',
@@ -185,6 +193,7 @@ function initializeFallbackStore() {
           manualStatus: isConcluded ? 'ENDED' : null,
           isDraft: false,
           posterUrl: ev.image || '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
+          listingType: 'EVENT',
           registrationUrl: 'https://wa.me/919789720897',
           partner: ev.partner || "Nomad's Province",
           description: ev.desc || '',
@@ -344,7 +353,7 @@ export const eventService = {
       try {
         const { data, error } = await supabase
           .from('events')
-          .select('id, slug, title, category, venue, start_date, end_date, registration_deadline, status_mode, manual_status, is_draft, poster_url, registration_url, partner, description, results, created_at')
+          .select('id, slug, title, category, venue, start_date, end_date, registration_deadline, status_mode, manual_status, is_draft, poster_url, registration_url, partner, description, results, created_at, listing_type, game_title, match_format, prize_pool, partner_info')
           .eq('is_draft', false)
           .order('start_date', { ascending: false });
 
@@ -363,6 +372,11 @@ export const eventService = {
               manualStatus: d.manual_status,
               isDraft: d.is_draft,
               posterUrl: d.poster_url,
+              listingType: d.listing_type || 'EVENT',
+              gameTitle: d.game_title || '',
+              matchFormat: d.match_format || '',
+              prizePool: d.prize_pool || '',
+              partnerInfo: d.partner_info || '',
               registrationUrl: d.registration_url,
               partner: d.partner,
               description: d.description,
@@ -418,6 +432,11 @@ export const eventService = {
             manualStatus: data.manual_status,
             isDraft: data.is_draft,
             posterUrl: data.poster_url,
+            listingType: data.listing_type || 'EVENT',
+            gameTitle: data.game_title || '',
+            matchFormat: data.match_format || '',
+            prizePool: data.prize_pool || '',
+            partnerInfo: data.partner_info || '',
             registrationUrl: data.registration_url,
             partner: data.partner,
             description: data.description,
@@ -506,6 +525,11 @@ export const eventService = {
               manualStatus: d.manual_status,
               isDraft: d.is_draft,
               posterUrl: d.poster_url,
+              listingType: d.listing_type || 'EVENT',
+              gameTitle: d.game_title || '',
+              matchFormat: d.match_format || '',
+              prizePool: d.prize_pool || '',
+              partnerInfo: d.partner_info || '',
               registrationUrl: d.registration_url,
               partner: d.partner,
               description: d.description,
@@ -559,6 +583,11 @@ export const eventService = {
             manual_status: sanitized.manualStatus,
             is_draft: sanitized.isDraft,
             poster_url: sanitized.posterUrl,
+            listing_type: sanitized.listingType,
+            game_title: sanitized.gameTitle,
+            match_format: sanitized.matchFormat,
+            prize_pool: sanitized.prizePool,
+            partner_info: sanitized.partnerInfo,
             registration_url: sanitized.registrationUrl,
             partner: sanitized.partner,
             description: sanitized.description,
@@ -574,6 +603,7 @@ export const eventService = {
       }
     }
 
+    if (isSupabaseConfigured && supabase) throw new Error('Cloud save failed. Event was NOT published; verify the SQL migration, login and Supabase connection.');
     const local = getLocalEvents();
     const newEvent = {
       ...sanitized,
@@ -611,6 +641,11 @@ export const eventService = {
             manual_status: sanitized.manualStatus,
             is_draft: sanitized.isDraft,
             poster_url: sanitized.posterUrl,
+            listing_type: sanitized.listingType,
+            game_title: sanitized.gameTitle,
+            match_format: sanitized.matchFormat,
+            prize_pool: sanitized.prizePool,
+            partner_info: sanitized.partnerInfo,
             registration_url: sanitized.registrationUrl,
             partner: sanitized.partner,
             description: sanitized.description,
@@ -627,6 +662,7 @@ export const eventService = {
       }
     }
 
+    if (isSupabaseConfigured && supabase) throw new Error('Cloud update failed. Event was NOT updated; verify the SQL migration and staff permissions.');
     const local = getLocalEvents();
     const index = local.findIndex((ev) => ev.id === id);
     if (index === -1) {
@@ -791,6 +827,7 @@ export const eventService = {
       }
     }
 
+    if (isSupabaseConfigured && supabase) throw new Error('Poster upload to Supabase failed. Please try again; no local-only poster was published.');
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
