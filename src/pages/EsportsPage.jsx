@@ -5,11 +5,29 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import './EsportsArenaGuide.css';
 import GameShell from '../game/components/GameShell.jsx';
 import { TOURNAMENTS, ORG_INFO } from '../game/data/campusContent.js';
+import { eventService } from '../game/services/eventService.js';
 import { sound } from '../game/systems/soundFx.js';
 import { IconCrosshair, IconWhatsApp, IconInstagram } from '../game/components/Icons.jsx';
 
 export default function EsportsPage() {
   const [selectedTournament, setSelectedTournament] = useState(TOURNAMENTS[0]);
+  const [publishedTournaments, setPublishedTournaments] = useState([]);
+  useEffect(() => {
+    let active = true;
+    eventService.getPublicEvents().then(events => {
+      if (!active) return;
+      setPublishedTournaments(events.filter(ev => ev.listingType === 'TOURNAMENT').map(ev => ({
+        id: ev.id, title: ev.title, game: ev.gameTitle || 'Esports',
+        status: ev.computedStatus === 'ENDED' ? 'CONCLUDED' : ev.computedStatus === 'ONGOING' ? 'LIVE NOW' : 'UPCOMING',
+        accent: '#f97316', badge: 'OFFICIAL TOURNAMENT', desc: ev.description || '',
+        partnerInfo: ev.partnerInfo || ev.partner || "Nomad's Province",
+        prizePool: ev.prizePool || 'Refer to organizer', format: ev.matchFormat || 'See registration details',
+        posterUrl: ev.posterUrl, registrationUrl: ev.registrationUrl
+      })));
+    }).catch(err => console.error('Could not load published tournaments',err));
+    return () => { active = false; };
+  }, []);
+  const allTournaments = [...publishedTournaments, ...TOURNAMENTS];
   const [modalOpen, setModalOpen] = useState(false);
   const [activeGame, setActiveGame] = useState('all');
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -17,8 +35,8 @@ export default function EsportsPage() {
   const touchStartX = useRef(0);
 
   const visibleTournaments = activeGame === 'all'
-    ? TOURNAMENTS
-    : TOURNAMENTS.filter(tourney => tourney.id === activeGame);
+    ? allTournaments
+    : allTournaments.filter(tourney => tourney.id === activeGame);
 
   const scrollToIndex = useCallback((index) => {
     const el = carouselRef.current;
@@ -157,7 +175,7 @@ export default function EsportsPage() {
           >
             All Games
           </button>
-          {TOURNAMENTS.map(tourney => (
+          {allTournaments.map(tourney => (
             <button
               type="button"
               key={tourney.id}
@@ -172,7 +190,7 @@ export default function EsportsPage() {
 
         <div className="esports-filter-status-row">
           <p className="arena-filter-count" aria-live="polite">
-            Showing {visibleTournaments.length} of {TOURNAMENTS.length} tournament circuits
+            Showing {visibleTournaments.length} of {allTournaments.length} tournament circuits
           </p>
 
           {/* Carousel Controls */}
@@ -233,6 +251,11 @@ export default function EsportsPage() {
                   <span className="tourney-game-badge">{t.game}</span>
                 </div>
 
+                {t.posterUrl && (
+                  <div className="tourney-poster-frame">
+                    <img src={t.posterUrl} alt={`${t.title} official poster`} className="tourney-poster-img" loading="lazy" />
+                  </div>
+                )}
                 <div className="tourney-body">
                   <div className="tourney-badge-sub" style={{ color: t.accent }}>
                     {t.badge}
@@ -323,16 +346,20 @@ export default function EsportsPage() {
               <p className="modal-instruction">
                 Squad check-ins and external registration forms are coordinated via our official channels:
               </p>
+              {selectedTournament?.posterUrl && (
+                <img src={selectedTournament.posterUrl} alt={`${selectedTournament.title} full poster`}
+                  className="tourney-modal-poster" />
+              )}
               <div className="modal-links">
                 <a
-                  href={ORG_INFO.whatsapp}
+                  href={selectedTournament?.registrationUrl || ORG_INFO.whatsapp}
                   target="_blank"
                   rel="noreferrer"
                   className="modal-action-btn whatsapp-btn"
                   onClick={() => sound.playSelect()}
                 >
                   <IconWhatsApp size={18} />
-                  <span>Register via Official WhatsApp</span>
+                  <span>{selectedTournament?.registrationUrl ? 'Open official registration' : 'Register via Official WhatsApp'}</span>
                 </a>
                 <a
                   href={ORG_INFO.instagram}
