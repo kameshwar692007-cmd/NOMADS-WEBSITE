@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {validateEventPayload} from '../src/game/services/eventService.js';
+import {validateEventPayload, eventService} from '../src/game/services/eventService.js';
 const read = p => readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const base = {
  title:'Sample Tournament',category:'Esports',venue:'Chennai',
@@ -52,4 +52,16 @@ test('migration adds tournament metadata without weakening staff RLS',()=>{
  assert.ok(sql.includes('add column if not exists game_title'));
  assert.ok(sql.includes("'event-posters'"));
  assert.ok(!sql.includes('disable row level security'));
+});
+
+test('a newly created tournament appears in public event records in local demo mode',async()=>{
+ if(eventService.isCloudConnected()) return;
+ const created=await eventService.createEvent(base);
+ assert.ok(created.id);
+ const publicEvents=await eventService.getPublicEvents();
+ const newlyListed=publicEvents.find(item=>item.id===created.id);
+ assert.ok(newlyListed);
+ assert.equal(newlyListed.listingType,'TOURNAMENT');
+ assert.equal(newlyListed.gameTitle,'Sample Game');
+ assert.equal(newlyListed.posterUrl,base.posterUrl);
 });
