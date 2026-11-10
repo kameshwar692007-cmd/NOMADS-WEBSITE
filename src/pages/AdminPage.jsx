@@ -24,14 +24,9 @@ import {
 export default function AdminPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userRoleState, setUserRoleState] = useState({
-    role: 'SUPER_ADMIN',
-    email: 'admin@nomadsprovince.com',
-    isStaff: true,
-    isAdmin: true,
-    isSuperAdmin: true,
-    isSimulated: true
-  });
+  const [userRoleState, setUserRoleState] = useState(() => eventService.isCloudConnected()
+    ? { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false, isSimulated: false }
+    : { role: 'SUPER_ADMIN', email: 'admin@nomadsprovince.com', isStaff: true, isAdmin: true, isSuperAdmin: true, isSimulated: true });
   const [analyticsData, setAnalyticsData] = useState({});
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [activeAdminTab, setActiveAdminTab] = useState('EVENTS'); // 'EVENTS' | 'CONTACT'
@@ -391,7 +386,7 @@ export default function AdminPage() {
 
           <h3 className="section-title" style={{ color: '#f8fafc', marginBottom: '8px' }}>INTERNAL ACCESS ONLY</h3>
           <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: '1.5', marginBottom: '24px' }}>
-            Sign in with your authorized Nomad's Province Super Admin credentials to access event management, tournament brackets, and telemetry.
+            Sign in with a verified Supabase staff account to manage events, tournaments, and poster uploads. Running SQL in the SQL Editor does not sign in your browser.
           </p>
 
           {loginError && (
@@ -432,7 +427,7 @@ export default function AdminPage() {
               {loggingIn ? 'VERIFYING CREDENTIALS...' : 'ACCESS COMMAND CENTER →'}
             </button>
 
-            {(typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) && (
+            {!eventService.isCloudConnected() && typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
               <button
                 type="button"
                 className="gamified-btn secondary"
