@@ -45,7 +45,7 @@ test('featured video-style partner carousel automatically advances with safe con
  const jsx=read('src/game/components/PinnedPartnersShowcase.jsx');
  const css=read('src/pages/AboutExplore.css');
  assert.ok(jsx.includes('window.setInterval('));
- assert.ok(jsx.includes('ALLY_HOLD_MS = 3500'));
+ assert.ok(jsx.includes('ALLY_HOLD_MS = 4000'));
  assert.ok(jsx.includes('filteredPartners.length), ALLY_HOLD_MS)'));
  assert.ok(jsx.includes('window.clearInterval(timer)'));
  assert.ok(!jsx.includes('setHovered(true)'));
