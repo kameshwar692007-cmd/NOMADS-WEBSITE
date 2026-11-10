@@ -59,22 +59,13 @@ test('featured video-style partner carousel automatically advances with safe con
  assert.ok(css.includes('.split-card {position:relative;top:auto;}'));
 });
 
-test('complete Allies overview uses original-style logo frames without duplicate info cards',()=>{
+test('only automatic Allies carousel remains; repetitive 14-logo overview is removed',()=>{
  const jsx=read('src/game/components/PinnedPartnersShowcase.jsx');
- const css=read('src/pages/AboutExplore.css');
- assert.ok(jsx.includes('className="showcase-allies-overview"'));
- assert.ok(jsx.includes('className="showcase-allies-grid"'));
- assert.ok(jsx.includes('className="showcase-ally-frame"'));
- assert.ok(jsx.includes('partners.map((partner, partnerIndex) =>'));
- assert.ok(jsx.includes('onClick={() => showcasePartner(partnerIndex)}'));
- assert.ok(jsx.includes("setFilter('all')"));
- assert.ok(jsx.includes('setActiveIndex(partnerIndex)'));
- assert.ok(jsx.indexOf('showcase-allies-overview')>jsx.indexOf('showcase-pinned-track'));
- assert.ok(css.includes('.showcase-allies-grid'));
- assert.ok(css.includes('.showcase-ally-tile'));
- assert.ok(css.includes('max-width:600px'));
- assert.ok(css.includes('focus-visible'));
- assert.ok(!jsx.includes('hq-partner-autoplay'));
+ assert.ok(jsx.includes('className="split-card"'));
+ assert.ok(jsx.includes('className="dots-group"'));
+ assert.ok(!jsx.includes('showcase-allies-grid'));
+ assert.ok(!jsx.includes('showcase-allies-overview'));
+ assert.ok(!jsx.includes('showcase-ally-tile'));
 });
 
 test('full Huddle Global wordmark remains exact user-supplied square WebP',()=>{
