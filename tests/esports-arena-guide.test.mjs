@@ -8,12 +8,14 @@ const read = p => readFileSync(new URL('../' + p, import.meta.url),'utf8');
 test('esports guide filters only known tournament objects while preserving the registration interaction',()=>{
   const page=read('src/pages/EsportsPage.jsx');
   assert.ok(page.includes("const [activeGame, setActiveGame] = useState('all')"));
-  assert.ok(page.includes('TOURNAMENTS.filter(tourney => tourney.id === activeGame)'));
+  assert.ok(page.includes('allTournaments.filter(tourney => tourney.id === activeGame)'));
+  assert.ok(page.includes('eventService.getPublicEvents()'));
+  assert.ok(page.includes("ev.listingType === 'TOURNAMENT'"));
   assert.ok(page.includes('visibleTournaments.map((t, idx)'));
   assert.ok(page.includes('onClick={() => handleRegisterClick(t)}'));
   assert.ok(page.includes('setSelectedTournament(tourney)'));
   assert.ok(page.includes('setModalOpen(true)'));
-  assert.ok(page.includes('href={ORG_INFO.whatsapp}'));
+  assert.ok(page.includes('selectedTournament?.registrationUrl || ORG_INFO.whatsapp'));
   assert.ok(page.includes('href={ORG_INFO.instagram}'));
   assert.equal(new Set(TOURNAMENTS.map(t=>t.id)).size,TOURNAMENTS.length);
   assert.ok(TOURNAMENTS.every(t=>t.id&&t.game&&t.title&&t.format));
