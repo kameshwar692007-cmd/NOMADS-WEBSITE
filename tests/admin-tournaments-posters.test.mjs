@@ -42,7 +42,9 @@ test('all public poster display areas preserve original image ratio',()=>{
  // may convert LF to CRLF without changing the browser's computed CSS.
  const hasUncroppedPoster = selector => {
    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-   const block = eventStyles.match(new RegExp(escaped + '\\s*\\{([^}]*)\\}'))?.[1] || '';
+   // Earlier theme rules may crop the poster; the final override must win.
+   const blocks = [...eventStyles.matchAll(new RegExp(escaped + '\\s*\\{([^}]*)\\}', 'g'))];
+   const block = blocks.at(-1)?.[1] || '';
    return /width\s*:\s*100%\s*;/i.test(block)
      && /height\s*:\s*auto\s*;/i.test(block)
      && /object-fit\s*:\s*contain\s*;/i.test(block);
