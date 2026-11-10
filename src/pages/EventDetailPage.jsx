@@ -116,7 +116,7 @@ export default function EventDetailPage() {
               <img
                 src={event.posterUrl || '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg'}
                 alt={event.title}
-                style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }}
+                style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'contain' }}
               />
               <div style={{
                 position: 'absolute',
