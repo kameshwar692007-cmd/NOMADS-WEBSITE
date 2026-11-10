@@ -38,8 +38,18 @@ test('all public poster display areas preserve original image ratio',()=>{
  const eventStyles=read('src/GamifiedPages.css');
  const esportsStyles=read('src/pages/EsportsArenaGuide.css');
  const esports=read('src/pages/EsportsPage.jsx');
- assert.ok(eventStyles.includes('.event-poster-img {\n  display: block;\n  width: 100%;\n  height: auto;\n  object-fit: contain;'));
- assert.ok(eventStyles.includes('.detail-poster-img {\n  display: block;'));
+ // Use line-ending and whitespace-independent declarations: Windows Git checkouts
+ // may convert LF to CRLF without changing the browser's computed CSS.
+ const hasUncroppedPoster = selector => {
+   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+   const block = eventStyles.match(new RegExp(escaped + '\\s*\\{([^}]*)\\}'))?.[1] || '';
+   return /width\s*:\s*100%\s*;/i.test(block)
+     && /height\s*:\s*auto\s*;/i.test(block)
+     && /object-fit\s*:\s*contain\s*;/i.test(block);
+ };
+ assert.ok(hasUncroppedPoster('.event-poster-img'), 'event poster must keep natural aspect ratio');
+ assert.ok(hasUncroppedPoster('.detail-poster-img'), 'event detail poster must keep natural aspect ratio');
+ assert.ok(hasUncroppedPoster('.poster-preview-original .poster-preview-img'), 'admin poster preview must remain uncropped');
  assert.ok(esportsStyles.includes('.tourney-poster-img'));
  assert.ok(esportsStyles.includes('object-fit:contain'));
  assert.ok(esports.includes('t.posterUrl &&'));
