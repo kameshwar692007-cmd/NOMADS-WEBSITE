@@ -32,7 +32,12 @@ test('admin form can create tournaments and upload a complete poster with truthf
  assert.ok(service.includes("game_title: sanitized.gameTitle"));
  assert.ok(service.includes("from('event-posters')"));
  assert.ok(service.includes("Cloud save failed. Event was NOT published"));
- assert.ok(service.includes("Poster upload to Supabase failed"));
+ assert.ok(service.includes("Sign in with your Supabase staff account"));
+ assert.ok(service.includes("Supabase poster upload failed:"));
+ assert.ok(service.includes("from('admin_users')"));
+ assert.ok(service.includes("storage INSERT RLS policy"));
+ assert.ok(admin.includes("!eventService.isCloudConnected()"));
+ assert.ok(admin.includes("role: 'ANONYMOUS'"));
 });
 test('all public poster display areas preserve original image ratio',()=>{
  const eventStyles=read('src/GamifiedPages.css');
@@ -76,4 +81,13 @@ test('a newly created tournament appears in public event records in local demo m
  assert.equal(newlyListed.listingType,'TOURNAMENT');
  assert.equal(newlyListed.gameTitle,'Sample Game');
  assert.equal(newlyListed.posterUrl,base.posterUrl);
+});
+
+test('Allies carousel auto-switches at four seconds without removing manual navigation', () => {
+ const carousel=read('src/game/components/PinnedPartnersShowcase.jsx');
+ assert.ok(carousel.includes('ALLY_HOLD_MS = 4000'));
+ assert.ok(carousel.includes('filteredPartners.length), ALLY_HOLD_MS)'));
+ assert.ok(carousel.includes('handlePrev'));
+ assert.ok(carousel.includes('handleNext'));
+ assert.ok(carousel.includes('isReducedMotion'));
 });
