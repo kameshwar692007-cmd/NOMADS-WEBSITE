@@ -545,6 +545,12 @@ export default function AdminPage() {
         </div>
       </section>
 
+      {!eventService.isCloudConnected() && (
+        <p role="status" style={{margin:'10px 0 20px',padding:'12px 16px',border:'1px solid #f59e0b',borderRadius:8,color:'#ffdf93',background:'#2c220f'}}>
+          DEMO MODE: Supabase is not configured. Records and poster uploads remain in this browser only and are not publicly published.
+        </p>
+      )}
+
       {/* Primary Admin Section Tabs */}
       <div className="admin-section-tabs" style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <button
