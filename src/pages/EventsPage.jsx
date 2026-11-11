@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import './EventGroundsGuide.css';
 import { Link } from 'react-router-dom';
 import GameShell from '../game/components/GameShell.jsx';
-import { eventService } from '../game/services/eventService.js';
+import { eventService, isEventListing } from '../game/services/eventService.js';
 import { ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
 import { IconMapPin, IconEvents, IconWhatsApp, IconTrophy, IconRocket, IconShield } from '../game/components/Icons.jsx';
@@ -24,7 +24,7 @@ export default function EventsPage() {
     setLoading(true);
     try {
       const data = await eventService.getPublicEvents();
-      setEvents(data);
+      setEvents(data.filter(isEventListing));
     } catch (err) {
       console.error('Failed to load events:', err);
     } finally {
