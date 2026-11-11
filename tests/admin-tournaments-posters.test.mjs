@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {validateEventPayload, eventService} from '../src/game/services/eventService.js';
+import {validateEventPayload, eventService, describeSupabaseWriteError} from '../src/game/services/eventService.js';
 const read = p => readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const base = {
  title:'Sample Tournament',category:'Esports',venue:'Chennai',
@@ -31,7 +31,9 @@ test('admin form can create tournaments and upload a complete poster with truthf
  assert.ok(service.includes("listing_type: sanitized.listingType"));
  assert.ok(service.includes("game_title: sanitized.gameTitle"));
  assert.ok(service.includes("from('event-posters')"));
- assert.ok(service.includes("Cloud save failed. Event was NOT published"));
+ assert.ok(service.includes("Supabase create failed; nothing was published:"));
+ assert.ok(service.includes("Sign in with a verified Supabase staff account before publishing events."));
+ assert.ok(service.includes("describeSupabaseWriteError(err, 'create')"));
  assert.ok(service.includes("Sign in with your Supabase staff account"));
  assert.ok(service.includes("Supabase poster upload failed:"));
  assert.ok(service.includes("from('admin_users')"));
@@ -90,4 +92,16 @@ test('Allies carousel auto-switches at four seconds without removing manual navi
  assert.ok(carousel.includes('handlePrev'));
  assert.ok(carousel.includes('handleNext'));
  assert.ok(carousel.includes('isReducedMotion'));
+});
+
+test('cloud write errors retain actionable PostgREST codes and details',()=>{
+ const denied = describeSupabaseWriteError({code:'42501',message:'new row violates row-level security policy'},'create');
+ assert.match(denied,/42501/);
+ assert.match(denied,/row-level security/);
+ assert.match(denied,/staff role/);
+ const missing = describeSupabaseWriteError({code:'PGRST204',message:'Could not find listing_type column'},'update');
+ assert.match(missing,/PGRST204/);
+ assert.match(missing,/tournament migration/);
+ const unique = describeSupabaseWriteError({code:'23505',message:'duplicate key value'},'create');
+ assert.match(unique,/unique/);
 });
