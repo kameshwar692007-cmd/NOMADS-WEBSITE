@@ -850,7 +850,7 @@ export default function AdminPage() {
 
                     <td className="details-col">
                       <div className="table-event-title">{ev.title}</div>
-                      <span style={{fontSize:11,color:'#8dd9f7'}}>{ev.listingType === 'TOURNAMENT' ? 'TOURNAMENT · ESPORTS + EVENTS' : 'EVENT GROUNDS'}</span>
+                      <span style={{fontSize:11,color:'#8dd9f7'}}>{ev.listingType === 'TOURNAMENT' ? 'TOURNAMENT · ESPORTS ARENA' : 'EVENT GROUNDS'}</span>
                       <div className="table-venue">
                         <IconMapPin size={12} color="#38bdf8" /> {ev.venue}
                       </div>
