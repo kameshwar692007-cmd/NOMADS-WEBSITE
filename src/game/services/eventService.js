@@ -151,6 +151,27 @@ export function validateEventPayload(data) {
   };
 }
 
+/**
+ * Preserve the actionable PostgREST error from a failed staff write.
+ * Never silently switch a connected deployment to local-only records.
+ */
+export function describeSupabaseWriteError(error, action = 'save') {
+  const code = typeof error?.code === 'string' ? error.code : '';
+  const message = typeof error?.message === 'string' && error.message.trim()
+    ? error.message.trim()
+    : 'The database did not return an error message.';
+  const hint = code === '42501'
+    ? 'Your authenticated user may lack the staff role or RLS permission.'
+    : code === '23505'
+      ? 'A record with the same unique value already exists.'
+      : code === '42703' || code === 'PGRST204' || code === 'PGRST205'
+        ? 'Check that the events schema and tournament migration were applied to this Supabase project.'
+        : code === '23514'
+          ? 'One or more values violate a database constraint.'
+          : 'Check your staff login, SQL schema, and browser Network response.';
+  return `Supabase ${action} failed${code ? ` [${code}]` : ''}: ${message}. ${hint}`;
+}
+
 // Memory storage adapter for Node.js / non-browser test runner environments
 const memoryStore = new Map();
 
@@ -560,6 +581,10 @@ export const eventService = {
     }
 
     if (isSupabaseConfigured && supabase) {
+      const role = await this.getCurrentUserRole();
+      if (!role.isStaff || role.isSimulated) {
+        throw new Error('Sign in with a verified Supabase staff account before publishing events. Local demo admin access cannot write to the cloud.');
+      }
       try {
         const { data, error } = await supabase
           .from('events')
@@ -591,11 +616,10 @@ export const eventService = {
         if (error) throw error;
         return data;
       } catch (err) {
-        console.warn('Supabase create failed, persisting locally:', err);
+        console.error('Supabase create failed; nothing was published:', err);
+        throw new Error(describeSupabaseWriteError(err, 'create'));
       }
     }
-
-    if (isSupabaseConfigured && supabase) throw new Error('Cloud save failed. Event was NOT published; verify the SQL migration, login and Supabase connection.');
     const local = getLocalEvents();
     const newEvent = {
       ...sanitized,
@@ -619,6 +643,10 @@ export const eventService = {
     }
 
     if (isSupabaseConfigured && supabase) {
+      const role = await this.getCurrentUserRole();
+      if (!role.isStaff || role.isSimulated) {
+        throw new Error('Sign in with a verified Supabase staff account before updating events.');
+      }
       try {
         const { data, error } = await supabase
           .from('events')
@@ -650,11 +678,10 @@ export const eventService = {
         if (error) throw error;
         return data;
       } catch (err) {
-        console.warn('Supabase update failed, updating locally:', err);
+        console.error('Supabase update failed; nothing was updated:', err);
+        throw new Error(describeSupabaseWriteError(err, 'update'));
       }
     }
-
-    if (isSupabaseConfigured && supabase) throw new Error('Cloud update failed. Event was NOT updated; verify the SQL migration and staff permissions.');
     const local = getLocalEvents();
     const index = local.findIndex((ev) => ev.id === id);
     if (index === -1) {
