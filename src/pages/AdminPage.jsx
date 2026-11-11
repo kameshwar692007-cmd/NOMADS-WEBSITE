@@ -18,7 +18,8 @@ import {
   IconRocket,
   IconZap,
   IconTrophy,
-  IconShield
+  IconShield,
+  IconClose
 } from '../game/components/Icons.jsx';
 
 export default function AdminPage() {
@@ -527,7 +528,7 @@ export default function AdminPage() {
           </div>
           <div className="admin-metric-card ended" onClick={() => setStatusFilter('ENDED')}>
             <span className="metric-val">{endedCount}</span>
-            <span className="metric-lbl">✓ ENDED / ARCHIVE</span>
+            <span className="metric-lbl"><IconCheck size={14} /> ENDED / ARCHIVE</span>
           </div>
           <div className="admin-metric-card draft" onClick={() => setStatusFilter('DRAFTS')}>
             <span className="metric-val">{draftCount}</span>
@@ -614,7 +615,7 @@ export default function AdminPage() {
 
             {contactSuccess && (
               <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7', padding: '12px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', marginBottom: '20px' }}>
-                ✓ {contactSuccess}
+                <IconCheck size={14} /> {contactSuccess}
               </div>
             )}
 
@@ -649,7 +650,7 @@ export default function AdminPage() {
                     rel="noreferrer"
                     style={{ fontSize: '12px', color: '#38bdf8', textDecoration: 'none', fontWeight: 'bold' }}
                   >
-                    Test WhatsApp Link ↗
+                    Test WhatsApp Link
                   </a>
                 </div>
               </div>
@@ -676,7 +677,7 @@ export default function AdminPage() {
                     href={`mailto:${contactSettings.email}`}
                     style={{ fontSize: '12px', color: '#38bdf8', textDecoration: 'none', fontWeight: 'bold' }}
                   >
-                    Test Mailto Link ↗
+                    Test Mailto Link
                   </a>
                 </div>
               </div>
@@ -756,7 +757,7 @@ export default function AdminPage() {
             { id: 'ALL', label: 'ALL EVENTS' },
             { id: 'ONGOING', label: '● LIVE ONGOING' },
             { id: 'UPCOMING', label: 'UPCOMING' },
-            { id: 'ENDED', label: '✓ ENDED' },
+            { id: 'ENDED', label: 'ENDED' },
             { id: 'DRAFTS', label: 'DRAFTS' }
           ].map((f) => (
             <button
@@ -904,7 +905,7 @@ export default function AdminPage() {
                           title="Lock status to Concluded / Ended"
                           onClick={() => handleStatusChange(ev.id, 'ENDED')}
                         >
-                          ✓ End
+                          <IconCheck size={13} /> End
                         </button>
                         <button 
                           className="status-action-pill" 
@@ -946,7 +947,7 @@ export default function AdminPage() {
                           <button 
                             className="action-btn delete-btn" 
                             onClick={() => handleDelete(ev.id, ev.title)}
-                            title="Delete Event"
+                            title="Delete Event" aria-label="Delete event"
                           >
                             ✕
                           </button>
@@ -969,7 +970,7 @@ export default function AdminPage() {
           <div className="retro-modal-card admin-form-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{editingEvent ? 'EDIT LISTING' : formData.listingType === 'TOURNAMENT' ? 'CREATE NEW TOURNAMENT' : 'CREATE NEW EVENT'}</h3>
-              <button className="modal-close-btn" onClick={() => setEditorOpen(false)}>✕</button>
+              <button className="modal-close-btn" aria-label="Close event editor" onClick={() => setEditorOpen(false)}><IconClose size={16} /></button>
             </div>
 
             <form onSubmit={handleSaveEvent} className="modal-body-form">
@@ -1183,7 +1184,7 @@ export default function AdminPage() {
           <div className="retro-modal-card results-form-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>RECORD TOURNAMENT RESULTS — {selectedForResults.title}</h3>
-              <button className="modal-close-btn" onClick={() => setResultsModalOpen(false)}>✕</button>
+              <button className="modal-close-btn" aria-label="Close results editor" onClick={() => setResultsModalOpen(false)}><IconClose size={16} /></button>
             </div>
 
             <form onSubmit={handleSaveResults} className="modal-body-form">
@@ -1239,7 +1240,7 @@ export default function AdminPage() {
           <div className="retro-modal-card admin-form-modal" style={{ maxWidth: '850px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>SECURITY AUDIT TRAIL (IMMUTABLE DATABASE LOGS)</h3>
-              <button className="modal-close-btn" onClick={() => setAuditModalOpen(false)}>✕</button>
+              <button className="modal-close-btn" aria-label="Close audit trail" onClick={() => setAuditModalOpen(false)}><IconClose size={16} /></button>
             </div>
 
             <div className="modal-body-form" style={{ maxHeight: 'min(60vh, 480px)', padding: '16px 20px' }}>
