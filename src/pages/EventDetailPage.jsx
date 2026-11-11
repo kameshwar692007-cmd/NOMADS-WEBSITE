@@ -3,10 +3,10 @@
 // tournament winner podium, and external registration redirect.
 
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import GameShell from '../game/components/GameShell.jsx';
 import { ORG_INFO } from '../game/data/campusContent.js';
-import { eventService } from '../game/services/eventService.js';
+import { eventService, isTournamentListing } from '../game/services/eventService.js';
 import { sound } from '../game/systems/soundFx.js';
 import {
   IconMapPin,
@@ -82,6 +82,9 @@ export default function EventDetailPage() {
       </GameShell>
     );
   }
+
+  // Tournament records have a single public destination: Esports Arena.
+  if (isTournamentListing(event)) return <Navigate to="/esports" replace />;
 
   const isOngoing = event.computedStatus === 'ONGOING';
   const isConcluded = event.computedStatus === 'ENDED';
