@@ -48,6 +48,13 @@ export function calculateDateStatus(startDate, endDate) {
  * Computes live effective status separating status_mode ('AUTO' vs 'MANUAL')
  * and computed temporal lifecycle state ('UPCOMING', 'ONGOING', 'ENDED')
  */
+/**
+ * Single public routing rule: event records belong to one destination only.
+ * Legacy records without a listing_type remain Events (never tournaments).
+ */
+export const isTournamentListing = event => event?.listingType === 'TOURNAMENT';
+export const isEventListing = event => !isTournamentListing(event);
+
 export function computeEventStatus(event) {
   if (!event) return 'UPCOMING';
 
