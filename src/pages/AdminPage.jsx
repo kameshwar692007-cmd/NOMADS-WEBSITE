@@ -949,7 +949,7 @@ export default function AdminPage() {
                             onClick={() => handleDelete(ev.id, ev.title)}
                             title="Delete Event" aria-label="Delete event"
                           >
-                            ✕
+                            <IconClose size={14} />
                           </button>
                         )}
                       </div>
