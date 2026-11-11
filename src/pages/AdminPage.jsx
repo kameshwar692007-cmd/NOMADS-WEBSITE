@@ -437,7 +437,7 @@ export default function AdminPage() {
                   loadEventsAndRole();
                 }}
               >
-                👑 ENTER AS LOCAL SUPER ADMIN (DEV MODE)
+                <IconShield size={16} /> ENTER AS LOCAL SUPER ADMIN (DEV MODE)
               </button>
             )}
           </form>
@@ -478,7 +478,7 @@ export default function AdminPage() {
             <span className="role-box-label">GOVERNANCE LEVEL</span>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginTop: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '24px' }}>👑</span>
+                <IconShield size={24} color="#ffd700" />
                 <div>
                   <div style={{ fontWeight: 'bold', color: '#ffd700', fontSize: '14px', fontFamily: 'monospace' }}>
                     SUPER ADMIN (OWNER)
@@ -523,7 +523,7 @@ export default function AdminPage() {
           </div>
           <div className="admin-metric-card upcoming" onClick={() => setStatusFilter('UPCOMING')}>
             <span className="metric-val">{upcomingCount}</span>
-            <span className="metric-lbl">⚡ UPCOMING</span>
+            <span className="metric-lbl"><IconZap size={14} /> UPCOMING</span>
           </div>
           <div className="admin-metric-card ended" onClick={() => setStatusFilter('ENDED')}>
             <span className="metric-val">{endedCount}</span>
@@ -566,7 +566,7 @@ export default function AdminPage() {
           onClick={() => { sound.playSelect(); setActiveAdminTab('EVENTS'); }}
         >
           <IconEvents size={18} />
-          <span>🎮 TOURNAMENTS & EVENTS</span>
+          <span>TOURNAMENTS & EVENTS</span>
         </button>
 
         <button
@@ -587,7 +587,7 @@ export default function AdminPage() {
           onClick={() => { sound.playSelect(); setActiveAdminTab('CONTACT'); }}
         >
           <IconWhatsApp size={18} />
-          <span>📞 CONTACT & COMMS SETTINGS</span>
+          <span>CONTACT & COMMS SETTINGS</span>
         </button>
       </div>
 
@@ -620,7 +620,7 @@ export default function AdminPage() {
 
             {contactError && (
               <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#fca5a5', padding: '12px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', marginBottom: '20px' }}>
-                ⚠ {contactError}
+                <IconShield size={14} /> {contactError}
               </div>
             )}
 
@@ -722,7 +722,7 @@ export default function AdminPage() {
                     cursor: 'pointer'
                   }}
                 >
-                  {savingContact ? 'SYNCHRONIZING...' : '💾 SAVE CONTACT SETTINGS'}
+                  <><IconCheck size={16} /> {savingContact ? 'SYNCHRONIZING...' : 'SAVE CONTACT SETTINGS'}</>
                 </button>
 
                 <button
@@ -755,7 +755,7 @@ export default function AdminPage() {
           {[
             { id: 'ALL', label: 'ALL EVENTS' },
             { id: 'ONGOING', label: '● LIVE ONGOING' },
-            { id: 'UPCOMING', label: '⚡ UPCOMING' },
+            { id: 'UPCOMING', label: 'UPCOMING' },
             { id: 'ENDED', label: '✓ ENDED' },
             { id: 'DRAFTS', label: 'DRAFTS' }
           ].map((f) => (
@@ -911,7 +911,7 @@ export default function AdminPage() {
                           title="Reset to Date-based Auto Calculation"
                           onClick={() => handleStatusChange(ev.id, 'AUTO')}
                         >
-                          ⚡ Auto
+                          <IconZap size={13} /> Auto
                         </button>
                       </div>
                     </td>
@@ -931,7 +931,7 @@ export default function AdminPage() {
                           onClick={() => handleOpenResults(ev)}
                           title="Record Winners & Tournament Results"
                         >
-                          🏆 Results
+                          <IconTrophy size={13} /> Results
                         </button>
 
                         <button 
@@ -1188,7 +1188,7 @@ export default function AdminPage() {
 
             <form onSubmit={handleSaveResults} className="modal-body-form">
               <div className="form-group">
-                <label className="retro-label">🥇 1ST PLACE / CHAMPION</label>
+                <label className="retro-label"><IconTrophy size={15} /> 1ST PLACE / CHAMPION</label>
                 <input
                   type="text"
                   placeholder="e.g. Team Phoenix or SRM Elite"
@@ -1199,7 +1199,7 @@ export default function AdminPage() {
               </div>
 
               <div className="form-group">
-                <label className="retro-label">🥈 2ND PLACE / RUNNER-UP</label>
+                <label className="retro-label"><IconTrophy size={15} /> 2ND PLACE / RUNNER-UP</label>
                 <input
                   type="text"
                   placeholder="e.g. Hyperion Gaming"
