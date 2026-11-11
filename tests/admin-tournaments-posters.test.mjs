@@ -105,3 +105,39 @@ test('cloud write errors retain actionable PostgREST codes and details',()=>{
  const unique = describeSupabaseWriteError({code:'23505',message:'duplicate key value'},'create');
  assert.match(unique,/unique/);
 });
+
+test('published listings have exactly one public destination and no dummy tournaments', () => {
+ const service=read('src/game/services/eventService.js');
+ const eventsPage=read('src/pages/EventsPage.jsx');
+ const esportsPage=read('src/pages/EsportsPage.jsx');
+ const eventDetail=read('src/pages/EventDetailPage.jsx');
+ const centralData=read('src/game/data/campusContent.js');
+ assert.ok(service.includes('export const isTournamentListing'));
+ assert.ok(service.includes('export const isEventListing'));
+ assert.ok(eventsPage.includes('data.filter(isEventListing)'));
+ assert.ok(esportsPage.includes('events.filter(isTournamentListing)'));
+ assert.ok(esportsPage.includes('const allTournaments = publishedTournaments;'));
+ assert.ok(esportsPage.includes('No tournaments published yet'));
+ assert.ok(!esportsPage.includes('...TOURNAMENTS'));
+ assert.ok(!centralData.includes('export const TOURNAMENTS ='));
+ assert.ok(eventDetail.includes('if (isTournamentListing(event)) return <Navigate to="/esports" replace />;'));
+ assert.ok(!read('src/pages/AdminPage.jsx').includes('TOURNAMENT · ESPORTS + EVENTS'));
+});
+test('connected Supabase public read errors never display fabricated local entries', () => {
+ const service=read('src/game/services/eventService.js');
+ const eventsPage=read('src/pages/EventsPage.jsx');
+ const esportsPage=read('src/pages/EsportsPage.jsx');
+ assert.ok(service.includes("throw new Error(describeSupabaseWriteError(err, 'public read'))"));
+ assert.ok(service.includes('Only projects without a Supabase connection use offline demo data'));
+ assert.ok(eventsPage.includes('loadError'));
+ assert.ok(eventsPage.includes('Retry loading'));
+ assert.ok(esportsPage.includes("setLoadError('Tournaments could not be loaded. Please retry.')"));
+});
+test('admin uses only styled vector controls instead of emoji labels', () => {
+ const admin=read('src/pages/AdminPage.jsx');
+ assert.ok(admin.includes('<IconShield size={24}'));
+ assert.ok(admin.includes('<IconTrophy size={13} /> Results'));
+ assert.ok(admin.includes('<IconZap size={13} /> Auto'));
+ assert.ok(admin.includes('<IconClose size={16} />'));
+ assert.equal(/[\u{1F000}-\u{1FAFF}\u2600-\u27BF]/u.test(admin),false);
+});
