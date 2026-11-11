@@ -377,7 +377,8 @@ export const eventService = {
           .eq('is_draft', false)
           .order('start_date', { ascending: false });
 
-        if (!error && data) {
+        if (error) throw error;
+        if (data) {
           return data.map((d) => {
             const mapped = {
               id: d.id,
@@ -409,11 +410,14 @@ export const eventService = {
             };
           });
         }
+        throw new Error('Supabase returned no public event data.');
       } catch (err) {
-        console.warn('Supabase public fetch failed, using fallback store:', err);
+        console.error('Supabase public fetch failed:', err);
+        throw new Error(describeSupabaseWriteError(err, 'public read'));
       }
     }
 
+    // Only projects without a Supabase connection use offline demo data.
     const local = getLocalEvents();
     return local
       .filter((ev) => !ev.isDraft)
