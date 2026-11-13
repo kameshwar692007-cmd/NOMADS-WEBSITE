@@ -3,7 +3,8 @@
 // Responsive sandwich drawer menu for tablet & mobile navigation
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import '../../pages/MobileExperience.css';
 import { sound } from '../systems/soundFx.js';
 import StitchCursorBuilder from './StitchCursorBuilder.jsx';
 import { ORG_INFO } from '../data/campusContent.js';
@@ -314,6 +315,7 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
             <a href="mailto:nomadsprovince@gmail.com" onMouseEnter={() => sound.playBlip()}>
               nomadsprovince@gmail.com
             </a>
+            <Link to="/admin" className="footer-admin-link" onMouseEnter={() => sound.playBlip()}>Staff login</Link>
           </div>
 
 
