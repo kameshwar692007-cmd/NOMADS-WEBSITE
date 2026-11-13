@@ -4992,3 +4992,81 @@
 @media (max-width: 600px) {
   .event-poster-frame,.detail-poster-wrap { width: 100%; }
 }
+
+/* MOBILE UX AUDIT 2026-11-13: Shared overflow, readable dialogs and touch targets. */
+.gamified-shell,.shell-main-content,.shell-main-content>*,.gamified-card{min-width:0}
+.shell-main-content img,.shell-main-content video{max-width:100%}
+.shell-main-content :is(h1,h2,h3,h4,p,a,button,strong,span){overflow-wrap:break-word}
+.footer-admin-link{appearance:none;font:inherit;font-size:12px;color:#a9bed4;
+  border:1px solid #3a4d65;border-radius:8px;background:#101d30;padding:10px 13px;
+  min-height:44px;cursor:pointer}
+.footer-admin-link:hover,.footer-admin-link:focus-visible{color:#fff;border-color:#60a5fa}
+.footer-links{align-items:center;gap:10px 16px}
+.footer-links a{display:inline-flex;align-items:center;min-height:44px}
+.mobile-detail-dialog{width:min(100%,860px);max-width:860px;max-height:calc(100dvh - 40px);min-width:0}
+.mobile-detail-dialog .modal-header{gap:12px;min-width:0;padding:16px 20px}
+.mobile-detail-dialog .modal-header h3{min-width:0;flex:1;overflow-wrap:anywhere;font-size:clamp(15px,2vw,21px);line-height:1.35}
+.mobile-detail-dialog .modal-close-btn{width:44px;height:44px;min-width:44px;flex:0 0 44px}
+.mobile-detail-dialog .modal-body{overflow:auto;overscroll-behavior:contain;min-height:0;min-width:0;padding:20px}
+.tournament-detail-content{display:grid;gap:16px}
+.tournament-detail-content .modal-specs-summary{display:grid;gap:10px;margin:0;padding:18px;background:#12223a;border-color:#38516f}
+.tournament-detail-content .modal-specs-summary p{display:grid;grid-template-columns:minmax(95px,140px) minmax(0,1fr);gap:10px;margin:0;overflow-wrap:anywhere}
+.tournament-detail-content .modal-specs-summary strong{color:#b6ddf9}
+.tournament-detail-content .tourney-modal-poster{display:block;max-width:100%;max-height:min(45dvh,460px);height:auto;width:auto;object-fit:contain;margin:0 auto;border:1px solid #304763}
+.tournament-detail-content .modal-links{margin-top:0}
+.mobile-detail-dialog .modal-action-btn{min-height:48px;gap:10px;overflow-wrap:anywhere;text-align:center}
+.event-detail-modal.mobile-detail-dialog .event-detail-body{display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);max-height:none;overflow:visible;min-width:0}
+.event-detail-modal.mobile-detail-dialog{max-width:860px}
+.event-detail-modal.mobile-detail-dialog .detail-poster-wrap{min-width:0;min-height:0;height:auto;align-self:start}
+.event-detail-modal.mobile-detail-dialog .detail-poster-img{width:100%;height:auto;max-height:440px;object-fit:contain}
+.event-detail-modal.mobile-detail-dialog .detail-content-wrap{min-width:0;gap:14px;padding:20px}
+.event-detail-modal.mobile-detail-dialog .detail-meta-list,.event-detail-modal.mobile-detail-dialog .meta-item{min-width:0}
+.event-detail-modal.mobile-detail-dialog .meta-val{overflow-wrap:anywhere}
+.event-detail-page-grid{min-width:0}
+.event-detail-page-grid>*{min-width:0}
+@media(max-width:860px){
+ .event-detail-page-grid{grid-template-columns:minmax(0,1fr)!important;gap:16px!important}
+ .event-detail-page-grid .gamified-card{min-width:0}
+}
+@media(max-width:640px){
+ .shell-main-content{padding:14px 12px 34px!important}
+ .shell-main-content>.gamified-card{padding:18px 14px!important}
+ .shell-footer{padding:20px 14px}
+ .footer-inner,.footer-links{align-items:stretch}
+ .footer-links{width:100%;gap:6px 12px}
+ .footer-links a{width:fit-content;max-width:100%;overflow-wrap:anywhere}
+ .footer-admin-link{width:fit-content}
+ .retro-modal-backdrop{padding:0!important;align-items:stretch;overflow:hidden}
+ .mobile-detail-dialog{width:100%!important;max-width:100%!important;height:100dvh;max-height:100dvh!important;
+  margin:0!important;border-radius:0!important;border-width:0!important;box-shadow:none}
+ .mobile-detail-dialog .modal-header{padding:12px 14px!important}
+ .mobile-detail-dialog .modal-body{padding:14px!important;overflow-y:auto;-webkit-overflow-scrolling:touch}
+ .mobile-detail-dialog .modal-header h3{font-size:16px!important}
+ .event-detail-modal.mobile-detail-dialog .event-detail-body{display:block;overflow-y:auto;max-height:none}
+ .event-detail-modal.mobile-detail-dialog .detail-poster-wrap{padding:8px 0;max-height:32dvh;overflow:auto}
+ .event-detail-modal.mobile-detail-dialog .detail-poster-img{max-height:30dvh;width:auto;max-width:100%;margin:auto}
+ .event-detail-modal.mobile-detail-dialog .detail-content-wrap{padding:16px 14px;gap:12px}
+ .event-detail-modal.mobile-detail-dialog .detail-title{font-size:clamp(19px,5vw,24px);overflow-wrap:anywhere}
+ .event-detail-modal.mobile-detail-dialog .detail-cta-wrap>*{width:100%!important;min-width:0;min-height:46px}
+ .tournament-detail-content .modal-specs-summary{padding:14px}
+ .tournament-detail-content .modal-specs-summary p{grid-template-columns:1fr;gap:3px}
+ .tournament-detail-content .tourney-modal-poster{max-height:31dvh}
+ .studio-project-grid{grid-template-columns:minmax(0,1fr)!important}
+ .studio-project-detail div{display:grid;grid-template-columns:1fr;gap:5px}
+ .studio-project-detail strong{text-align:left;max-width:100%;overflow-wrap:anywhere}
+ .studio-project-detail a{min-height:44px;display:inline-flex;align-items:center}
+ .studio-project-expand{min-height:48px}
+ .events-grid{grid-template-columns:minmax(0,1fr)}
+ .esports-carousel-card{min-width:0}
+ .admin-section-tabs .gamified-btn{flex:1 1 100%;justify-content:center}
+ .admin-metrics-row>*{min-width:0}
+}
+@media(max-width:380px){
+ .shell-main-content{padding-inline:8px!important}
+ .mobile-detail-dialog .modal-header{padding-inline:10px!important}
+ .mobile-detail-dialog .modal-body{padding-inline:10px!important}
+ .footer-links{flex-direction:column;align-items:start}
+}
+@media(prefers-reduced-motion:reduce){
+ .mobile-detail-dialog{animation:none!important;scroll-behavior:auto!important}
+}
