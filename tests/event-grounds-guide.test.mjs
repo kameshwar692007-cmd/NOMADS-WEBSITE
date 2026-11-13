@@ -15,13 +15,14 @@ test('Event Grounds search operates on published data and preserves status filte
  assert.ok(page.includes('aria-live="polite"'));
  assert.ok(page.includes("setFilter('ALL'); setCategory('ALL'); setSearch('')"));
 });
-test('existing event details, real registration and admin links remain functional',()=>{
+test('existing event details, real registration and footer staff link remain functional',()=>{
  const page=read('src/pages/EventsPage.jsx');
  assert.ok(page.includes('setSelectedEvent(ev)'));
  assert.ok(page.includes("selectedEvent.registrationUrl && selectedEvent.computedStatus !== 'ENDED'"));
  assert.ok(page.includes('eventService.trackRegistrationClick(selectedEvent.id, selectedEvent.title)'));
  assert.ok(page.includes('to={`/events/${ev.slug || ev.id}`}'));
- assert.ok(page.includes('to="/admin"'));
+ assert.ok(!page.includes('to="/admin"'));
+ assert.ok(read('src/game/components/GameShell.jsx').includes('to="/admin"'));
  assert.ok(page.includes('href={ORG_INFO.whatsapp}'));
  for(const route of ['/studio','/esports']){
   assert.ok(LOCATIONS.some(item=>item.route===route));

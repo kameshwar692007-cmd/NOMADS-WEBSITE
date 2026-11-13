@@ -40,6 +40,15 @@ export default function EventsPage() {
     loadEvents();
   }, []);
 
+  useEffect(() => {
+    if (!selectedEvent) return undefined;
+    const onKeyDown = event => {
+      if (event.key === 'Escape') setSelectedEvent(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedEvent]);
+
   const categories = [...new Set(events.map(ev => ev.category).filter(Boolean))].sort();
   const filteredEvents = events.filter((ev) => {
     if (filter !== 'ALL' && ev.computedStatus !== filter) return false;
@@ -214,22 +223,22 @@ export default function EventsPage() {
       {/* 3. Dedicated Event Detail Modal */}
       {selectedEvent && (
         <div className="retro-modal-backdrop" onClick={() => setSelectedEvent(null)}>
-          <div className="retro-modal-card event-detail-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="retro-modal-card event-detail-modal" role="dialog" aria-modal="true" aria-labelledby="event-quick-view-title" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <span className={`status-pill ${selectedEvent.computedStatus.toLowerCase()}`}>
                 {selectedEvent.computedStatus === 'ONGOING' ? '● LIVE NOW' : selectedEvent.computedStatus}
               </span>
-              <button className="modal-close-btn" onClick={() => setSelectedEvent(null)}>✕</button>
+              <button type="button" className="modal-close-btn" aria-label="Close event details" onClick={() => setSelectedEvent(null)}>✕</button>
             </div>
 
             <div className="event-detail-body">
-              <div className="detail-poster-wrap">
+              {selectedEvent.posterUrl && <div className="detail-poster-wrap">
                 <img src={selectedEvent.posterUrl} alt={selectedEvent.title} className="detail-poster-img" />
-              </div>
+              </div>}
 
               <div className="detail-content-wrap">
                 <div className="detail-cat-badge">{selectedEvent.category}</div>
-                <h3 className="detail-title">{selectedEvent.title}</h3>
+                <h3 id="event-quick-view-title" className="detail-title">{selectedEvent.title}</h3>
 
                 <div className="detail-meta-list">
                   <div className="meta-item">
@@ -339,9 +348,6 @@ export default function EventsPage() {
             <IconWhatsApp size={16} />
             <span>CO-HOST AN EVENT VIA WHATSAPP</span>
           </a>
-          <Link to="/admin" className="admin-portal-link" onMouseEnter={() => sound.playBlip()}>
-            Admin Command Center →
-          </Link>
         </div>
       </section>
     </GameShell>
