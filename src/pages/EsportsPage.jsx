@@ -22,8 +22,9 @@ export default function EsportsPage() {
       if (!active) return;
       setPublishedTournaments(events.filter(isTournamentListing).map(ev => ({
         id: ev.id, title: ev.title, game: ev.gameTitle || 'Esports',
+        isDemo: ev.slug?.startsWith('demo-') || false,
         status: ev.computedStatus === 'ENDED' ? 'CONCLUDED' : ev.computedStatus === 'ONGOING' ? 'LIVE NOW' : 'UPCOMING',
-        accent: '#f97316', badge: 'OFFICIAL TOURNAMENT', desc: ev.description || '',
+        accent: '#f97316', badge: ev.slug?.startsWith('demo-') ? 'DEMO / NOT A REAL EVENT' : 'OFFICIAL TOURNAMENT', desc: ev.description || '',
         partnerInfo: ev.partnerInfo || ev.partner || "Nomad's Province",
         prizePool: ev.prizePool || 'Refer to organizer', format: ev.matchFormat || 'See registration details',
         posterUrl: ev.posterUrl, registrationUrl: ev.registrationUrl
@@ -304,7 +305,7 @@ export default function EsportsPage() {
                     onMouseEnter={() => sound.playBlip()}
                   >
                     <IconCrosshair size={16} />
-                    <span>{t.status === 'CONCLUDED' ? 'VIEW TOURNAMENT DETAILS' : 'TOURNAMENT DETAILS & REGISTRATION'}</span>
+                    <span>{t.isDemo ? 'VIEW DEMO DETAILS' : t.status === 'CONCLUDED' ? 'VIEW TOURNAMENT DETAILS' : 'TOURNAMENT DETAILS & REGISTRATION'}</span>
                   </button>
                 </div>
               </article>
@@ -362,13 +363,15 @@ export default function EsportsPage() {
                 <p><strong>Partner:</strong> {selectedTournament?.partnerInfo}</p>
               </div>
               <p className="modal-instruction">
-                Squad check-ins and external registration forms are coordinated via our official channels:
+                {selectedTournament?.isDemo
+                  ? 'This is a fictional demonstration tournament. Registration is disabled and no prizes are offered.'
+                  : 'Squad check-ins and external registration forms are coordinated via our official channels:'}
               </p>
               {selectedTournament?.posterUrl && (
                 <img src={selectedTournament.posterUrl} alt={`${selectedTournament.title} full poster`}
                   className="tourney-modal-poster" />
               )}
-              <div className="modal-links">
+              {!selectedTournament?.isDemo && <div className="modal-links">
                 <a
                   href={selectedTournament?.registrationUrl || ORG_INFO.whatsapp}
                   target="_blank"
@@ -389,7 +392,7 @@ export default function EsportsPage() {
                   <IconInstagram size={18} />
                   <span>View Updates on Instagram (@nomadsprovince)</span>
                 </a>
-              </div>
+              </div>}
             </div>
           </div>
         </div>
