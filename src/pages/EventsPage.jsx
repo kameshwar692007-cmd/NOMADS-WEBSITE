@@ -40,6 +40,15 @@ export default function EventsPage() {
     loadEvents();
   }, []);
 
+  useEffect(() => {
+    if (!selectedEvent) return undefined;
+    const onKeyDown = event => {
+      if (event.key === 'Escape') setSelectedEvent(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedEvent]);
+
   const categories = [...new Set(events.map(ev => ev.category).filter(Boolean))].sort();
   const filteredEvents = events.filter((ev) => {
     if (filter !== 'ALL' && ev.computedStatus !== filter) return false;
