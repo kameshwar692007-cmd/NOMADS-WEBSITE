@@ -108,7 +108,7 @@ export default function EventDetailPage() {
       {/* 2. Main Event Detail Grid */}
       <div className="event-detail-page-grid" style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(300px, 420px) 1fr',
+        gridTemplateColumns: 'minmax(0, 420px) minmax(0, 1fr)',
         gap: '28px',
         alignItems: 'start'
       }}>
