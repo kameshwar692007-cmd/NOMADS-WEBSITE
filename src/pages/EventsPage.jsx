@@ -214,18 +214,18 @@ export default function EventsPage() {
       {/* 3. Dedicated Event Detail Modal */}
       {selectedEvent && (
         <div className="retro-modal-backdrop" onClick={() => setSelectedEvent(null)}>
-          <div className="retro-modal-card event-detail-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="retro-modal-card event-detail-modal mobile-detail-dialog" role="dialog" aria-modal="true" aria-label={`Details for ${selectedEvent.title}`} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <span className={`status-pill ${selectedEvent.computedStatus.toLowerCase()}`}>
                 {selectedEvent.computedStatus === 'ONGOING' ? '● LIVE NOW' : selectedEvent.computedStatus}
               </span>
-              <button className="modal-close-btn" onClick={() => setSelectedEvent(null)}>✕</button>
+              <button type="button" className="modal-close-btn" aria-label="Close event details" onClick={() => setSelectedEvent(null)}>✕</button>
             </div>
 
             <div className="event-detail-body">
-              <div className="detail-poster-wrap">
+              {selectedEvent.posterUrl && <div className="detail-poster-wrap">
                 <img src={selectedEvent.posterUrl} alt={selectedEvent.title} className="detail-poster-img" />
-              </div>
+              </div>}
 
               <div className="detail-content-wrap">
                 <div className="detail-cat-badge">{selectedEvent.category}</div>
@@ -339,9 +339,7 @@ export default function EventsPage() {
             <IconWhatsApp size={16} />
             <span>CO-HOST AN EVENT VIA WHATSAPP</span>
           </a>
-          <Link to="/admin" className="admin-portal-link" onMouseEnter={() => sound.playBlip()}>
-            Admin Command Center →
-          </Link>
+
         </div>
       </section>
     </GameShell>
