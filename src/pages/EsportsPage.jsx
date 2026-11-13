@@ -338,14 +338,14 @@ export default function EsportsPage() {
           onClick={() => { sound.playCancel(); setModalOpen(false); }}
         >
           <div
-            className="retro-modal-card"
+            className="retro-modal-card tournament-detail-dialog mobile-detail-dialog"
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header" style={{ borderColor: selectedTournament?.accent }}>
-              <h3 id="modal-title">ENTER {selectedTournament?.title}</h3>
+              <h3 id="modal-title">{selectedTournament?.title}</h3>
               <button
                 type="button"
                 className="modal-close-btn"
@@ -355,7 +355,7 @@ export default function EsportsPage() {
                 ✕
               </button>
             </div>
-            <div className="modal-body">
+            <div className="modal-body tournament-detail-content">
               <div className="modal-specs-summary">
                 <p><strong>Game:</strong> {selectedTournament?.game}</p>
                 <p><strong>Format:</strong> {selectedTournament?.format}</p>
