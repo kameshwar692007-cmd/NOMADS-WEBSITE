@@ -49,3 +49,20 @@
 @media(prefers-reduced-motion:reduce){
  .events-guide-links a,.events-clear-filters{transition:none}
 }
+
+
+/* Original-size posters remain readable on light/white artwork. Status lives below the image. */
+.events-grid .event-poster-frame{height:auto;min-height:0;display:flex;justify-content:center;align-items:center;background:#0b1421;overflow:hidden}
+.events-grid .event-poster-img{display:block;width:auto;max-width:100%;height:auto;max-height:300px;object-fit:contain}
+.events-grid .event-card-body{padding:16px 18px 18px}
+.event-status-card{position:static;display:inline-flex;align-items:center;gap:7px;
+  padding:6px 11px;margin:0 0 13px;color:#fff;background:#17283e;
+  border:1px solid #64809e;border-radius:7px;font-size:11px;font-weight:900;
+  text-shadow:none;letter-spacing:.05em}
+.event-status-card.ongoing{background:#12483b;border-color:#3c9b82;color:#e1fff6}
+.event-status-card.upcoming{background:#25364b;border-color:#7390b3;color:#fff}
+.event-status-card.ended{background:#2b3543;border-color:#64748b;color:#f0f5ff}
+.events-field-guide{padding:clamp(16px,2.4vw,25px)}
+.events-search-panel{margin:18px 0 15px;padding:15px 18px}
+.events-visitor-notes{margin-top:20px}
+@media(max-width:650px){.events-grid .event-poster-img{max-height:245px}.events-grid .event-card-body{padding:14px}.events-search-panel{padding:14px}}
