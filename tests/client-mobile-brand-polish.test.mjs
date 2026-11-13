@@ -53,5 +53,5 @@ test('mobile joystick drives the existing movement model and Studio project card
  assert.ok(!studio.includes('<BlueprintAssembler'));
  assert.ok(!studio.includes('RE-ASSEMBLE'));
  assert.ok(studio.includes('studio-project-grid'));
- assert.ok(studio.includes('STUDIO_PROJECTS.map((proj)'));
+ assert.ok(studio.includes('projects.map((proj)'));
 });

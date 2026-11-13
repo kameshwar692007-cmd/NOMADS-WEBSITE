@@ -76,9 +76,6 @@ export default function EventsPage() {
 
       {/* 1. Event Grounds Festival Hero */}
       <section className="gamified-card events-hero-card stitch-target" data-stitch-label="Synthesizing Event Grounds Festival Hub...">
-        <div className="events-partner-strip">
-          SRMIST • EASWARI • VIT-AP • CRESCENT • HUDDLE GLOBAL • DECATHLON • PLAYO • GDAI
-        </div>
         <h2 className="events-headline">Where Campus Communities & Gaming Culture Unite</h2>
         <p className="events-desc">
           Nomad's Province orchestrates esports competitions, 24-hour game development hackathons, 
@@ -160,13 +157,13 @@ export default function EventsPage() {
             >
               <div className="event-poster-frame">
                 <img src={ev.posterUrl} alt={ev.title} className="event-poster-img" />
-                <div className={`event-status-badge ${ev.computedStatus.toLowerCase()}`}>
-                  {ev.computedStatus === 'ONGOING' && <span className="live-dot" />}
-                  {ev.computedStatus === 'ONGOING' ? 'LIVE NOW' : ev.computedStatus === 'UPCOMING' ? 'UPCOMING' : 'CONCLUDED'}
-                </div>
               </div>
 
               <div className="event-card-body">
+                <div className={`event-status-badge event-status-card ${ev.computedStatus.toLowerCase()}`}>
+                  {ev.computedStatus === 'ONGOING' && <span className="live-dot" />}
+                  {ev.computedStatus === 'ONGOING' ? 'LIVE NOW' : ev.computedStatus === 'UPCOMING' ? 'UPCOMING' : 'CONCLUDED'}
+                </div>
                 <div className="event-meta-row">
                   <span className="event-cat">{ev.category}</span>
                   <span className="event-partner-tag">{ev.partner}</span>

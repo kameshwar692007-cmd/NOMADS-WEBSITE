@@ -2,15 +2,26 @@
 // Showcasing original games, prototypes, and GDAI partnerships
 // Featured studio creations are immediately visible without assembly controls.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './StudioJourney.css';
 import GameShell from '../game/components/GameShell.jsx';
-import { STUDIO_PROJECTS, ORG_INFO } from '../game/data/campusContent.js';
+import { ORG_INFO } from '../game/data/campusContent.js';
+import { studioService } from '../game/services/studioService.js';
 import { sound } from '../game/systems/soundFx.js';
 import { IconCode, IconZap, IconSparkles, IconGlobe, IconRocket } from '../game/components/Icons.jsx';
 
 export default function StudioPage() {
+  const [projects, setProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [projectsError, setProjectsError] = useState('');
+  useEffect(() => {
+    let mounted = true;
+    studioService.getProjects().then(data => {if(mounted) setProjects(data);})
+      .catch(err => {if(mounted) setProjectsError(err.message);})
+      .finally(() => {if(mounted) setProjectsLoading(false);});
+    return () => {mounted=false;};
+  }, []);
   const [pitchDraftReady, setPitchDraftReady] = useState(false);
   const [expandedProject, setExpandedProject] = useState(null);
   const [formData, setFormData] = useState({ name: '', role: 'Developer', pitch: '' });
@@ -73,8 +84,11 @@ export default function StudioPage() {
         <h3 className="section-title">ORIGINAL CREATIONS & STUDIO PORTFOLIO</h3>
       </div>
 
+      {projectsLoading && <p role="status">Loading published studio projects…</p>}
+      {projectsError && <p role="alert" className="studio-project-error">{projectsError}</p>}
+      {!projectsLoading && !projectsError && projects.length === 0 && <p>No studio projects published yet.</p>}
       <div className="studio-project-grid">
-        {STUDIO_PROJECTS.map((proj) => (
+        {projects.map((proj) => (
           <div
             key={proj.id}
             className="gamified-card project-card"
@@ -82,11 +96,11 @@ export default function StudioPage() {
             onMouseEnter={() => sound.playBlip()}
           >
             <div className="project-banner-wrap">
-              <img src={proj.image} alt={proj.title} className="project-banner-img" />
-              <div className="project-overlay">
-                <span className="project-badge" style={{ backgroundColor: proj.accent }}>{proj.status}</span>
-                <span className="project-engine">{proj.engine}</span>
-              </div>
+              {proj.image ? <img src={proj.image} alt={proj.title} className="project-banner-img" /> : <div className="studio-no-poster">Artwork coming soon</div>}
+            </div>
+            <div className="studio-project-meta">
+              <span className="studio-project-status" style={{ borderColor: proj.accent }}>{proj.status}</span>
+              <span className="studio-project-tools">{proj.engine}</span>
             </div>
 
             <div className="project-body">
@@ -105,7 +119,8 @@ export default function StudioPage() {
                   <div><span>PROJECT STATUS</span><strong>{proj.status}</strong></div>
                   <div><span>FORMAT / TOOLS</span><strong>{proj.engine}</strong></div>
                   <div><span>CREATIVE FOCUS</span><strong>{proj.genre}</strong></div>
-                  {proj.id === 'nomads-headquarters' && (
+                  {proj.projectUrl && <a href={proj.projectUrl} target="_blank" rel="noreferrer">Visit project</a>}
+                  {proj.id === 'nomads-headquarters' && !proj.projectUrl && (
                     <Link to="/" onMouseEnter={() => sound.playBlip()}>Explore the playable campus <span aria-hidden="true">→</span></Link>
                   )}
                 </div>
