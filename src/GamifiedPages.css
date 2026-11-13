@@ -5070,3 +5070,5 @@
 @media(prefers-reduced-motion:reduce){
  .mobile-detail-dialog{animation:none!important;scroll-behavior:auto!important}
 }
+/* Canonical non-cropped event detail image rule, after responsive overrides. */
+.detail-poster-img { width:100%; height:auto; object-fit:contain; }
