@@ -28,7 +28,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [userRoleState, setUserRoleState] = useState(() => eventService.isCloudConnected()
     ? { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false, isSimulated: false }
-    : { role: 'SUPER_ADMIN', email: 'admin@nomadsprovince.com', isStaff: true, isAdmin: true, isSuperAdmin: true, isSimulated: true });
+    : { role: 'SUPER_ADMIN', email: null, isStaff: true, isAdmin: true, isSuperAdmin: true, isSimulated: true });
   const [analyticsData, setAnalyticsData] = useState({});
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [activeAdminTab, setActiveAdminTab] = useState('EVENTS'); // 'EVENTS' | 'CONTACT'
@@ -404,7 +404,7 @@ export default function AdminPage() {
                 type="email"
                 required
                 className="retro-input"
-                placeholder="owner@nomadsprovince.com"
+                placeholder="Enter your staff email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
               />
