@@ -53,3 +53,21 @@
 .studio-project-grid .project-body{flex:1;display:flex;flex-direction:column;}
 .studio-project-grid .studio-project-expand{margin-top:auto;}
 @media(max-width:600px){.studio-project-grid{grid-template-columns:1fr;gap:16px;}}
+
+
+/* Studio portfolio: natural artwork aspect ratio, no cropped posters and no badge on image. */
+.studio-project-grid .project-banner-wrap{height:auto;min-height:0;display:flex;justify-content:center;align-items:center;background:#0b1322;overflow:hidden}
+.studio-project-grid .project-banner-img{display:block;width:auto;max-width:100%;height:auto;max-height:320px;object-fit:contain}
+.studio-project-meta{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 16px 0}
+.studio-project-status,.studio-project-tools{font-size:11px;font-weight:800;color:#e7f4ff;background:#172a40;border:1px solid #54728d;border-radius:7px;padding:6px 9px;overflow-wrap:anywhere}
+.studio-no-poster{display:grid;place-items:center;width:100%;min-height:110px;background:#14243a;color:#b7c8da;font-size:13px}
+.studio-project-error{color:#ffe1b5}
+.studio-journey-intro{padding:clamp(16px,2.4vw,26px)}
+.studio-journey-navigation{margin-top:16px}
+.studio-project-grid{gap:16px;margin:12px 0 24px}
+.studio-pathway-steps{gap:12px;margin:18px 0 14px}
+@media(max-width:600px){
+ .studio-journey-intro{padding:18px 14px}
+ .studio-project-meta{padding:10px 12px 0}
+ .studio-project-grid .project-banner-img{max-height:260px}
+}
