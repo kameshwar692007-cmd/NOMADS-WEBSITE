@@ -494,3 +494,16 @@
   background:#090f1c;
   border-radius:8px;
 }
+
+/* Tournament cards: guarantee consistent paragraph-to-action breathing room. */
+.esports-carousel-card{min-width:0}
+.esports-carousel-card .tourney-title{overflow-wrap:anywhere;line-height:1.4}
+.esports-carousel-card .tourney-desc{line-height:1.75;margin:0 0 18px;flex:0 1 auto;overflow-wrap:anywhere}
+.esports-carousel-card .tourney-partner-tag{margin-bottom:16px;overflow-wrap:anywhere}
+.esports-carousel-card .tourney-specs-grid{margin-bottom:18px;min-width:0}
+.esports-carousel-card .tourney-btn{flex-shrink:0;min-height:48px;margin-top:8px}
+@media(max-width:600px){
+ .esports-carousel-card{padding:18px}
+ .esports-carousel-card .tourney-desc{margin-bottom:20px}
+ .esports-carousel-card .tourney-btn{margin-top:12px;min-height:50px}
+}
