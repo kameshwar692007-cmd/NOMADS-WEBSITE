@@ -13,7 +13,9 @@ test('studio showcases genuine records with accessible expandable details',()=>{
   assert.ok(p.id&&p.title&&p.genre&&p.engine&&p.status&&p.desc);
   assert.ok(existsSync(new URL('../public'+p.image,import.meta.url)),p.id+' image');
  }
- assert.ok(page.includes("STUDIO_PROJECTS.map((proj)"));
+ assert.ok(page.includes("projects.map((proj)"));
+ assert.ok(page.includes("studioService.getProjects()"));
+ assert.ok(read('src/game/services/studioService.js').includes("from('studio_projects')"));
  assert.ok(page.includes("aria-expanded={expandedProject === proj.id}"));
  assert.ok(page.includes("aria-controls={`studio-project-detail-${proj.id}`}"));
  assert.ok(page.includes("id={`studio-project-detail-${proj.id}`}"));
