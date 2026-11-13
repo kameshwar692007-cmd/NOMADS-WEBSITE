@@ -1,0 +1,142 @@
+/* Mobile-first detail/interaction layer for all GameShell routes.
+   Only the shell's content is affected: the playable campus remains unchanged. */
+.gamified-shell .shell-main-content,
+.gamified-shell .shell-main-content > *,
+.gamified-shell .shell-main-content :is(section,article,aside,div) { min-width:0; }
+.gamified-shell .shell-main-content :is(h1,h2,h3,h4,p,strong,a,button,span) { overflow-wrap:break-word; }
+.gamified-shell .shell-main-content img { max-width:100%; }
+.gamified-shell .shell-main-content :is(button,a,input,textarea,select):focus-visible,
+.gamified-shell .shell-footer a:focus-visible { outline:3px solid #8ddcff;outline-offset:3px; }
+.gamified-shell .shell-footer .footer-links a { min-height:36px;display:inline-flex;align-items:center; }
+.gamified-shell .shell-footer .footer-admin-link { color:#d9e8fa;border:1px solid #526881;border-radius:8px;padding:5px 12px; }
+.gamified-shell .shell-footer .footer-admin-link:hover { background:#20354c;color:white; }
+.gamified-shell .footer-meta { display:flex;align-items:center;flex-wrap:wrap;gap:6px; }
+
+/* One accessible scrolling region per modal; buttons always remain reachable. */
+.gamified-shell .retro-modal-backdrop {
+  padding: max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));
+  overscroll-behavior:contain;
+}
+.gamified-shell .retro-modal-card {
+  max-width:min(680px,100%);
+  width:100%;
+  max-height:min(90dvh,860px);
+  min-width:0;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.gamified-shell .retro-modal-card .modal-header {
+  gap:12px;padding:15px clamp(15px,3vw,22px);min-width:0;
+}
+.gamified-shell .retro-modal-card .modal-header h3 {
+  min-width:0;flex:1;font-size:clamp(16px,2.5vw,21px);
+  line-height:1.35;overflow-wrap:anywhere;letter-spacing:0;
+}
+.gamified-shell .retro-modal-card .modal-close-btn {
+  flex:0 0 44px;width:44px;height:44px;
+}
+.gamified-shell .retro-modal-card .modal-body,
+.gamified-shell .retro-modal-card .modal-body-form {
+  flex:1 1 auto;min-height:0;min-width:0;
+  overflow-y:auto;overscroll-behavior:contain;
+  padding:clamp(16px,3vw,24px);
+}
+.gamified-shell .retro-modal-card .modal-action-btn { min-height:46px;box-sizing:border-box;text-align:center;gap:10px; }
+.gamified-shell .retro-modal-card .modal-links { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px; }
+.gamified-shell .retro-modal-card .modal-specs-summary { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px; }
+.gamified-shell .retro-modal-card .modal-specs-summary p { margin:0;overflow-wrap:anywhere; }
+.gamified-shell .retro-modal-card .tourney-modal-poster { height:auto;width:auto;max-width:100%;max-height:min(44dvh,410px);object-fit:contain;margin:10px auto 18px;border:1px solid #3d5672; }
+.gamified-shell .retro-modal-card .modal-instruction { line-height:1.65; }
+
+/* Event detail: independent poster sizing, readable values, one scroll area. */
+.gamified-shell .retro-modal-card.event-detail-modal { max-width:min(850px,100%); }
+.gamified-shell .event-detail-modal .event-detail-body {
+  display:grid;grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);
+  flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain;
+}
+.gamified-shell .event-detail-modal .detail-poster-wrap { min-height:0;align-self:start;padding:16px;background:#0b1625; }
+.gamified-shell .event-detail-modal .detail-poster-img { width:100%;height:auto;max-height:min(55dvh,520px);object-fit:contain;border-radius:8px; }
+.gamified-shell .event-detail-modal .detail-content-wrap { min-width:0;padding:clamp(15px,2.7vw,24px);gap:14px; }
+.gamified-shell .event-detail-modal .detail-title {font-size:clamp(19px,3vw,26px);overflow-wrap:anywhere;}
+.gamified-shell .event-detail-modal .meta-item { min-width:0; }
+.gamified-shell .event-detail-modal .meta-item > div { min-width:0; }
+.gamified-shell .event-detail-modal .meta-val { color:#d8e7f8;overflow-wrap:anywhere; }
+.gamified-shell .event-detail-modal .winners-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+.gamified-shell .event-detail-modal .detail-cta-wrap {display:flex;flex-wrap:wrap;gap:10px;}
+.gamified-shell .event-detail-modal .detail-cta-wrap > * { flex:1 1 min(100%,210px);min-width:0;justify-content:center;text-align:center; }
+
+/* Studio game accordion: detail blocks never cause sideways scroll. */
+.gamified-shell .studio-project-grid {grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),1fr));}
+.gamified-shell .studio-project-grid .project-card {min-width:0;overflow:hidden;}
+.gamified-shell .studio-project-grid .studio-project-detail {min-width:0;border:1px solid #38546d;border-radius:10px;padding:14px;margin-top:12px;background:#0c1e30;overflow-wrap:anywhere;}
+.gamified-shell .studio-project-grid .studio-project-detail div {align-items:flex-start;min-width:0;gap:12px;}
+.gamified-shell .studio-project-grid .studio-project-detail strong {min-width:0;overflow-wrap:anywhere;text-align:right;max-width:65%;}
+.gamified-shell .studio-project-grid .studio-project-detail a {display:inline-flex;min-height:44px;align-items:center;}
+.gamified-shell .studio-project-grid .studio-project-expand {min-height:48px;}
+
+/* Dedicated event page uses a class rather than fixed 300px inline grid minimum. */
+.gamified-shell .event-detail-page-grid {
+  grid-template-columns:minmax(0,min(38%,420px)) minmax(0,1fr)!important;
+  gap:clamp(16px,2.5vw,28px)!important;
+}
+.gamified-shell .event-detail-page-grid > * {min-width:0;}
+.gamified-shell .event-detail-page-grid .gamified-card {min-width:0;overflow-wrap:anywhere;}
+.gamified-shell .event-detail-page-grid .event-status-outside {display:inline-flex;padding:7px 11px;margin-top:12px;border-radius:7px;border:1px solid #506981;background:#14243a;color:#fff;font-size:12px;font-weight:800;}
+
+/* Navigation, quick filters and admin toolbars remain usable at narrow widths. */
+@media(max-width:900px) {
+ .gamified-shell .event-detail-page-grid {grid-template-columns:minmax(0,1fr)!important;}
+ .gamified-shell .event-detail-modal .event-detail-body {grid-template-columns:minmax(0,1fr);}
+ .gamified-shell .event-detail-modal .detail-poster-wrap {padding:14px;}
+ .gamified-shell .event-detail-modal .detail-poster-img {width:auto;max-width:100%;max-height:30dvh;}
+ .gamified-shell .admin-section-tabs > button { flex:1 1 220px;justify-content:center; }
+ .gamified-shell .admin-header-actions {flex-wrap:wrap;gap:10px;}
+}
+@media(max-width:600px) {
+ .gamified-shell .shell-main-content {padding:18px 12px 38px!important;}
+ .gamified-shell .shell-main-content > .gamified-card {padding:18px 14px;}
+ .gamified-shell .shell-main-content > :is(section,article,aside)+:is(section,article,aside) {margin-top:20px;}
+ .gamified-shell .shell-footer {padding:22px 14px max(24px,env(safe-area-inset-bottom));}
+ .gamified-shell .footer-inner {display:flex;align-items:flex-start;flex-direction:column;gap:16px;}
+ .gamified-shell .footer-links {gap:8px 14px;width:100%;}
+ .gamified-shell .footer-version {margin-left:0;line-height:1.5;}
+ .gamified-shell .retro-modal-backdrop {padding:0;align-items:stretch;}
+ .gamified-shell .retro-modal-card {
+   max-width:100%;max-height:100dvh;min-height:0;
+   margin:auto 0 0;border-radius:18px 18px 0 0;border-width:1px 0 0;
+   box-shadow:0 -12px 40px #000a;
+ }
+ .gamified-shell .retro-modal-card .modal-header {padding:13px 15px;}
+ .gamified-shell .retro-modal-card .modal-body,
+ .gamified-shell .retro-modal-card .modal-body-form {padding:16px 15px max(20px,env(safe-area-inset-bottom));}
+ .gamified-shell .retro-modal-card .modal-specs-summary {grid-template-columns:minmax(0,1fr);gap:7px;}
+ .gamified-shell .retro-modal-card .tourney-modal-poster {max-height:33dvh;}
+ .gamified-shell .retro-modal-card .modal-links {grid-template-columns:minmax(0,1fr);}
+ .gamified-shell .event-detail-modal .detail-content-wrap {padding:15px;}
+ .gamified-shell .event-detail-modal .detail-poster-img {max-height:23dvh;}
+ .gamified-shell .event-detail-modal .winners-grid {grid-template-columns:minmax(0,1fr);}
+ .gamified-shell .studio-project-grid {grid-template-columns:minmax(0,1fr);}
+ .gamified-shell .studio-project-grid .studio-project-detail div {flex-direction:column;gap:4px;}
+ .gamified-shell .studio-project-grid .studio-project-detail strong {text-align:left;max-width:100%;}
+ .gamified-shell .event-detail-page-grid {gap:16px!important;}
+ .gamified-shell .event-detail-page-grid .gamified-card {padding:16px!important;}
+ .gamified-shell .event-detail-page-grid [style*="minmax(200px"] {grid-template-columns:minmax(0,1fr)!important;}
+ .gamified-shell .admin-section-tabs {gap:8px!important;}
+ .gamified-shell .admin-section-tabs > button {flex:1 1 100%;min-height:44px;}
+ .gamified-shell .admin-metrics-row {grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+ .gamified-shell .admin-action-bar,.gamified-shell .admin-header-actions {flex-wrap:wrap;}
+ .gamified-shell .admin-header-actions > button {flex:1 1 min(100%,180px);}
+ .gamified-shell .retro-modal-card .modal-footer-actions {flex-wrap:wrap;bottom:0;}
+ .gamified-shell .retro-modal-card .modal-footer-actions > * {flex:1 1 min(100%,160px);}
+ .gamified-shell .studio-admin-row .studio-admin-actions {flex-wrap:wrap;}
+ .gamified-shell .events-grid,.gamified-shell .studio-project-grid {gap:14px;}
+}
+@media(max-width:380px) {
+ .gamified-shell .shell-main-content {padding-inline:9px!important;}
+ .gamified-shell .retro-modal-card .modal-header h3 {font-size:15px;}
+ .gamified-shell .footer-links {flex-direction:column;align-items:flex-start;}
+}
+@media(prefers-reduced-motion:reduce) {
+ .gamified-shell .retro-modal-card {animation:none;}
+ .gamified-shell :is(.studio-project-expand,.modal-action-btn,.footer-admin-link) {transition:none;}
+}
