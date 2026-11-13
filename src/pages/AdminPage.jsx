@@ -8,6 +8,7 @@ import GameShell from '../game/components/GameShell.jsx';
 import { eventService } from '../game/services/eventService.js';
 import { sound } from '../game/systems/soundFx.js';
 import { ORG_INFO } from '../game/data/campusContent.js';
+import StudioAdmin from './StudioAdmin.jsx';
 import {
   IconWhatsApp,
   IconMail,
@@ -590,7 +591,16 @@ export default function AdminPage() {
           <IconWhatsApp size={18} />
           <span>CONTACT & COMMS SETTINGS</span>
         </button>
+        <button type="button" className="gamified-btn" aria-pressed={activeAdminTab === 'STUDIO'}
+          style={{padding:'12px 24px',fontSize:13,fontWeight:'bold',
+            background:activeAdminTab === 'STUDIO'?'#0b7195':'#1e293b',
+            color:'#fff',border:'1px solid #54708c',display:'inline-flex',alignItems:'center',gap:8}}
+          onClick={()=>setActiveAdminTab('STUDIO')}>
+          <IconRocket size={18}/><span>STUDIO GAMES & PROJECTS</span>
+        </button>
       </div>
+
+      {activeAdminTab === 'STUDIO' && <StudioAdmin role={userRoleState} />}
 
       {activeAdminTab === 'CONTACT' && (
         <section className="gamified-card admin-contact-settings-card" style={{ padding: '32px', marginBottom: '32px' }}>
