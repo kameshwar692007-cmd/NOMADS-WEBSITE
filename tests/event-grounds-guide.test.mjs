@@ -21,7 +21,9 @@ test('existing event details, real registration and admin links remain functiona
  assert.ok(page.includes("selectedEvent.registrationUrl && selectedEvent.computedStatus !== 'ENDED'"));
  assert.ok(page.includes('eventService.trackRegistrationClick(selectedEvent.id, selectedEvent.title)'));
  assert.ok(page.includes('to={`/events/${ev.slug || ev.id}`}'));
- assert.ok(page.includes('to="/admin"'));
+ assert.ok(!page.includes('to="/admin"'));
+ const footer=read('src/game/components/GameShell.jsx');
+ assert.ok(footer.includes("navigate('/admin')"));
  assert.ok(page.includes('href={ORG_INFO.whatsapp}'));
  for(const route of ['/studio','/esports']){
   assert.ok(LOCATIONS.some(item=>item.route===route));
