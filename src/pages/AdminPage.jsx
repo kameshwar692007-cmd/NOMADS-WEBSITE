@@ -404,7 +404,7 @@ export default function AdminPage() {
                 type="email"
                 required
                 className="retro-input"
-                placeholder="owner@nomadsprovince.com"
+                placeholder="Enter your staff email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
               />
