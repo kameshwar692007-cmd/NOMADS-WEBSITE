@@ -81,3 +81,20 @@ test('Events poster labels cannot disappear into white poster artwork',()=>{
  assert.ok(studioStyles.includes('object-fit:contain'));
  assert.ok(studioStyles.includes('max-height:320px'));
 });
+
+test('Event and tournament create workflows publish to their separate destinations',async()=>{
+ if(eventService.isCloudConnected()) return;
+ const base={
+  category:'Esports',venue:'Chennai',startDate:'2027-02-10T10:00:00+05:30',
+  endDate:'2027-02-10T18:00:00+05:30',posterUrl:'',
+  registrationUrl:'',isDraft:false,statusMode:'AUTO'
+ };
+ const event=await eventService.createEvent({...base,title:'Test game jam event',listingType:'EVENT'});
+ const tournament=await eventService.createEvent({...base,title:'Test game tournament',
+  listingType:'TOURNAMENT',gameTitle:'BGMI',matchFormat:'Squads'});
+ const publicRecords=await eventService.getPublicEvents();
+ assert.ok(publicRecords.some(item=>item.id===event.id && isEventListing(item)));
+ assert.ok(publicRecords.some(item=>item.id===tournament.id && isTournamentListing(item)));
+ assert.ok(!publicRecords.filter(isEventListing).some(item=>item.id===tournament.id));
+ assert.ok(!publicRecords.filter(isTournamentListing).some(item=>item.id===event.id));
+});
