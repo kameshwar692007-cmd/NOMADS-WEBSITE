@@ -317,6 +317,9 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
             <button type="button" className="footer-admin-link" aria-label="Admin login" onClick={() => {sound.playSelect(); navigate('/admin');}}>
               Admin Login
             </button>
+            <button type="button" className="footer-admin-link" aria-label="Admin login" onClick={() => {sound.playSelect(); navigate('/admin');}}>
+              Admin Login
+            </button>
           </div>
 
 
