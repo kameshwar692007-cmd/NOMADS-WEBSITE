@@ -314,6 +314,9 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
             <a href="mailto:nomadsprovince@gmail.com" onMouseEnter={() => sound.playBlip()}>
               nomadsprovince@gmail.com
             </a>
+            <button type="button" className="footer-admin-link" aria-label="Admin login" onClick={() => {sound.playSelect(); navigate('/admin');}}>
+              Admin Login
+            </button>
           </div>
 
 
