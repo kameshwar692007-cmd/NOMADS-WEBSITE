@@ -467,3 +467,30 @@
     transform: none !important;
   }
 }
+
+/* Admin-uploaded tournament posters render in full without center cropping. */
+.tourney-poster-frame{
+  width:100%;
+  height:auto;
+  background:#090f1c;
+  border:1px solid rgba(138,167,203,.24);
+  border-radius:9px;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+.tourney-poster-img{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+}
+.tourney-modal-poster{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:70vh;
+  object-fit:contain;
+  margin:0 auto 18px;
+  background:#090f1c;
+  border-radius:8px;
+}

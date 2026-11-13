@@ -191,61 +191,8 @@ export const PARTNERS = [
   }
 ];
 
-// Verified Esports titles and tournament circuits (no fabricated cash pools or fake team numbers)
-export const TOURNAMENTS = [
-  {
-    id: 'freefire-showdown',
-    title: 'Free Fire Max Campus Showdown',
-    game: 'Free Fire Max',
-    prizePool: 'Trophies, Certificates & Cash Pool',
-    date: 'Monthly Series',
-    format: 'Battle Royale Squads • Custom Lobbies',
-    status: 'ACTIVE REGISTRATION',
-    accent: '#f97316',
-    badge: 'ESPORTS PARTNER',
-    partnerInfo: 'In collaboration with Free Fire Community',
-    desc: 'Collegiate esports clash featuring custom private lobbies, live match casting, and verified certificates.'
-  },
-  {
-    id: 'codm-squad-cup',
-    title: 'Call of Duty: Mobile Squad Cup',
-    game: 'Call of Duty: Mobile',
-    prizePool: 'Awards, Swag & Cash Prizes',
-    date: 'Weekend Series',
-    format: 'Tactical Squads • Bracket Elimination',
-    status: 'ACTIVE REGISTRATION',
-    accent: '#eab308',
-    badge: 'TACTICAL SQUADS',
-    partnerInfo: 'Official Nomad\'s Province Bracket',
-    desc: 'Multi-regional mobile esports tournament with seeded bracket check-ins and broadcasted finals.'
-  },
-  {
-    id: 'indus-clash',
-    title: 'Indus Battle Royale Community Clash',
-    game: 'Indus Battle Royale',
-    prizePool: 'Community Rewards & Recognition',
-    date: 'Community Scrims',
-    format: 'Custom BR Rooms • Squad Play',
-    status: 'COMMUNITY SCRIMS',
-    accent: '#06b6d4',
-    badge: 'MADE IN INDIA',
-    partnerInfo: 'Grassroots Community Circuit',
-    desc: 'Community scrims and custom rooms celebrating homegrown Indian battle royale gaming.'
-  },
-  {
-    id: 'bgmi-pro-am',
-    title: 'BGMI Collegiate Invitational',
-    game: 'Battlegrounds Mobile India',
-    prizePool: 'Prize Pool & Medals',
-    date: 'Seasonal Championship',
-    format: 'Erangel / Miramar Squads',
-    status: 'UPCOMING',
-    accent: '#22c55e',
-    badge: 'COLLEGIATE ESPORTS',
-    partnerInfo: 'Inter-College Esports Circuit',
-    desc: 'Tiered scrims elevating grassroots collegiate players into competitive broadcasted tournaments.'
-  }
-];
+// Esports tournaments are published exclusively through Supabase admin listings.
+// No hardcoded sample tournaments are presented to visitors.
 
 // Authentic Studio Projects (100% verified, no fictional made-up games)
 export const STUDIO_PROJECTS = [

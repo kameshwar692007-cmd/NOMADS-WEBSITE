@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import './EventGroundsGuide.css';
 import { Link } from 'react-router-dom';
 import GameShell from '../game/components/GameShell.jsx';
-import { eventService } from '../game/services/eventService.js';
+import { eventService, isEventListing } from '../game/services/eventService.js';
 import { ORG_INFO } from '../game/data/campusContent.js';
 import { sound } from '../game/systems/soundFx.js';
 import { IconMapPin, IconEvents, IconWhatsApp, IconTrophy, IconRocket, IconShield } from '../game/components/Icons.jsx';
@@ -14,6 +14,7 @@ import { IconMapPin, IconEvents, IconWhatsApp, IconTrophy, IconRocket, IconShiel
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [filter, setFilter] = useState('ALL');
   const [category, setCategory] = useState('ALL');
   const [search, setSearch] = useState('');
@@ -22,11 +23,14 @@ export default function EventsPage() {
   // Load public events (excludes drafts)
   const loadEvents = async () => {
     setLoading(true);
+    setLoadError('');
     try {
       const data = await eventService.getPublicEvents();
-      setEvents(data);
+      setEvents(data.filter(isEventListing));
     } catch (err) {
       console.error('Failed to load events:', err);
+      setEvents([]);
+      setLoadError('Published events could not be loaded. Please retry.');
     } finally {
       setLoading(false);
     }
@@ -121,13 +125,20 @@ export default function EventsPage() {
         </p>
       </section>
 
+      {loadError && (
+        <div role="alert" className="gamified-card events-empty-pane">
+          <p>{loadError}</p>
+          <button type="button" className="events-clear-filters" onClick={loadEvents}>Retry loading</button>
+        </div>
+      )}
+
       {/* 2. Events Grid */}
       {loading ? (
         <div className="events-loading-pane">
           <span className="pulse-beacon" />
           <p>LOADING FESTIVAL SCHEDULE...</p>
         </div>
-      ) : filteredEvents.length === 0 ? (
+      ) : loadError ? null : filteredEvents.length === 0 ? (
         <div className="events-empty-pane">
           <IconEvents size={40} color="#64748b" />
           <p>No published events match the selected filters.</p>

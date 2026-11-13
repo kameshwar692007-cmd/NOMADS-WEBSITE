@@ -48,6 +48,13 @@ export function calculateDateStatus(startDate, endDate) {
  * Computes live effective status separating status_mode ('AUTO' vs 'MANUAL')
  * and computed temporal lifecycle state ('UPCOMING', 'ONGOING', 'ENDED')
  */
+/**
+ * Single public routing rule: event records belong to one destination only.
+ * Legacy records without a listing_type remain Events (never tournaments).
+ */
+export const isTournamentListing = event => event?.listingType === 'TOURNAMENT';
+export const isEventListing = event => !isTournamentListing(event);
+
 export function computeEventStatus(event) {
   if (!event) return 'UPCOMING';
 
@@ -108,6 +115,9 @@ export function validateEventPayload(data) {
     }
   }
 
+  if (data.listingType === 'TOURNAMENT' && !(data.gameTitle || '').trim()) {
+    errors.push('Game title is required for tournaments.');
+  }
   // Determine status_mode and manual_status
   let statusMode = 'AUTO';
   let manualStatus = null;
@@ -135,12 +145,38 @@ export function validateEventPayload(data) {
       manualStatus,
       isDraft: Boolean(data.isDraft),
       posterUrl: data.posterUrl ? data.posterUrl.trim() : '',
+      listingType: data.listingType === 'TOURNAMENT' ? 'TOURNAMENT' : 'EVENT',
+      gameTitle: typeof data.gameTitle === 'string' ? data.gameTitle.trim() : '',
+      matchFormat: typeof data.matchFormat === 'string' ? data.matchFormat.trim() : '',
+      prizePool: typeof data.prizePool === 'string' ? data.prizePool.trim() : '',
+      partnerInfo: typeof data.partnerInfo === 'string' ? data.partnerInfo.trim() : '',
       registrationUrl: data.registrationUrl ? data.registrationUrl.trim() : '',
       partner: data.partner ? data.partner.trim() : "Nomad's Province",
       description: data.description ? data.description.trim() : '',
       results: data.results || { champion: '', runnerUp: '', highlights: '', trophy_notes: '' }
     }
   };
+}
+
+/**
+ * Preserve the actionable PostgREST error from a failed staff write.
+ * Never silently switch a connected deployment to local-only records.
+ */
+export function describeSupabaseWriteError(error, action = 'save') {
+  const code = typeof error?.code === 'string' ? error.code : '';
+  const message = typeof error?.message === 'string' && error.message.trim()
+    ? error.message.trim()
+    : 'The database did not return an error message.';
+  const hint = code === '42501'
+    ? 'Your authenticated user may lack the staff role or RLS permission.'
+    : code === '23505'
+      ? 'A record with the same unique value already exists.'
+      : code === '42703' || code === 'PGRST204' || code === 'PGRST205'
+        ? 'Check that the events schema and tournament migration were applied to this Supabase project.'
+        : code === '23514'
+          ? 'One or more values violate a database constraint.'
+          : 'Check your staff login, SQL schema, and browser Network response.';
+  return `Supabase ${action} failed${code ? ` [${code}]` : ''}: ${message}. ${hint}`;
 }
 
 // Memory storage adapter for Node.js / non-browser test runner environments
@@ -185,6 +221,7 @@ function initializeFallbackStore() {
           manualStatus: isConcluded ? 'ENDED' : null,
           isDraft: false,
           posterUrl: ev.image || '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
+          listingType: 'EVENT',
           registrationUrl: 'https://wa.me/919789720897',
           partner: ev.partner || "Nomad's Province",
           description: ev.desc || '',
@@ -257,17 +294,8 @@ export const eventService = {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
-          if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-            const simulatedRole = storageGet(ROLES_KEY) || 'SUPER_ADMIN';
-            return {
-              role: simulatedRole,
-              email: 'admin@nomadsprovince.com',
-              isStaff: ['SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(simulatedRole),
-              isAdmin: ['SUPER_ADMIN', 'ADMIN'].includes(simulatedRole),
-              isSuperAdmin: simulatedRole === 'SUPER_ADMIN',
-              isSimulated: true
-            };
-          }
+          // Connecting to a real Supabase project always requires a real Auth
+          // session. A localhost URL does NOT grant upload or admin privileges.
           return { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false };
         }
 
@@ -291,10 +319,11 @@ export const eventService = {
         };
       } catch (err) {
         console.warn('Failed to resolve role from database:', err);
+        return { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false };
       }
     }
 
-    // Local simulation fallback
+    // Only offline/demo mode uses simulated roles.
     const simulatedRole = storageGet(ROLES_KEY) || 'SUPER_ADMIN';
     return {
       role: simulatedRole,
@@ -344,11 +373,12 @@ export const eventService = {
       try {
         const { data, error } = await supabase
           .from('events')
-          .select('id, slug, title, category, venue, start_date, end_date, registration_deadline, status_mode, manual_status, is_draft, poster_url, registration_url, partner, description, results, created_at')
+          .select('id, slug, title, category, venue, start_date, end_date, registration_deadline, status_mode, manual_status, is_draft, poster_url, registration_url, partner, description, results, created_at, listing_type, game_title, match_format, prize_pool, partner_info')
           .eq('is_draft', false)
           .order('start_date', { ascending: false });
 
-        if (!error && data) {
+        if (error) throw error;
+        if (data) {
           return data.map((d) => {
             const mapped = {
               id: d.id,
@@ -363,6 +393,11 @@ export const eventService = {
               manualStatus: d.manual_status,
               isDraft: d.is_draft,
               posterUrl: d.poster_url,
+              listingType: d.listing_type || 'EVENT',
+              gameTitle: d.game_title || '',
+              matchFormat: d.match_format || '',
+              prizePool: d.prize_pool || '',
+              partnerInfo: d.partner_info || '',
               registrationUrl: d.registration_url,
               partner: d.partner,
               description: d.description,
@@ -375,11 +410,14 @@ export const eventService = {
             };
           });
         }
+        throw new Error('Supabase returned no public event data.');
       } catch (err) {
-        console.warn('Supabase public fetch failed, using fallback store:', err);
+        console.error('Supabase public fetch failed:', err);
+        throw new Error(describeSupabaseWriteError(err, 'public read'));
       }
     }
 
+    // Only projects without a Supabase connection use offline demo data.
     const local = getLocalEvents();
     return local
       .filter((ev) => !ev.isDraft)
@@ -418,6 +456,11 @@ export const eventService = {
             manualStatus: data.manual_status,
             isDraft: data.is_draft,
             posterUrl: data.poster_url,
+            listingType: data.listing_type || 'EVENT',
+            gameTitle: data.game_title || '',
+            matchFormat: data.match_format || '',
+            prizePool: data.prize_pool || '',
+            partnerInfo: data.partner_info || '',
             registrationUrl: data.registration_url,
             partner: data.partner,
             description: data.description,
@@ -506,6 +549,11 @@ export const eventService = {
               manualStatus: d.manual_status,
               isDraft: d.is_draft,
               posterUrl: d.poster_url,
+              listingType: d.listing_type || 'EVENT',
+              gameTitle: d.game_title || '',
+              matchFormat: d.match_format || '',
+              prizePool: d.prize_pool || '',
+              partnerInfo: d.partner_info || '',
               registrationUrl: d.registration_url,
               partner: d.partner,
               description: d.description,
@@ -544,6 +592,10 @@ export const eventService = {
     }
 
     if (isSupabaseConfigured && supabase) {
+      const role = await this.getCurrentUserRole();
+      if (!role.isStaff || role.isSimulated) {
+        throw new Error('Sign in with a verified Supabase staff account before publishing events. Local demo admin access cannot write to the cloud.');
+      }
       try {
         const { data, error } = await supabase
           .from('events')
@@ -559,6 +611,11 @@ export const eventService = {
             manual_status: sanitized.manualStatus,
             is_draft: sanitized.isDraft,
             poster_url: sanitized.posterUrl,
+            listing_type: sanitized.listingType,
+            game_title: sanitized.gameTitle,
+            match_format: sanitized.matchFormat,
+            prize_pool: sanitized.prizePool,
+            partner_info: sanitized.partnerInfo,
             registration_url: sanitized.registrationUrl,
             partner: sanitized.partner,
             description: sanitized.description,
@@ -570,10 +627,10 @@ export const eventService = {
         if (error) throw error;
         return data;
       } catch (err) {
-        console.warn('Supabase create failed, persisting locally:', err);
+        console.error('Supabase create failed; nothing was published:', err);
+        throw new Error(describeSupabaseWriteError(err, 'create'));
       }
     }
-
     const local = getLocalEvents();
     const newEvent = {
       ...sanitized,
@@ -597,6 +654,10 @@ export const eventService = {
     }
 
     if (isSupabaseConfigured && supabase) {
+      const role = await this.getCurrentUserRole();
+      if (!role.isStaff || role.isSimulated) {
+        throw new Error('Sign in with a verified Supabase staff account before updating events.');
+      }
       try {
         const { data, error } = await supabase
           .from('events')
@@ -611,6 +672,11 @@ export const eventService = {
             manual_status: sanitized.manualStatus,
             is_draft: sanitized.isDraft,
             poster_url: sanitized.posterUrl,
+            listing_type: sanitized.listingType,
+            game_title: sanitized.gameTitle,
+            match_format: sanitized.matchFormat,
+            prize_pool: sanitized.prizePool,
+            partner_info: sanitized.partnerInfo,
             registration_url: sanitized.registrationUrl,
             partner: sanitized.partner,
             description: sanitized.description,
@@ -623,10 +689,10 @@ export const eventService = {
         if (error) throw error;
         return data;
       } catch (err) {
-        console.warn('Supabase update failed, updating locally:', err);
+        console.error('Supabase update failed; nothing was updated:', err);
+        throw new Error(describeSupabaseWriteError(err, 'update'));
       }
     }
-
     const local = getLocalEvents();
     const index = local.findIndex((ev) => ev.id === id);
     if (index === -1) {
@@ -769,26 +835,54 @@ export const eventService = {
     }
 
     if (isSupabaseConfigured && supabase) {
+      // The storage INSERT policy requires auth.uid() to belong to a real
+      // SUPER_ADMIN / ADMIN / EDITOR in public.admin_users. Running the
+      // events migration alone cannot grant an unauthenticated browser access.
+      let session;
       try {
-        const fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
-        // Unique collision-proof filename using crypto random UUID
-        const safeId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-        const filePath = `posters/${safeId}.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('event-posters')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (uploadError) throw uploadError;
-
-        const { data } = supabase.storage.from('event-posters').getPublicUrl(filePath);
-        return data.publicUrl;
-      } catch (err) {
-        console.warn('Storage upload error, falling back to data URL:', err);
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        session = data?.session;
+      } catch (error) {
+        throw new Error(`Supabase authentication check failed: ${error.message || 'unknown error'}. Please sign in again.`);
       }
+      if (!session?.user) {
+        throw new Error('Sign in with your Supabase staff account before uploading posters. Local demo admin access cannot upload to a protected storage bucket.');
+      }
+
+      const { data: staff, error: staffError } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      if (staffError) {
+        throw new Error(`Could not verify staff permissions: ${staffError.message}. Verify admin_users policies and your signed-in account.`);
+      }
+      if (!['SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(staff?.role)) {
+        throw new Error('This Supabase account is not an authorized staff member. Add its auth user ID to public.admin_users with an appropriate role.');
+      }
+
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+      const safeId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).substring(2)}`;
+      const filePath = `posters/${safeId}.${fileExt}`;
+      let uploadError;
+      try {
+        ({ error: uploadError } = await supabase.storage
+          .from('event-posters')
+          .upload(filePath, file, { cacheControl: '3600', upsert: false, contentType: file.type }));
+      } catch (error) {
+        throw new Error(`Poster upload request failed: ${error.message || 'network error'}. Check Supabase connection and browser console.`);
+      }
+      if (uploadError) {
+        const reason = uploadError.message || 'Unknown storage error';
+        throw new Error(`Supabase poster upload failed: ${reason}. Check the event-posters bucket and storage INSERT RLS policy for staff.`);
+      }
+
+      const { data } = supabase.storage.from('event-posters').getPublicUrl(filePath);
+      if (!data?.publicUrl) throw new Error('Poster uploaded but public URL was unavailable; check bucket visibility.');
+      return data.publicUrl;
     }
 
     return new Promise((resolve, reject) => {

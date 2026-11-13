@@ -7,10 +7,9 @@ import { PARTNERS } from '../data/campusContent.js';
 import { sound } from '../systems/soundFx.js';
 
 export default function PinnedPartnersShowcase({ partners = PARTNERS, operations = [] }) {
-  const ALLY_HOLD_MS = 3500;
+  const ALLY_HOLD_MS = 4000;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReducedMotion, setIsReducedMotion] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
-  const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [pageVisible, setPageVisible] = useState(() => !document.hidden);
   const [filter, setFilter] = useState('all');
@@ -73,18 +72,12 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
   useEffect(() => {
-    if (hovered || focused || isReducedMotion || !pageVisible || filteredPartners.length < 2) return;
+    if (focused || isReducedMotion || !pageVisible || filteredPartners.length < 2) return;
     const timer = window.setInterval(() => setActiveIndex(i => (i + 1) % filteredPartners.length), ALLY_HOLD_MS);
     return () => window.clearInterval(timer);
-  }, [hovered, focused, isReducedMotion, pageVisible, filteredPartners.length]);
+  }, [focused, isReducedMotion, pageVisible, filteredPartners.length]);
 
   const activePartner = filteredPartners[safeIndex] || filteredPartners[0] || partners[0];
-  const showcasePartner = partnerIndex => {
-    sound.playSelect();
-    setFilter('all');
-    setActiveIndex(partnerIndex);
-    window.scrollTo({ top: Math.max(0, document.querySelector('.showcase-pinned-track')?.getBoundingClientRect().top + window.scrollY - 120), behavior: 'smooth' });
-  };
   const changeFilter = id => {
     sound.playBlip();
     setFilter(id);
@@ -95,8 +88,6 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
     <section
       className="pinned-partners-showcase-section"
       aria-label="Strategic Partners & Sponsors Showcase"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={e => { if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false); }}
     >
@@ -223,33 +214,6 @@ export default function PinnedPartnersShowcase({ partners = PARTNERS, operations
       <div className="showcase-original-filter-row" role="group" aria-label="Filter partner categories">
         {filters.map(item => <button type="button" key={item.id} className={filter === item.id ? 'hq-filter active' : 'hq-filter'}
           aria-pressed={filter === item.id} onClick={() => changeFilter(item.id)}>{item.label}</button>)}
-      </div>
-      {/* Partner overview uses the same restrained card language as the split-screen above. */}
-      <div className="showcase-allies-overview" aria-labelledby="showcase-allies-overview-title">
-        <div className="showcase-header">
-          <span className="badge-pill">OFFICIAL ALLIANCE NETWORK • {partners.length} ALLIES</span>
-          <h3 className="showcase-title" id="showcase-allies-overview-title">Allies Showcase</h3>
-          <p className="showcase-desc">Select an ally to view their profile above.</p>
-        </div>
-        <div className="showcase-allies-grid">
-          {partners.map((partner, partnerIndex) => (
-            <button type="button" key={partner.id}
-              className={filter === 'all' && safeIndex === partnerIndex ? 'showcase-ally-tile is-selected' : 'showcase-ally-tile'}
-              onClick={() => showcasePartner(partnerIndex)}
-              style={{ '--accent-color': partner.accent, '--bg-color': partner.bgColor || '#000000' }}
-              aria-label={`View ${partner.name} in the Allies carousel`}
-              aria-pressed={filter === 'all' && safeIndex === partnerIndex}>
-              <span className="showcase-ally-frame">
-                <span className="stage-corner tl" aria-hidden="true"/>
-                <span className="stage-corner tr" aria-hidden="true"/>
-                <span className="stage-corner bl" aria-hidden="true"/>
-                <span className="stage-corner br" aria-hidden="true"/>
-                <img src={partner.image1x1 || partner.image} alt="" loading="lazy" decoding="async"/>
-              </span>
-              <span className="showcase-ally-name">{partner.name}</span>
-            </button>
-          ))}
-        </div>
       </div>
     </section>
   );

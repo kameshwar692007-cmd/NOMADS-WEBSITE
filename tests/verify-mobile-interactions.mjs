@@ -90,10 +90,10 @@ async function runViewport(w,h){
 
  // Client's restored HQ Allies showcase: full logo, 1:1 asset and cyber-stage layout.
  await navigate('/about');
- check(w+'px HQ partner showcase renders',await waitFor('.showcase-allies-grid'));
- const partnerCount=await evalJs('document.querySelectorAll(".showcase-ally-tile").length');
- check(w+'px all 14 allies are shown',partnerCount===14,String(partnerCount));
- const huddleButton='[aria-label="View Huddle Global in the Allies carousel"]';
+ check(w+'px HQ partner showcase renders',await waitFor('.split-card'));
+ const partnerCount=await evalJs('document.querySelectorAll(".dots-group .dot").length');
+ check(w+'px all 14 allies remain selectable',partnerCount===14,String(partnerCount));
+ const huddleButton='[aria-label="Select Huddle Global"]';
  check(w+'px Huddle Global selectable',await click(huddleButton));
  await pause(250);
  const huddle=await evalJs('(()=>{const img=document.querySelector(".stage-box img");const stage=document.querySelector(".stage-wrapper");if(!img||!stage)return null;const r=stage.getBoundingClientRect();return {src:new URL(img.src).pathname,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,width:r.width,height:r.height}})()');
@@ -106,7 +106,7 @@ async function runViewport(w,h){
  check(w+'px no Pause button in HQ',
    !(await exists('[aria-label="Pause partner carousel"]')));
  check(w+'px original video-style split-card rendered',await exists('.split-card') && await exists('.dots-group') && await exists('.arrows-group'));
- check(w+'px gallery matches original framed logo design',await exists('.showcase-ally-frame .stage-corner.tl'));
+ check(w+'px carousel retains original framed logo design',await exists('.stage-box .stage-corner.tl'));
  check(w+'px HQ no horizontal overflow',!(await evalJs('document.documentElement.scrollWidth>innerWidth+1')));
  await screenshot('hq-huddle-'+w);
 }

@@ -4,21 +4,49 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import './EsportsArenaGuide.css';
 import GameShell from '../game/components/GameShell.jsx';
-import { TOURNAMENTS, ORG_INFO } from '../game/data/campusContent.js';
+import { ORG_INFO } from '../game/data/campusContent.js';
+import { eventService, isTournamentListing } from '../game/services/eventService.js';
 import { sound } from '../game/systems/soundFx.js';
 import { IconCrosshair, IconWhatsApp, IconInstagram } from '../game/components/Icons.jsx';
 
 export default function EsportsPage() {
-  const [selectedTournament, setSelectedTournament] = useState(TOURNAMENTS[0]);
+  const [selectedTournament, setSelectedTournament] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [publishedTournaments, setPublishedTournaments] = useState([]);
+  useEffect(() => {
+    let active = true;
+    setIsLoading(true);
+    setLoadError('');
+    eventService.getPublicEvents().then(events => {
+      if (!active) return;
+      setPublishedTournaments(events.filter(isTournamentListing).map(ev => ({
+        id: ev.id, title: ev.title, game: ev.gameTitle || 'Esports',
+        isDemo: ev.slug?.startsWith('demo-') || false,
+        status: ev.computedStatus === 'ENDED' ? 'CONCLUDED' : ev.computedStatus === 'ONGOING' ? 'LIVE NOW' : 'UPCOMING',
+        accent: '#f97316', badge: ev.slug?.startsWith('demo-') ? 'DEMO / NOT A REAL EVENT' : 'OFFICIAL TOURNAMENT', desc: ev.description || '',
+        partnerInfo: ev.partnerInfo || ev.partner || "Nomad's Province",
+        prizePool: ev.prizePool || 'Refer to organizer', format: ev.matchFormat || 'See registration details',
+        posterUrl: ev.posterUrl, registrationUrl: ev.registrationUrl
+      })));
+    }).catch(err => {
+      if (!active) return;
+      console.error('Could not load published tournaments',err);
+      setLoadError('Tournaments could not be loaded. Please retry.');
+    }).finally(() => { if (active) setIsLoading(false); });
+    return () => { active = false; };
+  }, []);
+  const allTournaments = publishedTournaments;
   const [modalOpen, setModalOpen] = useState(false);
   const [activeGame, setActiveGame] = useState('all');
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const carouselRef = useRef(null);
   const touchStartX = useRef(0);
 
+  const gameFilters = [...new Set(allTournaments.map(tourney => tourney.game).filter(Boolean))].sort();
   const visibleTournaments = activeGame === 'all'
-    ? TOURNAMENTS
-    : TOURNAMENTS.filter(tourney => tourney.id === activeGame);
+    ? allTournaments
+    : allTournaments.filter(tourney => tourney.game === activeGame);
 
   const scrollToIndex = useCallback((index) => {
     const el = carouselRef.current;
@@ -129,7 +157,7 @@ export default function EsportsPage() {
         <div className="esports-header-meta">
           <span className="esports-status-pill">
             <span className="esports-live-dot" />
-            COMPETITIVE CIRCUITS ACTIVE
+            ESPORTS TOURNAMENTS
           </span>
           <span className="esports-badge-kicker">NOMAD'S PROVINCE ESPORTS</span>
         </div>
@@ -144,7 +172,7 @@ export default function EsportsPage() {
       <section className="esports-circuits-section" aria-labelledby="esports-circuits-heading">
         <div className="section-title-wrap">
           <h3 id="esports-circuits-heading" className="section-title">FEATURED TOURNAMENT CIRCUITS</h3>
-          <span className="section-badge">VERIFIED CIRCUITS</span>
+          <span className="section-badge">PUBLISHED TOURNAMENTS</span>
         </div>
 
         {/* Game Filters */}
@@ -157,22 +185,22 @@ export default function EsportsPage() {
           >
             All Games
           </button>
-          {TOURNAMENTS.map(tourney => (
+          {gameFilters.map(game => (
             <button
               type="button"
-              key={tourney.id}
-              className={`arena-game-filter ${activeGame === tourney.id ? 'active' : ''}`}
-              aria-pressed={activeGame === tourney.id}
-              onClick={() => handleFilterChange(tourney.id)}
+              key={game}
+              className={`arena-game-filter ${activeGame === game ? 'active' : ''}`}
+              aria-pressed={activeGame === game}
+              onClick={() => handleFilterChange(game)}
             >
-              {tourney.game}
+              {game}
             </button>
           ))}
         </div>
 
         <div className="esports-filter-status-row">
           <p className="arena-filter-count" aria-live="polite">
-            Showing {visibleTournaments.length} of {TOURNAMENTS.length} tournament circuits
+            Showing {visibleTournaments.length} of {allTournaments.length} tournament circuits
           </p>
 
           {/* Carousel Controls */}
@@ -211,6 +239,15 @@ export default function EsportsPage() {
           aria-label="Featured tournaments carousel"
           onKeyDown={handleKeyDown}
         >
+          {isLoading && <p className="arena-filter-count" role="status">Loading published tournaments…</p>}
+          {loadError && <p className="arena-filter-count" role="alert">{loadError}</p>}
+          {!isLoading && !loadError && visibleTournaments.length === 0 && (
+            <div className="gamified-card esports-empty-state" role="status">
+              <IconCrosshair size={32} />
+              <h4>No tournaments published yet</h4>
+              <p>New tournaments will appear here after the organizer publishes them from the admin panel.</p>
+            </div>
+          )}
           <div
             ref={carouselRef}
             className="esports-carousel-track"
@@ -233,6 +270,11 @@ export default function EsportsPage() {
                   <span className="tourney-game-badge">{t.game}</span>
                 </div>
 
+                {t.posterUrl && (
+                  <div className="tourney-poster-frame">
+                    <img src={t.posterUrl} alt={`${t.title} official poster`} className="tourney-poster-img" loading="lazy" />
+                  </div>
+                )}
                 <div className="tourney-body">
                   <div className="tourney-badge-sub" style={{ color: t.accent }}>
                     {t.badge}
@@ -263,7 +305,7 @@ export default function EsportsPage() {
                     onMouseEnter={() => sound.playBlip()}
                   >
                     <IconCrosshair size={16} />
-                    <span>REGISTER FOR TOURNAMENT</span>
+                    <span>{t.isDemo ? 'VIEW DEMO DETAILS' : t.status === 'CONCLUDED' ? 'VIEW TOURNAMENT DETAILS' : 'TOURNAMENT DETAILS & REGISTRATION'}</span>
                   </button>
                 </div>
               </article>
@@ -321,18 +363,24 @@ export default function EsportsPage() {
                 <p><strong>Partner:</strong> {selectedTournament?.partnerInfo}</p>
               </div>
               <p className="modal-instruction">
-                Squad check-ins and external registration forms are coordinated via our official channels:
+                {selectedTournament?.isDemo
+                  ? 'This is a fictional demonstration tournament. Registration is disabled and no prizes are offered.'
+                  : 'Squad check-ins and external registration forms are coordinated via our official channels:'}
               </p>
-              <div className="modal-links">
+              {selectedTournament?.posterUrl && (
+                <img src={selectedTournament.posterUrl} alt={`${selectedTournament.title} full poster`}
+                  className="tourney-modal-poster" />
+              )}
+              {!selectedTournament?.isDemo && <div className="modal-links">
                 <a
-                  href={ORG_INFO.whatsapp}
+                  href={selectedTournament?.registrationUrl || ORG_INFO.whatsapp}
                   target="_blank"
                   rel="noreferrer"
                   className="modal-action-btn whatsapp-btn"
                   onClick={() => sound.playSelect()}
                 >
                   <IconWhatsApp size={18} />
-                  <span>Register via Official WhatsApp</span>
+                  <span>{selectedTournament?.registrationUrl ? 'Open official registration' : 'Register via Official WhatsApp'}</span>
                 </a>
                 <a
                   href={ORG_INFO.instagram}
@@ -344,7 +392,7 @@ export default function EsportsPage() {
                   <IconInstagram size={18} />
                   <span>View Updates on Instagram (@nomadsprovince)</span>
                 </a>
-              </div>
+              </div>}
             </div>
           </div>
         </div>

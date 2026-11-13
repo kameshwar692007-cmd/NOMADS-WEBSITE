@@ -3,10 +3,10 @@
 // tournament winner podium, and external registration redirect.
 
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import GameShell from '../game/components/GameShell.jsx';
 import { ORG_INFO } from '../game/data/campusContent.js';
-import { eventService } from '../game/services/eventService.js';
+import { eventService, isTournamentListing } from '../game/services/eventService.js';
 import { sound } from '../game/systems/soundFx.js';
 import {
   IconMapPin,
@@ -83,6 +83,9 @@ export default function EventDetailPage() {
     );
   }
 
+  // Tournament records have a single public destination: Esports Arena.
+  if (isTournamentListing(event)) return <Navigate to="/esports" replace />;
+
   const isOngoing = event.computedStatus === 'ONGOING';
   const isConcluded = event.computedStatus === 'ENDED';
   const isUpcoming = event.computedStatus === 'UPCOMING';
@@ -116,7 +119,7 @@ export default function EventDetailPage() {
               <img
                 src={event.posterUrl || '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg'}
                 alt={event.title}
-                style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }}
+                style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'contain' }}
               />
               <div style={{
                 position: 'absolute',

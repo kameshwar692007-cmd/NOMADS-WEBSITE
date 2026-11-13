@@ -18,20 +18,16 @@ import {
   IconRocket,
   IconZap,
   IconTrophy,
-  IconShield
+  IconShield,
+  IconClose
 } from '../game/components/Icons.jsx';
 
 export default function AdminPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userRoleState, setUserRoleState] = useState({
-    role: 'SUPER_ADMIN',
-    email: 'admin@nomadsprovince.com',
-    isStaff: true,
-    isAdmin: true,
-    isSuperAdmin: true,
-    isSimulated: true
-  });
+  const [userRoleState, setUserRoleState] = useState(() => eventService.isCloudConnected()
+    ? { role: 'ANONYMOUS', email: null, isStaff: false, isAdmin: false, isSuperAdmin: false, isSimulated: false }
+    : { role: 'SUPER_ADMIN', email: 'admin@nomadsprovince.com', isStaff: true, isAdmin: true, isSuperAdmin: true, isSimulated: true });
   const [analyticsData, setAnalyticsData] = useState({});
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [activeAdminTab, setActiveAdminTab] = useState('EVENTS'); // 'EVENTS' | 'CONTACT'
@@ -64,6 +60,8 @@ export default function AdminPage() {
     registrationUrl: '',
     partner: "Nomad's Province",
     posterUrl: '',
+    listingType: 'EVENT',
+    gameTitle: '', matchFormat: '', prizePool: '', partnerInfo: '',
     description: '',
     statusMode: 'AUTO',
     manualStatus: 'UPCOMING',
@@ -160,13 +158,15 @@ export default function AdminPage() {
   });
 
   // Open creation modal
-  const handleOpenCreate = () => {
+  const handleOpenCreate = (listingType = 'EVENT') => {
     sound.playSelect();
     setEditingEvent(null);
     const now = new Date();
     const later = new Date(now.getTime() + 4 * 3600000);
     setFormData({
       title: '',
+      listingType,
+      gameTitle: '', matchFormat: '', prizePool: '', partnerInfo: '',
       category: 'Esports',
       venue: 'Chennai Campus / Online',
       startDate: now.toISOString().slice(0, 16),
@@ -174,7 +174,7 @@ export default function AdminPage() {
       registrationDeadline: '',
       registrationUrl: ORG_INFO.whatsapp || 'https://wa.me/919789720897',
       partner: "Nomad's Province",
-      posterUrl: '/assets/events-and-logos/img_1_2026-11-05_at_10.30.08_AM.jpeg',
+      posterUrl: '',
       description: '',
       statusMode: 'AUTO',
       manualStatus: 'UPCOMING',
@@ -199,6 +199,9 @@ export default function AdminPage() {
       registrationUrl: ev.registrationUrl || '',
       partner: ev.partner || '',
       posterUrl: ev.posterUrl || '',
+      listingType: ev.listingType || 'EVENT',
+      gameTitle: ev.gameTitle || '', matchFormat: ev.matchFormat || '',
+      prizePool: ev.prizePool || '', partnerInfo: ev.partnerInfo || '',
       description: ev.description || '',
       statusMode: ev.statusMode || 'AUTO',
       manualStatus: ev.manualStatus || 'UPCOMING',
@@ -214,6 +217,7 @@ export default function AdminPage() {
     e.preventDefault();
     setFormError('');
     setFormSuccess('');
+    if (uploadingPoster) { setFormError('Finish uploading the poster before saving.'); return; }
 
     try {
       if (editingEvent) {
@@ -343,6 +347,7 @@ export default function AdminPage() {
     if (!file) return;
 
     setUploadingPoster(true);
+    setFormError('');
     sound.playBlip();
     try {
       const url = await eventService.uploadPoster(file);
@@ -382,7 +387,7 @@ export default function AdminPage() {
 
           <h3 className="section-title" style={{ color: '#f8fafc', marginBottom: '8px' }}>INTERNAL ACCESS ONLY</h3>
           <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: '1.5', marginBottom: '24px' }}>
-            Sign in with your authorized Nomad's Province Super Admin credentials to access event management, tournament brackets, and telemetry.
+            Sign in with a verified Supabase staff account to manage events, tournaments, and poster uploads. Running SQL in the SQL Editor does not sign in your browser.
           </p>
 
           {loginError && (
@@ -423,7 +428,7 @@ export default function AdminPage() {
               {loggingIn ? 'VERIFYING CREDENTIALS...' : 'ACCESS COMMAND CENTER →'}
             </button>
 
-            {(typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) && (
+            {!eventService.isCloudConnected() && typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
               <button
                 type="button"
                 className="gamified-btn secondary"
@@ -433,7 +438,7 @@ export default function AdminPage() {
                   loadEventsAndRole();
                 }}
               >
-                👑 ENTER AS LOCAL SUPER ADMIN (DEV MODE)
+                <IconShield size={16} /> ENTER AS LOCAL SUPER ADMIN (DEV MODE)
               </button>
             )}
           </form>
@@ -474,7 +479,7 @@ export default function AdminPage() {
             <span className="role-box-label">GOVERNANCE LEVEL</span>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginTop: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '24px' }}>👑</span>
+                <IconShield size={24} color="#ffd700" />
                 <div>
                   <div style={{ fontWeight: 'bold', color: '#ffd700', fontSize: '14px', fontFamily: 'monospace' }}>
                     SUPER ADMIN (OWNER)
@@ -519,11 +524,11 @@ export default function AdminPage() {
           </div>
           <div className="admin-metric-card upcoming" onClick={() => setStatusFilter('UPCOMING')}>
             <span className="metric-val">{upcomingCount}</span>
-            <span className="metric-lbl">⚡ UPCOMING</span>
+            <span className="metric-lbl"><IconZap size={14} /> UPCOMING</span>
           </div>
           <div className="admin-metric-card ended" onClick={() => setStatusFilter('ENDED')}>
             <span className="metric-val">{endedCount}</span>
-            <span className="metric-lbl">✓ ENDED / ARCHIVE</span>
+            <span className="metric-lbl"><IconCheck size={14} /> ENDED / ARCHIVE</span>
           </div>
           <div className="admin-metric-card draft" onClick={() => setStatusFilter('DRAFTS')}>
             <span className="metric-val">{draftCount}</span>
@@ -535,6 +540,12 @@ export default function AdminPage() {
           </div>
         </div>
       </section>
+
+      {!eventService.isCloudConnected() && (
+        <p role="status" style={{margin:'10px 0 20px',padding:'12px 16px',border:'1px solid #f59e0b',borderRadius:8,color:'#ffdf93',background:'#2c220f'}}>
+          DEMO MODE: Supabase is not configured. Records and poster uploads remain in this browser only and are not publicly published.
+        </p>
+      )}
 
       {/* Primary Admin Section Tabs */}
       <div className="admin-section-tabs" style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
@@ -556,7 +567,7 @@ export default function AdminPage() {
           onClick={() => { sound.playSelect(); setActiveAdminTab('EVENTS'); }}
         >
           <IconEvents size={18} />
-          <span>🎮 TOURNAMENTS & EVENTS</span>
+          <span>TOURNAMENTS & EVENTS</span>
         </button>
 
         <button
@@ -577,7 +588,7 @@ export default function AdminPage() {
           onClick={() => { sound.playSelect(); setActiveAdminTab('CONTACT'); }}
         >
           <IconWhatsApp size={18} />
-          <span>📞 CONTACT & COMMS SETTINGS</span>
+          <span>CONTACT & COMMS SETTINGS</span>
         </button>
       </div>
 
@@ -604,13 +615,13 @@ export default function AdminPage() {
 
             {contactSuccess && (
               <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7', padding: '12px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', marginBottom: '20px' }}>
-                ✓ {contactSuccess}
+                <IconCheck size={14} /> {contactSuccess}
               </div>
             )}
 
             {contactError && (
               <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#fca5a5', padding: '12px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', marginBottom: '20px' }}>
-                ⚠ {contactError}
+                <IconShield size={14} /> {contactError}
               </div>
             )}
 
@@ -639,7 +650,7 @@ export default function AdminPage() {
                     rel="noreferrer"
                     style={{ fontSize: '12px', color: '#38bdf8', textDecoration: 'none', fontWeight: 'bold' }}
                   >
-                    Test WhatsApp Link ↗
+                    Test WhatsApp Link
                   </a>
                 </div>
               </div>
@@ -666,7 +677,7 @@ export default function AdminPage() {
                     href={`mailto:${contactSettings.email}`}
                     style={{ fontSize: '12px', color: '#38bdf8', textDecoration: 'none', fontWeight: 'bold' }}
                   >
-                    Test Mailto Link ↗
+                    Test Mailto Link
                   </a>
                 </div>
               </div>
@@ -712,7 +723,7 @@ export default function AdminPage() {
                     cursor: 'pointer'
                   }}
                 >
-                  {savingContact ? 'SYNCHRONIZING...' : '💾 SAVE CONTACT SETTINGS'}
+                  <><IconCheck size={16} /> {savingContact ? 'SYNCHRONIZING...' : 'SAVE CONTACT SETTINGS'}</>
                 </button>
 
                 <button
@@ -745,8 +756,8 @@ export default function AdminPage() {
           {[
             { id: 'ALL', label: 'ALL EVENTS' },
             { id: 'ONGOING', label: '● LIVE ONGOING' },
-            { id: 'UPCOMING', label: '⚡ UPCOMING' },
-            { id: 'ENDED', label: '✓ ENDED' },
+            { id: 'UPCOMING', label: 'UPCOMING' },
+            { id: 'ENDED', label: 'ENDED' },
             { id: 'DRAFTS', label: 'DRAFTS' }
           ].map((f) => (
             <button
@@ -772,9 +783,15 @@ export default function AdminPage() {
           )}
 
           {userRoleState.isStaff && (
-            <button className="gamified-btn create-event-btn" onClick={handleOpenCreate} onMouseEnter={() => sound.playBlip()}>
+            <button className="gamified-btn create-event-btn" onClick={() => handleOpenCreate('EVENT')} onMouseEnter={() => sound.playBlip()}>
               <IconRocket size={16} />
               <span>+ CREATE NEW EVENT</span>
+            </button>
+          )}
+          {userRoleState.isStaff && (
+            <button type="button" className="gamified-btn create-event-btn" onClick={() => handleOpenCreate('TOURNAMENT')} style={{background:'#274469',border:'1px solid #38bdf8'}}>
+              <IconCrosshair size={16} />
+              <span>+ CREATE TOURNAMENT</span>
             </button>
           )}
         </div>
@@ -833,6 +850,7 @@ export default function AdminPage() {
 
                     <td className="details-col">
                       <div className="table-event-title">{ev.title}</div>
+                      <span style={{fontSize:11,color:'#8dd9f7'}}>{ev.listingType === 'TOURNAMENT' ? 'TOURNAMENT · ESPORTS ARENA' : 'EVENT GROUNDS'}</span>
                       <div className="table-venue">
                         <IconMapPin size={12} color="#38bdf8" /> {ev.venue}
                       </div>
@@ -887,14 +905,14 @@ export default function AdminPage() {
                           title="Lock status to Concluded / Ended"
                           onClick={() => handleStatusChange(ev.id, 'ENDED')}
                         >
-                          ✓ End
+                          <IconCheck size={13} /> End
                         </button>
                         <button 
                           className="status-action-pill" 
                           title="Reset to Date-based Auto Calculation"
                           onClick={() => handleStatusChange(ev.id, 'AUTO')}
                         >
-                          ⚡ Auto
+                          <IconZap size={13} /> Auto
                         </button>
                       </div>
                     </td>
@@ -914,7 +932,7 @@ export default function AdminPage() {
                           onClick={() => handleOpenResults(ev)}
                           title="Record Winners & Tournament Results"
                         >
-                          🏆 Results
+                          <IconTrophy size={13} /> Results
                         </button>
 
                         <button 
@@ -929,9 +947,9 @@ export default function AdminPage() {
                           <button 
                             className="action-btn delete-btn" 
                             onClick={() => handleDelete(ev.id, ev.title)}
-                            title="Delete Event"
+                            title="Delete Event" aria-label="Delete event"
                           >
-                            ✕
+                            <IconClose size={14} />
                           </button>
                         )}
                       </div>
@@ -951,8 +969,8 @@ export default function AdminPage() {
         <div className="retro-modal-backdrop" onClick={() => setEditorOpen(false)}>
           <div className="retro-modal-card admin-form-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{editingEvent ? 'EDIT EVENT DETAILS' : 'CREATE NEW NOMAD EVENT'}</h3>
-              <button className="modal-close-btn" onClick={() => setEditorOpen(false)}>✕</button>
+              <h3>{editingEvent ? 'EDIT LISTING' : formData.listingType === 'TOURNAMENT' ? 'CREATE NEW TOURNAMENT' : 'CREATE NEW EVENT'}</h3>
+              <button className="modal-close-btn" aria-label="Close event editor" onClick={() => setEditorOpen(false)}><IconClose size={16} /></button>
             </div>
 
             <form onSubmit={handleSaveEvent} className="modal-body-form">
@@ -960,6 +978,30 @@ export default function AdminPage() {
               {formSuccess && <div className="admin-form-alert success">{formSuccess}</div>}
 
               <div className="form-grid-2">
+                <div className="form-group span-2">
+                  <label className="retro-label" htmlFor="listing-type">PUBLISH TO</label>
+                  <select id="listing-type" className="retro-input" value={formData.listingType}
+                    onChange={e => setFormData(prev => ({...prev, listingType:e.target.value, category:e.target.value==='TOURNAMENT'?'Esports':prev.category}))}>
+                    <option value="EVENT">Event Grounds (Event)</option>
+                    <option value="TOURNAMENT">Event Grounds + Esports Arena (Tournament)</option>
+                  </select>
+                </div>
+                {formData.listingType === 'TOURNAMENT' && (
+                  <>
+                    <div className="form-group"><label className="retro-label" htmlFor="admin-game-title">GAME TITLE</label>
+                      <input id="admin-game-title" className="retro-input" required maxLength={100} value={formData.gameTitle}
+                        placeholder="e.g. Free Fire Max" onChange={e=>setFormData({...formData,gameTitle:e.target.value})}/></div>
+                    <div className="form-group"><label className="retro-label" htmlFor="admin-match-format">MATCH FORMAT</label>
+                      <input id="admin-match-format" className="retro-input" value={formData.matchFormat} maxLength={160}
+                        placeholder="e.g. Battle Royale Squads" onChange={e=>setFormData({...formData,matchFormat:e.target.value})}/></div>
+                    <div className="form-group"><label className="retro-label" htmlFor="admin-prize-pool">AWARDS / PRIZE DETAILS</label>
+                      <input id="admin-prize-pool" className="retro-input" value={formData.prizePool} maxLength={160}
+                        placeholder="Only confirmed prizes" onChange={e=>setFormData({...formData,prizePool:e.target.value})}/></div>
+                    <div className="form-group"><label className="retro-label" htmlFor="admin-partner-info">PARTNER / COLLABORATION</label>
+                      <input id="admin-partner-info" className="retro-input" value={formData.partnerInfo} maxLength={180}
+                        placeholder="Verified partner information" onChange={e=>setFormData({...formData,partnerInfo:e.target.value})}/></div>
+                  </>
+                )}
                 <div className="form-group span-2">
                   <label className="retro-label">EVENT TITLE</label>
                   <input
@@ -1073,7 +1115,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="form-group span-2">
-                  <label className="retro-label">EVENT POSTER IMAGE (Upload or URL)</label>
+                  <label className="retro-label">EVENT / TOURNAMENT POSTER — ORIGINAL ASPECT RATIO</label>
                   <div className="poster-upload-row">
                     <input
                       type="file"
@@ -1092,9 +1134,10 @@ export default function AdminPage() {
                     value={formData.posterUrl}
                     onChange={(e) => setFormData({ ...formData, posterUrl: e.target.value })}
                   />
+                  <small style={{color:'#a6bdd5'}}>JPG, PNG, WebP or GIF · max 5 MB. Full poster displayed without cropping or stretching.</small>
                   {formData.posterUrl && (
-                    <div className="poster-preview-box">
-                      <img src={formData.posterUrl} alt="Poster Preview" className="poster-preview-img" />
+                    <div className="poster-preview-box poster-preview-original">
+                      <img src={formData.posterUrl} alt="Poster Preview" className="poster-preview-img" style={{objectFit:'contain',width:'100%',height:'auto',maxHeight:'400px'}} />
                     </div>
                   )}
                 </div>
@@ -1126,8 +1169,8 @@ export default function AdminPage() {
                 <button type="button" className="gamified-btn cancel-btn" onClick={() => setEditorOpen(false)}>
                   CANCEL
                 </button>
-                <button type="submit" className="gamified-btn save-btn">
-                  {editingEvent ? 'UPDATE EVENT' : 'REGISTER EVENT'}
+                <button type="submit" className="gamified-btn save-btn" disabled={uploadingPoster}>
+                  {uploadingPoster ? 'UPLOADING POSTER…' : editingEvent ? 'UPDATE LISTING' : 'PUBLISH LISTING'}
                 </button>
               </div>
             </form>
@@ -1141,12 +1184,12 @@ export default function AdminPage() {
           <div className="retro-modal-card results-form-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>RECORD TOURNAMENT RESULTS — {selectedForResults.title}</h3>
-              <button className="modal-close-btn" onClick={() => setResultsModalOpen(false)}>✕</button>
+              <button className="modal-close-btn" aria-label="Close results editor" onClick={() => setResultsModalOpen(false)}><IconClose size={16} /></button>
             </div>
 
             <form onSubmit={handleSaveResults} className="modal-body-form">
               <div className="form-group">
-                <label className="retro-label">🥇 1ST PLACE / CHAMPION</label>
+                <label className="retro-label"><IconTrophy size={15} /> 1ST PLACE / CHAMPION</label>
                 <input
                   type="text"
                   placeholder="e.g. Team Phoenix or SRM Elite"
@@ -1157,7 +1200,7 @@ export default function AdminPage() {
               </div>
 
               <div className="form-group">
-                <label className="retro-label">🥈 2ND PLACE / RUNNER-UP</label>
+                <label className="retro-label"><IconTrophy size={15} /> 2ND PLACE / RUNNER-UP</label>
                 <input
                   type="text"
                   placeholder="e.g. Hyperion Gaming"
@@ -1197,7 +1240,7 @@ export default function AdminPage() {
           <div className="retro-modal-card admin-form-modal" style={{ maxWidth: '850px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>SECURITY AUDIT TRAIL (IMMUTABLE DATABASE LOGS)</h3>
-              <button className="modal-close-btn" onClick={() => setAuditModalOpen(false)}>✕</button>
+              <button className="modal-close-btn" aria-label="Close audit trail" onClick={() => setAuditModalOpen(false)}><IconClose size={16} /></button>
             </div>
 
             <div className="modal-body-form" style={{ maxHeight: 'min(60vh, 480px)', padding: '16px 20px' }}>
