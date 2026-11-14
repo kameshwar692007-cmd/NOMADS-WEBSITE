@@ -71,3 +71,47 @@
  .studio-project-meta{padding:10px 12px 0}
  .studio-project-grid .project-banner-img{max-height:260px}
 }
+
+/* Card content spacing: explicit separation prevents description text from touching CTAs.
+   Natural card height on mobile avoids dead space introduced by equal-height flex cards. */
+.studio-project-grid{align-items:start}
+.studio-project-grid>.project-card{align-self:start;height:auto;min-height:0}
+.studio-project-grid .project-body{
+  flex:0 1 auto;display:flex;flex-direction:column;min-width:0;
+  padding:clamp(16px,2.5vw,22px);
+}
+.studio-project-grid .project-title{
+  margin:0 0 8px;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+}
+.studio-project-grid .project-genre{
+  line-height:1.55;
+  margin-bottom:14px;
+  overflow-wrap:anywhere;
+}
+.studio-project-grid .project-desc{
+  flex:none;
+  line-height:1.75;
+  margin:0 0 20px;
+  overflow-wrap:anywhere;
+}
+.studio-project-grid .studio-project-expand{
+  flex:none;
+  margin-top:0;
+  min-height:48px;
+  padding:12px 16px;
+  position:relative;
+}
+.studio-project-grid .studio-project-detail{
+  margin-top:16px;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+@media(max-width:600px){
+ .studio-project-grid{align-items:start}
+ .studio-project-grid>.project-card{align-self:start}
+ .studio-project-grid .project-body{padding:18px 16px 20px}
+ .studio-project-grid .project-desc{margin-bottom:22px}
+ .studio-project-grid .studio-project-expand{min-height:50px}
+}

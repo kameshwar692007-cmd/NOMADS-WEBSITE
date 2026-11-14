@@ -66,3 +66,18 @@
 .events-search-panel{margin:18px 0 15px;padding:15px 18px}
 .events-visitor-notes{margin-top:20px}
 @media(max-width:650px){.events-grid .event-poster-img{max-height:245px}.events-grid .event-card-body{padding:14px}.events-search-panel{padding:14px}}
+
+/* Event cards: keep summary and actions visually separated at every viewport. */
+.events-grid{align-items:start;gap:clamp(14px,2.3vw,22px)}
+.events-grid .event-card{height:auto;align-self:start;min-width:0}
+.events-grid .event-card-body{min-width:0;display:flex;flex-direction:column;gap:0}
+.events-grid .event-card-title{line-height:1.4;margin-bottom:12px;overflow-wrap:anywhere}
+.events-grid .event-meta-row{flex-wrap:wrap;gap:7px 12px}
+.events-grid .event-card-desc{line-height:1.7;margin:14px 0 0;overflow-wrap:anywhere}
+.events-grid .event-card-action{margin-top:20px!important;gap:10px!important;flex-wrap:wrap}
+.events-grid .event-card-action>*{flex:1 1 120px;min-width:0;min-height:46px}
+@media(max-width:600px){
+ .events-grid .event-card-desc{margin-top:14px}
+ .events-grid .event-card-action{margin-top:22px!important}
+ .events-grid .event-card-body{padding:18px 16px 20px}
+}
