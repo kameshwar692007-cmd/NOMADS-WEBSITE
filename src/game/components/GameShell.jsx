@@ -114,20 +114,16 @@ export default function GameShell({ title, subtitle, accentColor = '#e84537', ch
     sound.playWarp();
     setWarping(true);
     setMobileMenuOpen(false);
-    setTimeout(() => {
-      navigate(targetPath);
-      setWarping(false);
-    }, 240);
+    navigate(targetPath);
+    setWarping(false);
   };
 
   const handleReturnToCampus = () => {
     sound.playWarp();
     setWarping(true);
     setMobileMenuOpen(false);
-    setTimeout(() => {
-      navigate('/');
-      setWarping(false);
-    }, 240);
+    navigate('/');
+    setWarping(false);
   };
 
   const toggleAudio = () => {
