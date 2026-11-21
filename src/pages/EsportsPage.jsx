@@ -152,26 +152,24 @@ export default function EsportsPage() {
       subtitle="Tournament Operations, Collegiate Circuits & Competitive Showdowns"
       accentColor="#ff4444"
     >
-      {/* 1. Concise Professional Headline Banner */}
-      <section className="gamified-card esports-hero-card">
-        <div className="esports-header-meta">
-          <span className="esports-status-pill">
-            <span className="esports-live-dot" />
-            ESPORTS TOURNAMENTS
-          </span>
-          <span className="esports-badge-kicker">NOMAD'S PROVINCE ESPORTS</span>
+      {/* Tournament-first visual hero: no duplicate oversized page introduction. */}
+      <section className="arena-revamp-hero" aria-label="Esports Arena overview">
+        <div className="arena-revamp-copy">
+          <span className="arena-revamp-eyebrow"><span className="arena-revamp-pulse" /> NOMAD'S PROVINCE / COMPETITIVE</span>
+          <h2>THE ARENA <em>IS YOURS.</em></h2>
+          <p>Discover competitive circuits, find your next tournament and enter the game.</p>
+          <a className="arena-revamp-link" href="#esports-circuits-heading">Explore tournaments <span aria-hidden="true">↗</span></a>
         </div>
-        <h2 className="esports-hero-title">Structured Esports & Collegiate Tournaments</h2>
-        <p className="esports-hero-desc">
-          Nomad's Province organizes structured tournaments, private collegiate scrims, and community showdowns 
-          across India's top competitive mobile and PC titles. Browse active circuits below to view match formats and register.
-        </p>
+        <div className="arena-revamp-metrics" aria-label="Tournament overview">
+          <div><strong>{allTournaments.length}</strong><span>Published circuits</span></div>
+          <div><strong>{gameFilters.length}</strong><span>Game titles</span></div>
+        </div>
       </section>
 
       {/* 2. Interactive Game Filters & Circuit Carousel */}
       <section className="esports-circuits-section" aria-labelledby="esports-circuits-heading">
         <div className="section-title-wrap">
-          <h3 id="esports-circuits-heading" className="section-title">FEATURED TOURNAMENT CIRCUITS</h3>
+          <h3 id="esports-circuits-heading" className="section-title">TOURNAMENTS <span className="arena-revamp-heading-accent">/ THE CIRCUIT</span></h3>
           <span className="section-badge">PUBLISHED TOURNAMENTS</span>
         </div>
 
