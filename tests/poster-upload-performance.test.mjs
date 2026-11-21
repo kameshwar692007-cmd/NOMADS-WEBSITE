@@ -22,7 +22,7 @@ test('Both upload services optimize before Supabase upload and preserve accurate
   assert.ok(source.includes('await optimizePosterUpload(file)'),path);
   assert.ok(source.includes('contentType: optimized.type'),path);
   assert.ok(source.includes("cacheControl: '31536000'"),path);
-  assert.ok(source.includes('optimized.size > 5'),path);
+  assert.match(source,/optimized\.size\s*>\s*5\s*\*/);
  }
 });
 test('Vercel cache policy targets only static assets, not HTML or API data',()=>{
