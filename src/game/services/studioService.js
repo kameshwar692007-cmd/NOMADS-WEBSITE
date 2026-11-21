@@ -1,3 +1,4 @@
+import { optimizePosterUpload } from '../../lib/optimizePosterUpload.js';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase.js';
 import { STUDIO_PROJECTS } from '../data/campusContent.js';
 
@@ -98,15 +99,17 @@ export const studioService = {
     localWrite(records.filter(item=>item.id!==id));
   },
   async uploadPoster(file) {
-    if(!file || !allowedTypes.has(file.type) || file.size > 5*1024*1024 || file.size===0)
+    if(!file || !allowedTypes.has(file.type) || file.size===0)
       throw new Error('Choose a JPEG, PNG, WebP or GIF poster under 5 MB.');
     await ensureStaff();
     if (!isSupabaseConfigured || !supabase)
       throw new Error('Poster upload needs Supabase. Local demo mode cannot upload media.');
-    const extension={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'}[file.type];
+    const optimized = await optimizePosterUpload(file);
+    if (optimized.size > 5*1024*1024) throw new Error('Poster exceeds 5 MB after optimization.');
+    const extension={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'}[optimized.type];
     const path='projects/'+crypto.randomUUID()+'.'+extension;
-    const {error}=await supabase.storage.from('studio-posters').upload(path,file,{
-      contentType:file.type,upsert:false,cacheControl:'3600'
+    const {error}=await supabase.storage.from('studio-posters').upload(path,optimized,{
+      contentType:optimized.type,upsert:false,cacheControl:'31536000'
     });
     if(error) throw new Error('Studio poster upload failed: '+error.message);
     const {data}=supabase.storage.from('studio-posters').getPublicUrl(path);
