@@ -833,7 +833,7 @@ export const eventService = {
 
     const optimized = await optimizePosterUpload(file);
     if (optimized.size > 5 * 1024 * 1024) {
-      throw new Error('File exceeds 5MB even after WebP optimization.');
+      throw new Error('File exceeds 5MB size limit even after WebP optimization.');
     }
 
     if (isSupabaseConfigured && supabase) {
