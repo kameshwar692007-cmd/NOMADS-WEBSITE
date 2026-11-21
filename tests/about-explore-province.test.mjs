@@ -39,7 +39,9 @@ test('slider auto-advances and supports navigation, pause and reduced motion', (
   assert.ok(slider.includes('visibilitychange'));
   assert.ok(slider.includes('aria-label="Previous destination"'));
   assert.ok(slider.includes('aria-label="Next destination"'));
-  assert.ok(!slider.includes('province-slider-pause'));
+  assert.ok(slider.includes('className="province-slider-pause"'));
+  assert.ok(slider.includes('aria-pressed={paused}'));
+  assert.ok(slider.includes('hovered || focused || paused || reducedMotion'));
   assert.ok(slider.includes('<NpcPortrait portraitIndex={npc.portraitIndex}'));
 });
 
