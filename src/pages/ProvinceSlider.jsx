@@ -10,8 +10,9 @@ export default function ProvinceSlider({ destinations }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [pageVisible, setPageVisible] = useState(() => !document.hidden);
+  const [pageVisible, setPageVisible] = useState(() => typeof document === 'undefined' || !document.hidden);
 
   useEffect(() => {
     const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -32,12 +33,12 @@ export default function ProvinceSlider({ destinations }) {
 
   // Always scrolls automatically across destinations
   useEffect(() => {
-    if (!pageVisible || count < 2) return;
+    if (!pageVisible || hovered || focused || paused || reducedMotion || count < 2) return;
     const timer = window.setInterval(() => {
       setActiveIndex(index => (index + 1) % count);
     }, SLIDE_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [pageVisible, count]);
+  }, [pageVisible, count, hovered, focused, paused, reducedMotion]);
 
   if (!count) return null;
 
@@ -100,6 +101,10 @@ export default function ProvinceSlider({ destinations }) {
         <button type="button" className="province-slider-arrow"
           onClick={() => goTo(activeIndex + 1)}
           aria-label="Next destination">→</button>
+        <button type="button" className="province-slider-pause"
+          onClick={() => setPaused(value => !value)}
+          aria-label={paused ? 'Resume automatic destination slides' : 'Pause automatic destination slides'}
+          aria-pressed={paused}>{paused ? 'Play' : 'Pause'}</button>
       </div>
     </div>
   );
