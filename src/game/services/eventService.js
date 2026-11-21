@@ -1,3 +1,4 @@
+import { optimizePosterUpload } from '../../lib/optimizePosterUpload.js';
 // Nomad's Province — Universal Event & Security Service
 // Dual-mode integration: Supabase PostgreSQL with verified RBAC + Resilient Fallback
 // Provides input validation, status_mode vs computed status separation, slug generation,
@@ -830,8 +831,9 @@ export const eventService = {
       throw new Error('Invalid file format. Only JPG, PNG, WebP, and GIF images are allowed.');
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      throw new Error('File exceeds 5MB size limit.');
+    const optimized = await optimizePosterUpload(file);
+    if (optimized.size > 5 * 1024 * 1024) {
+      throw new Error('File exceeds 5MB even after WebP optimization.');
     }
 
     if (isSupabaseConfigured && supabase) {
@@ -862,7 +864,7 @@ export const eventService = {
         throw new Error('This Supabase account is not an authorized staff member. Add its auth user ID to public.admin_users with an appropriate role.');
       }
 
-      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+      const fileExt = optimized.name.split('.').pop()?.toLowerCase() || 'webp';
       const safeId = (typeof crypto !== 'undefined' && crypto.randomUUID)
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random().toString(36).substring(2)}`;
@@ -871,7 +873,7 @@ export const eventService = {
       try {
         ({ error: uploadError } = await supabase.storage
           .from('event-posters')
-          .upload(filePath, file, { cacheControl: '3600', upsert: false, contentType: file.type }));
+          .upload(filePath, optimized, { cacheControl: '31536000', upsert: false, contentType: optimized.type }));
       } catch (error) {
         throw new Error(`Poster upload request failed: ${error.message || 'network error'}. Check Supabase connection and browser console.`);
       }
