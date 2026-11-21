@@ -96,7 +96,7 @@ export default function StudioPage() {
             onMouseEnter={() => sound.playBlip()}
           >
             <div className="project-banner-wrap">
-              {proj.image ? <img src={proj.image} alt={proj.title} className="project-banner-img" /> : <div className="studio-no-poster">Artwork coming soon</div>}
+              {proj.image ? <img src={proj.image} alt={proj.title} className="project-banner-img" loading="lazy" decoding="async" /> : <div className="studio-no-poster">Artwork coming soon</div>}
             </div>
             <div className="studio-project-meta">
               <span className="studio-project-status" style={{ borderColor: proj.accent }}>{proj.status}</span>

@@ -165,7 +165,7 @@ export default function EventsPage() {
               onMouseEnter={() => sound.playBlip()}
             >
               <div className="event-poster-frame">
-                <img src={ev.posterUrl} alt={ev.title} className="event-poster-img" />
+                <img src={ev.posterUrl} alt={ev.title} className="event-poster-img" loading="lazy" decoding="async" />
               </div>
 
               <div className="event-card-body">
@@ -233,7 +233,7 @@ export default function EventsPage() {
 
             <div className="event-detail-body">
               {selectedEvent.posterUrl && <div className="detail-poster-wrap">
-                <img src={selectedEvent.posterUrl} alt={selectedEvent.title} className="detail-poster-img" />
+                <img src={selectedEvent.posterUrl} alt={selectedEvent.title} className="detail-poster-img" decoding="async" />
               </div>}
 
               <div className="detail-content-wrap">

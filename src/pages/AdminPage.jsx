@@ -853,7 +853,7 @@ export default function AdminPage() {
                   <tr key={ev.id} className={`event-row ${ev.isDraft ? 'row-draft' : ''}`}>
                     <td className="poster-col">
                       <div className="table-poster-wrap">
-                        <img src={ev.posterUrl} alt={ev.title} className="table-poster-thumb" />
+                        <img src={ev.posterUrl} alt={ev.title} className="table-poster-thumb" loading="lazy" decoding="async" />
                         {ev.isDraft && <span className="table-draft-tag">DRAFT</span>}
                       </div>
                     </td>
@@ -1147,7 +1147,7 @@ export default function AdminPage() {
                   <small style={{color:'#a6bdd5'}}>JPG, PNG, WebP or GIF · max 5 MB. Full poster displayed without cropping or stretching.</small>
                   {formData.posterUrl && (
                     <div className="poster-preview-box poster-preview-original">
-                      <img src={formData.posterUrl} alt="Poster Preview" className="poster-preview-img" style={{objectFit:'contain',width:'100%',height:'auto',maxHeight:'400px'}} />
+                      <img src={formData.posterUrl} alt="Poster Preview" decoding="async" className="poster-preview-img" style={{objectFit:'contain',width:'100%',height:'auto',maxHeight:'400px'}} />
                     </div>
                   )}
                 </div>

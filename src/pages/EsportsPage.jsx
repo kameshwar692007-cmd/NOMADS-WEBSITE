@@ -272,7 +272,7 @@ export default function EsportsPage() {
 
                 {t.posterUrl && (
                   <div className="tourney-poster-frame">
-                    <img src={t.posterUrl} alt={`${t.title} official poster`} className="tourney-poster-img" loading="lazy" />
+                    <img src={t.posterUrl} alt={`${t.title} official poster`} className="tourney-poster-img" loading="lazy" decoding="async" />
                   </div>
                 )}
                 <div className="tourney-body">
@@ -368,7 +368,7 @@ export default function EsportsPage() {
                   : 'Squad check-ins and external registration forms are coordinated via our official channels:'}
               </p>
               {selectedTournament?.posterUrl && (
-                <img src={selectedTournament.posterUrl} alt={`${selectedTournament.title} full poster`}
+                <img src={selectedTournament.posterUrl} alt={`${selectedTournament.title} full poster`} decoding="async"
                   className="tourney-modal-poster" />
               )}
               {!selectedTournament?.isDemo && <div className="modal-links">
