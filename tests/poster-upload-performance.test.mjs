@@ -20,8 +20,8 @@ test('Both upload services optimize before Supabase upload and preserve accurate
  for(const path of ['src/game/services/eventService.js','src/game/services/studioService.js']){
   const source=read(path);
   assert.ok(source.includes('await optimizePosterUpload(file)'),path);
-  assert.ok(source.includes('contentType: optimized.type'),path);
-  assert.ok(source.includes("cacheControl: '31536000'"),path);
+  assert.match(source,/contentType:\s*optimized\.type/,path);
+  assert.match(source,/cacheControl:\s*'31536000'/,path);
   assert.match(source,/optimized\.size\s*>\s*5\s*\*/);
  }
 });
