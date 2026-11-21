@@ -891,7 +891,7 @@ export const eventService = {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
       reader.onerror = (err) => reject(err);
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(optimized);
     });
   },
 
